@@ -1,0 +1,27 @@
+/* phoenix/app/static/css/user/profile.css */
+.profile-container {
+    max-width: 500px;
+    margin: 2em auto;
+    padding: 2em;
+    background: #f4f7fb;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    text-align: center;
+}
+.profile-container .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1em;
+}
+.profile-container h2 {
+    color: #0078d4;
+    margin-bottom: 0.5em;
+}
+.profile-container p {
+    margin: 0.5em 0;
+}
+.profile-container .btn {
+    margin-top: 1em;
+}

@@ -1,0 +1,41 @@
+/* phoenix/app/static/css/admin/backend_control.css */
+.backend-control-container {
+    max-width: 700px;
+    margin: 2em auto;
+    padding: 2em;
+    background: #f4f7fb;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.backend-control-container h2 {
+    color: #0078d4;
+    margin-bottom: 1em;
+}
+.backend-control-container form {
+    display: flex;
+    gap: 1em;
+    margin-bottom: 1em;
+}
+.backend-control-container input[type="text"] {
+    flex: 1;
+}
+.backend-control-container button {
+    background: #0078d4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.backend-control-container button:hover {
+    background: #005fa3;
+}
+.backend-control-container ul {
+    list-style: none;
+    padding: 0;
+}
+.backend-control-container ul li {
+    margin-bottom: 0.7em;
+}

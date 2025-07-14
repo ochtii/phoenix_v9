@@ -1,0 +1,29 @@
+{# phoenix/app/templates/messages/conversation.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages/conversation.css') }}">
+{% endblock %}
+{% block content %}
+<div class="conversation-container">
+    <h2>Conversation</h2>
+    <ul class="messages-list">
+        {% for message in messages %}
+            <li class="{% if message.sender_uid == session.get('user_id') %}sent{% else %}received{% endif %}">
+                <span class="msg-content">{{ message.content }}</span>
+                <span class="msg-meta">{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+            </li>
+        {% else %}
+            <li>No messages yet.</li>
+        {% endfor %}
+    </ul>
+    <form method="POST" action="{{ url_for('messages.conversation', user_id=user_id) }}">
+        <textarea name="content" required placeholder="Type your message..."></textarea>
+        <button type="submit">Send</button>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/messages/conversation.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,20 @@
+/* phoenix/app/static/css/messages/inbox.css */
+.inbox-container {
+    max-width: 600px;
+    margin: 2em auto;
+    padding: 2em;
+    background: #f4f7fb;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.inbox-container h2 {
+    color: #0078d4;
+    margin-bottom: 1em;
+}
+.inbox-container ul {
+    list-style: none;
+    padding: 0;
+}
+.inbox-container ul li {
+    margin-bottom: 0.7em;
+}

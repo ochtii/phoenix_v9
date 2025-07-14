@@ -1,0 +1,38 @@
+/* phoenix/app/static/css/user/login.css */
+.login-container {
+    max-width: 400px;
+    margin: 3em auto;
+    padding: 2em;
+    background: #f4f7fb;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.login-container h2 {
+    margin-bottom: 1em;
+    color: #0078d4;
+}
+.login-container form {
+    display: flex;
+    flex-direction: column;
+}
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    margin-bottom: 1em;
+}
+.login-container button {
+    background: #0078d4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.7em;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.login-container button:hover {
+    background: #005fa3;
+}
+.login-container p {
+    margin-top: 1em;
+    text-align: center;
+}

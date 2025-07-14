@@ -1,0 +1,23 @@
+/* phoenix/app/static/css/projects/project_view.css */
+.project-view-container {
+    max-width: 700px;
+    margin: 2em auto;
+    padding: 2em;
+    background: #f4f7fb;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.project-view-container h2 {
+    color: #0078d4;
+    margin-bottom: 1em;
+}
+.project-view-container ul {
+    list-style: none;
+    padding: 0;
+}
+.project-view-container ul li {
+    margin-bottom: 0.7em;
+}
+.project-view-container .btn {
+    margin-top: 1em;
+}

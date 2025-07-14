@@ -1,0 +1,22 @@
+{# phoenix/app/templates/base.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Phoenix{% endblock %}</title>
+    {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% endblock %}
+</head>
+<body>
+    {% include 'components/header.html' %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'components/footer.html' %}
+    {% block scripts %}
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    {% endblock %}
+</body>
+</html>

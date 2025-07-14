@@ -1,0 +1,27 @@
+{# phoenix/app/templates/discover/explore.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/discover/explore.css') }}">
+{% endblock %}
+{% block content %}
+<div class="explore-container">
+    <h2>Discover Public Projects</h2>
+    <ul>
+        {% for project in projects %}
+            <li>
+                <strong>{{ project.title }}</strong> - {{ project.description }}
+                <form method="POST" action="{{ url_for('discover.join_public_project', project_id=project.project_id) }}" style="display:inline;">
+                    <button type="submit">Join</button>
+                </form>
+            </li>
+        {% else %}
+            <li>No public projects found.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/discover/explore.js') }}"></script>
+{% endblock %}

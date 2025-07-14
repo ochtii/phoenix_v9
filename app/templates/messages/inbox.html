@@ -1,0 +1,26 @@
+{# phoenix/app/templates/messages/inbox.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages/inbox.css') }}">
+{% endblock %}
+{% block content %}
+<div class="inbox-container">
+    <h2>Inbox</h2>
+    <ul>
+        {% for user_id, conv in conversations.items() %}
+            <li>
+                <a href="{{ url_for('messages.conversation', user_id=user_id) }}">
+                    Conversation with {{ user_id }} ({{ conv|length }} messages)
+                </a>
+            </li>
+        {% else %}
+            <li>No conversations found.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/messages/inbox.js') }}"></script>
+{% endblock %}

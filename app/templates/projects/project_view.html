@@ -1,0 +1,31 @@
+{# phoenix/app/templates/projects/project_view.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/project_view.css') }}">
+{% endblock %}
+{% block content %}
+<div class="project-view-container">
+    {% if project %}
+        <h2>{{ project.title }}</h2>
+        <p><strong>Description:</strong> {{ project.description }}</p>
+        <p><strong>Status:</strong> {{ project.status }}</p>
+        <p><strong>Members:</strong> {{ project.members|length }}</p>
+        <form method="POST" action="{{ url_for('projects.invite_to_project', project_id=project.project_id) }}">
+            <button type="submit">Invite Friend</button>
+        </form>
+    {% else %}
+        <h2>Your Projects</h2>
+        <ul>
+            {% for p in projects %}
+                <li><a href="{{ url_for('projects.project_details', project_id=p.project_id) }}">{{ p.title }}</a></li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('projects.new_project') }}" class="btn">Create New Project</a>
+    {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/projects/project_view.js') }}"></script>
+{% endblock %}

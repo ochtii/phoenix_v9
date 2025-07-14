@@ -1,0 +1,20 @@
+/* phoenix/app/static/css/admin/dashboard.css */
+.admin-dashboard-container {
+    max-width: 700px;
+    margin: 2em auto;
+    padding: 2em;
+    background: #f4f7fb;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.admin-dashboard-container h2 {
+    color: #0078d4;
+    margin-bottom: 1em;
+}
+.admin-dashboard-container ul {
+    list-style: none;
+    padding: 0;
+}
+.admin-dashboard-container ul li {
+    margin-bottom: 0.7em;
+}

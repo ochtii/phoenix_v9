@@ -1,0 +1,25 @@
+{# phoenix/app/templates/projects/project_settings.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/project_settings.css') }}">
+{% endblock %}
+{% block content %}
+<div class="project-settings-container">
+    <h2>Create New Project</h2>
+    <form method="POST" action="{{ url_for('projects.new_project') }}">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <label for="is_public">
+            <input type="checkbox" id="is_public" name="is_public"> Public Project
+        </label>
+        <button type="submit">Create Project</button>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/projects/project_settings.js') }}"></script>
+{% endblock %}

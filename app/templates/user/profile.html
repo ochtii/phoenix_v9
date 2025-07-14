@@ -1,0 +1,28 @@
+{# phoenix/app/templates/user/profile.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user/profile.css') }}">
+{% endblock %}
+{% block content %}
+<div class="profile-container">
+    <h2>{{ user.username }}'s Profile</h2>
+    <img src="{{ user.profile_data.avatar_url or url_for('static', filename='img/default_avatar.png') }}" alt="Avatar" class="avatar">
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>About me:</strong> {{ user.profile_data.about_me }}</p>
+    <p><strong>Location:</strong> {{ user.profile_data.location }}</p>
+    <p><strong>Website:</strong> <a href="{{ user.profile_data.website }}" target="_blank">{{ user.profile_data.website }}</a></p>
+    <p><strong>Social Links:</strong>
+        {% for name, link in user.profile_data.social_links.items() %}
+            <a href="{{ link }}" target="_blank">{{ name }}</a>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    {% if session.get('user_id') == user.uid %}
+        <a href="{{ url_for('user.edit_profile') }}" class="btn">Edit Profile</a>
+    {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/user/profile.js') }}"></script>
+{% endblock %}

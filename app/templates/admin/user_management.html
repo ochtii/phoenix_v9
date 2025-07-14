@@ -1,0 +1,40 @@
+{# phoenix/app/templates/admin/user_management.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/user_management.css') }}">
+{% endblock %}
+{% block content %}
+<div class="user-management-container">
+    <h2>User Management</h2>
+    <table>
+        <thead>
+            <tr><th>Username</th><th>Email</th><th>Role</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.edit_user_role', user_id=user.uid) }}">
+                        <select name="role">
+                            <option value="User" {% if user.role == 'User' %}selected{% endif %}>User</option>
+                            <option value="Moderator" {% if user.role == 'Moderator' %}selected{% endif %}>Moderator</option>
+                            <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Admin</option>
+                            <option value="Webmaster" {% if user.role == 'Webmaster' %}selected{% endif %}>Webmaster</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/admin/user_management.js') }}"></script>
+{% endblock %}

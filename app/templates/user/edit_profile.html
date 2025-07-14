@@ -1,0 +1,24 @@
+{# phoenix/app/templates/user/edit_profile.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user/edit_profile.css') }}">
+{% endblock %}
+{% block content %}
+<div class="edit-profile-container">
+    <h2>Edit Profile</h2>
+    <form method="POST" action="{{ url_for('user.edit_profile') }}">
+        <label for="about_me">About Me:</label>
+        <textarea id="about_me" name="about_me">{{ user.profile_data.about_me }}</textarea>
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" value="{{ user.profile_data.location }}">
+        <label for="website">Website:</label>
+        <input type="url" id="website" name="website" value="{{ user.profile_data.website }}">
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/user/edit_profile.js') }}"></script>
+{% endblock %}

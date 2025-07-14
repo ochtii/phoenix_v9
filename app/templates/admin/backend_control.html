@@ -1,0 +1,24 @@
+{# phoenix/app/templates/admin/backend_control.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/backend_control.css') }}">
+{% endblock %}
+{% block content %}
+<div class="backend-control-container">
+    <h2>Backend Control</h2>
+    <form method="POST" action="{{ url_for('admin.backend_control') }}">
+        <input type="text" name="action" placeholder="Enter action...">
+        <button type="submit">Execute</button>
+    </form>
+    <ul>
+        {% for log in logs %}
+            <li>{{ log }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/admin/backend_control.js') }}"></script>
+{% endblock %}

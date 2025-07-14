@@ -1,0 +1,4 @@
+# requirements.txt
+Flask>=2.2.0
+python-dotenv>=1.0.0
+Werkzeug>=2.2.0

@@ -1,0 +1,20 @@
+{# phoenix/app/templates/components/header.html #}
+<header>
+    <nav class="navbar">
+        <a href="/" class="logo">Phoenix</a>
+        <ul class="nav-links">
+            <li><a href="/discover">Discover</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/messages">Messages</a></li>
+            <li><a href="/support/tickets">Support</a></li>
+            <li><a href="/admin/dashboard">Admin</a></li>
+            {% if session.get('user_id') %}
+                <li><a href="/profile/{{ session.get('username') }}">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>

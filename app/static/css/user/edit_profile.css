@@ -1,0 +1,35 @@
+/* phoenix/app/static/css/user/edit_profile.css */
+.edit-profile-container {
+    max-width: 500px;
+    margin: 2em auto;
+    padding: 2em;
+    background: #f4f7fb;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.edit-profile-container h2 {
+    color: #0078d4;
+    margin-bottom: 1em;
+}
+.edit-profile-container form {
+    display: flex;
+    flex-direction: column;
+}
+.edit-profile-container textarea,
+.edit-profile-container input[type="text"],
+.edit-profile-container input[type="url"] {
+    margin-bottom: 1em;
+}
+.edit-profile-container button {
+    background: #0078d4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.7em;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.edit-profile-container button:hover {
+    background: #005fa3;
+}

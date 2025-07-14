@@ -1,0 +1,28 @@
+{# phoenix/app/templates/support/view_ticket.html #}
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/support/view_ticket.css') }}">
+{% endblock %}
+{% block content %}
+<div class="view-ticket-container">
+    {% if ticket %}
+        <h2>Ticket: {{ ticket.title }}</h2>
+        <p><strong>Status:</strong> {{ ticket.status }}</p>
+        <p><strong>Description:</strong> {{ ticket.description }}</p>
+        <p><strong>Assigned Moderator:</strong> {{ ticket.assigned_moderator_uid or 'Unassigned' }}</p>
+    {% else %}
+        <h2>Your Support Tickets</h2>
+        <ul>
+            {% for t in tickets %}
+                <li><a href="{{ url_for('support.ticket_details', ticket_id=t.ticket_id) }}">{{ t.title }} ({{ t.status }})</a></li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('support.new_ticket') }}" class="btn">Create New Ticket</a>
+    {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/support/view_ticket.js') }}"></script>
+{% endblock %}
