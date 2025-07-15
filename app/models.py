@@ -50,6 +50,14 @@ class User:
         self.last_login = None
         self.is_active = True
         self.friends = []  # List of user IDs
+        # Automatic plan assignment based on role
+        self.subscription_plan = self._get_plan_for_role(role)
+    
+    def _get_plan_for_role(self, role: str) -> str:
+        """Get appropriate subscription plan based on user role."""
+        if role in ['Admin', 'Webmaster', 'Moderator']:
+            return 'Unlimited'
+        return 'Free'
     
     def _hash_password(self, password: str) -> str:
         """Hash a password using bcrypt."""
@@ -76,7 +84,8 @@ class User:
             'created_at': self.created_at,
             'last_login': self.last_login,
             'is_active': self.is_active,
-            'friends': self.friends
+            'friends': self.friends,
+            'subscription_plan': getattr(self, 'subscription_plan', 'Free')
         }
     
     @classmethod
@@ -93,6 +102,7 @@ class User:
         user.last_login = data.get('last_login')
         user.is_active = data.get('is_active', True)
         user.friends = data.get('friends', [])
+        user.subscription_plan = data.get('subscription_plan', 'Free')
         return user
 
 
@@ -588,17 +598,3 @@ class ProjectFinancials:
         self.created_by = created_by
         self.created_at = datetime.utcnow()
     
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert ProjectFinancials object to dictionary for Firestore storage."""
-        return {
-            'entry_id': self.entry_id,
-            'project_id': self.project_id,
-            'entry_type': self.entry_type,
-            'amount': self.amount,
-            'currency': self.currency,
-            'category': self.category,
-            'description': self.description,
-            'date': self.date,
-            'created_by': self.created_by,
-            'created_at': self.created_at
-        }

@@ -13,18 +13,29 @@
             border-radius: 0 0 20px 20px;
         }
         
-        .voucher-card {
+        .voucher-table {
             background: var(--theme-bg-secondary);
             border: 1px solid var(--theme-border);
             border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
+            overflow: hidden;
         }
         
-        .voucher-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        .voucher-table th {
+            background: var(--theme-bg-primary);
+            border-bottom: 1px solid var(--theme-border);
+            color: var(--theme-text-primary);
+            font-weight: 600;
+            padding: 1rem;
+        }
+        
+        .voucher-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--theme-border);
+            vertical-align: middle;
+        }
+        
+        .voucher-table tbody tr:hover {
+            background: var(--theme-bg-primary);
         }
         
         .voucher-code {
@@ -72,8 +83,19 @@
         }
         
         .form-floating-custom label {
-            color: var(--theme-text-secondary);
+            color: var(--theme-text-primary);
             padding: 1rem;
+            font-weight: 500;
+        }
+        
+        .form-floating-custom .form-control:focus + label,
+        .form-floating-custom .form-control:not(:placeholder-shown) + label {
+            color: var(--phoenix-primary);
+        }
+        
+        .form-check-label {
+            color: var(--theme-text-primary);
+            font-weight: 500;
         }
         
         .voucher-stats {
@@ -188,78 +210,94 @@
     </div>
 
     <!-- Gutschein-Liste -->
-    <div class="row">
-        {% for voucher in vouchers %}
-        <div class="col-lg-6 col-xl-4">
-            <div class="voucher-card">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="voucher-code">{{ voucher.code }}</div>
-                    <span class="status-badge status-{{ voucher.status }}">
-                        {% if voucher.status == 'active' %}Aktiv
-                        {% elif voucher.status == 'used' %}Verwendet  
-                        {% elif voucher.status == 'expired' %}Abgelaufen
+    <div class="table-responsive">
+        <table class="table voucher-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Plan</th>
+                    <th>Dauer</th>
+                    <th>Verwendungen</th>
+                    <th>Status</th>
+                    <th>Erstellt</th>
+                    <th>Ablauf</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for voucher in vouchers %}
+                <tr>
+                    <td>
+                        <code class="voucher-code">{{ voucher.code }}</code>
+                    </td>
+                    <td>
+                        <span class="text-capitalize fw-bold">{{ voucher.plan }}</span>
+                    </td>
+                    <td>
+                        {% if voucher.duration_days %}
+                            {{ voucher.duration_days }} Tag(e)
+                        {% elif voucher.duration_months %}
+                            {{ voucher.duration_months }} Monat(e)
                         {% endif %}
-                    </span>
-                </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">
+                            {{ voucher.usage_count|default(0) }}/{{ voucher.usage_limit|default(1) }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ voucher.status }}">
+                            {% if voucher.status == 'active' %}Aktiv
+                            {% elif voucher.status == 'used' %}Verwendet  
+                            {% elif voucher.status == 'expired' %}Abgelaufen
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <small>{{ voucher.created_at.strftime('%d.%m.%Y') if voucher.created_at else 'N/A' }}</small>
+                    </td>
+                    <td>
+                        {% if voucher.expires_at %}
+                        <small>{{ voucher.expires_at.strftime('%d.%m.%Y') }}</small>
+                        {% else %}
+                        <small class="text-muted">Kein Ablauf</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-info" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#voucherDetailsModal"
+                                    onclick="showVoucherDetails('{{ voucher.id }}', '{{ voucher.code }}', '{{ voucher.used_by_username|default('') }}', '{{ voucher.used_at.strftime('%d.%m.%Y %H:%M') if voucher.used_at else '' }}')">
+                                <i class="fas fa-info"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="copyVoucherCode('{{ voucher.code }}')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            {% if voucher.status == 'active' %}
+                            <button class="btn btn-outline-danger" onclick="deactivateVoucher('{{ voucher.id }}')">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-outline-danger" onclick="deleteVoucher('{{ voucher.id }}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
                 
-                <div class="mb-2">
-                    <strong>Plan:</strong> 
-                    <span class="text-capitalize">{{ voucher.plan }}</span>
-                </div>
-                
-                <div class="mb-2">
-                    <strong>Dauer:</strong> {{ voucher.duration_months }} Monat(e)
-                </div>
-                
-                {% if voucher.used_by %}
-                <div class="mb-2">
-                    <strong>Verwendet von:</strong> {{ voucher.used_by_username }}
-                </div>
-                <div class="mb-2">
-                    <small class="text-muted">Verwendet am: {{ voucher.used_at.strftime('%d.%m.%Y %H:%M') if voucher.used_at else 'N/A' }}</small>
-                </div>
+                {% if not vouchers %}
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+                        <div class="h5 text-muted">Keine Gutscheine gefunden</div>
+                        <p class="text-muted">Erstellen Sie Ihren ersten Gutschein für bezahlte Pläne.</p>
+                    </td>
+                </tr>
                 {% endif %}
-                
-                <div class="mb-2">
-                    <small class="text-muted">
-                        Erstellt: {{ voucher.created_at.strftime('%d.%m.%Y %H:%M') if voucher.created_at else 'N/A' }}
-                    </small>
-                </div>
-                
-                {% if voucher.expires_at %}
-                <div class="mb-3">
-                    <small class="text-muted">
-                        Läuft ab: {{ voucher.expires_at.strftime('%d.%m.%Y %H:%M') }}
-                    </small>
-                </div>
-                {% endif %}
-                
-                <div class="d-flex gap-2">
-                    {% if voucher.status == 'active' %}
-                    <button class="btn btn-outline-danger btn-sm" onclick="deactivateVoucher('{{ voucher.id }}')">
-                        <i class="fas fa-ban me-1"></i>Deaktivieren
-                    </button>
-                    {% endif %}
-                    <button class="btn btn-outline-secondary btn-sm" onclick="copyVoucherCode('{{ voucher.code }}')">
-                        <i class="fas fa-copy me-1"></i>Kopieren
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteVoucher('{{ voucher.id }}')">
-                        <i class="fas fa-trash me-1"></i>Löschen
-                    </button>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-        
-        {% if not vouchers %}
-        <div class="col-12">
-            <div class="voucher-card text-center py-5">
-                <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">Keine Gutscheine gefunden</h5>
-                <p class="text-muted">Erstellen Sie Ihren ersten Gutschein für bezahlte Pläne.</p>
-            </div>
-        </div>
-        {% endif %}
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -295,9 +333,50 @@
                                 <option value="3">3 Monate</option>
                                 <option value="6">6 Monate</option>
                                 <option value="12">12 Monate</option>
+                                <option value="custom">Benutzerdefiniert</option>
                             </select>
                             <label for="voucherDuration">Gültigkeitsdauer</label>
                         </div>
+                    </div>
+                    
+                    <!-- Custom Duration Fields -->
+                    <div id="customDurationFields" class="row" style="display: none;">
+                        <div class="col-md-6">
+                            <div class="form-floating-custom">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="customDurationValue" name="custom_duration_value" min="1" max="31">
+                                    <label for="customDurationValue">Anzahl</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating-custom">
+                                <div class="form-floating">
+                                    <select class="form-select" id="customDurationUnit" name="custom_duration_unit">
+                                        <option value="days">Tage (1-31)</option>
+                                        <option value="months">Monate (1-12)</option>
+                                    </select>
+                                    <label for="customDurationUnit">Einheit</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Multiple Usage Toggle -->
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="multipleUsage" name="multiple_usage">
+                        <label class="form-check-label" for="multipleUsage">
+                            Mehrfachverwendung aktivieren
+                        </label>
+                    </div>
+                    
+                    <!-- Usage Limit (only shown when multiple usage is enabled) -->
+                    <div class="form-floating-custom" id="usageLimitField" style="display: none;">
+                        <div class="form-floating">
+                            <input type="number" class="form-control" id="voucherUsageLimit" name="usage_limit" min="2" max="1000" value="5">
+                            <label for="voucherUsageLimit">Anzahl der Verwendungen</label>
+                        </div>
+                        <small class="form-text text-muted">Wie oft kann dieser Gutschein verwendet werden?</small>
                     </div>
                     
                     <div class="form-floating-custom">
@@ -358,6 +437,58 @@
         </div>
     </div>
 </div>
+
+<!-- Voucher Details Modal -->
+<div class="modal fade" id="voucherDetailsModal" tabindex="-1" aria-labelledby="voucherDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="voucherDetailsModalLabel">
+                    <i class="fas fa-info-circle me-2"></i>Gutschein Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <strong>Gutschein Code:</strong>
+                        <div class="mt-2">
+                            <code id="detailVoucherCode" class="fs-5 p-2 bg-light rounded"></code>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="usageDetails" class="mt-4" style="display: none;">
+                    <h6 class="text-primary">Verwendungsdetails</h6>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Verwendet von:</strong>
+                            <div id="detailUsedBy" class="mt-1"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Verwendet am:</strong>
+                            <div id="detailUsedAt" class="mt-1"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="noUsageDetails" class="mt-4">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-ticket-alt fa-2x mb-2"></i>
+                        <p>Dieser Gutschein wurde noch nicht eingelöst.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-outline-primary" onclick="copyDetailVoucherCode()">
+                    <i class="fas fa-copy me-1"></i>Code kopieren
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -368,6 +499,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const customCodeField = document.getElementById('customCodeField');
     const voucherCountField = document.getElementById('voucherCount');
     
+    // Custom duration toggle
+    const voucherDurationSelect = document.getElementById('voucherDuration');
+    const customDurationFields = document.getElementById('customDurationFields');
+    const customDurationValue = document.getElementById('customDurationValue');
+    const customDurationUnit = document.getElementById('customDurationUnit');
+    
+    // Multiple usage toggle
+    const multipleUsageCheckbox = document.getElementById('multipleUsage');
+    const usageLimitField = document.getElementById('usageLimitField');
+    
     customCodeCheckbox.addEventListener('change', function() {
         if (this.checked) {
             customCodeField.style.display = 'block';
@@ -376,6 +517,42 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             customCodeField.style.display = 'none';
             voucherCountField.disabled = false;
+        }
+    });
+    
+    // Duration selection handling
+    voucherDurationSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customDurationFields.style.display = 'block';
+            customDurationValue.required = true;
+        } else {
+            customDurationFields.style.display = 'none';
+            customDurationValue.required = false;
+        }
+    });
+    
+    // Update max value based on unit selection
+    customDurationUnit.addEventListener('change', function() {
+        if (this.value === 'days') {
+            customDurationValue.max = 31;
+            customDurationValue.placeholder = '1-31';
+            if (customDurationValue.value > 31) {
+                customDurationValue.value = 31;
+            }
+        } else if (this.value === 'months') {
+            customDurationValue.max = 12;
+            customDurationValue.placeholder = '1-12';
+            if (customDurationValue.value > 12) {
+                customDurationValue.value = 12;
+            }
+        }
+    });
+    
+    multipleUsageCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            usageLimitField.style.display = 'block';
+        } else {
+            usageLimitField.style.display = 'none';
         }
     });
     
@@ -458,7 +635,10 @@ async function deactivateVoucher(voucherId) {
     
     try {
         const response = await fetch(`/admin/api/vouchers/${voucherId}/deactivate`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken()
+            }
         });
         
         const result = await response.json();
@@ -500,6 +680,30 @@ async function deleteVoucher(voucherId) {
     }
 }
 
+// Show voucher details in modal
+function showVoucherDetails(voucherId, voucherCode, usedBy, usedAt) {
+    document.getElementById('detailVoucherCode').innerText = voucherCode;
+    
+    const usageDetails = document.getElementById('usageDetails');
+    const noUsageDetails = document.getElementById('noUsageDetails');
+    
+    if (usedBy && usedAt) {
+        document.getElementById('detailUsedBy').innerText = usedBy;
+        document.getElementById('detailUsedAt').innerText = usedAt;
+        usageDetails.style.display = 'block';
+        noUsageDetails.style.display = 'none';
+    } else {
+        usageDetails.style.display = 'none';
+        noUsageDetails.style.display = 'block';
+    }
+}
+
+// Copy detail voucher code
+function copyDetailVoucherCode() {
+    const code = document.getElementById('detailVoucherCode').innerText;
+    copyVoucherCode(code);
+}
+
 // Toast notification function
 function showToast(message, type = 'info') {
     // Create toast element
@@ -534,6 +738,11 @@ function showToast(message, type = 'info') {
     toast.addEventListener('hidden.bs.toast', function() {
         toast.remove();
     });
+}
+
+// CSRF token function
+function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 }
 </script>
 {% endblock %}

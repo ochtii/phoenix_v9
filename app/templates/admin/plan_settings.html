@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}Plan Settings - Phoenix Admin{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/dashboard.css') }}">
+    <style>
+        .plan-settings-header {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .plan-card {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .plan-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .plan-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--theme-text-primary);
+        }
+        
+        .plan-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--phoenix-primary);
+        }
+        
+        .plan-limits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .limit-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--theme-bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--theme-border);
+        }
+        
+        .limit-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--phoenix-primary);
+        }
+        
+        .limit-label {
+            font-size: 0.875rem;
+            color: var(--theme-text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        .plan-features {
+            margin: 1rem 0;
+        }
+        
+        .feature-badge {
+            display: inline-block;
+            background: var(--phoenix-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+        }
+        
+        .plan-status {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-active { background: #28a745; color: white; }
+        .status-inactive { background: #6c757d; color: white; }
+        .status-featured { background: #ffc107; color: #000; }
+        
+        .plan-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: end;
+        }
+        
+        .add-plan-btn {
+            background: var(--phoenix-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-plan-btn:hover {
+            background: var(--phoenix-secondary);
+            transform: translateY(-1px);
+        }
+        
+        .modal-content {
+            background: var(--theme-bg-primary);
+            color: var(--theme-text-primary);
+            border: 1px solid var(--theme-border);
+        }
+        
+        .form-control {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            color: var(--theme-text-primary);
+        }
+        
+        .form-control:focus {
+            background: var(--theme-bg-secondary);
+            border-color: var(--phoenix-primary);
+            color: var(--theme-text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+        
+        .feature-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .features-list {
+            margin-bottom: 1rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="plan-settings-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0">
+                        <i class="fas fa-layer-group me-3"></i>
+                        Plan Settings
+                    </h1>
+                    <p class="mb-0 mt-2 opacity-75">Configure subscription plans and pricing</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="add-plan-btn" data-bs-toggle="modal" data-bs-target="#addPlanModal">
+                        <i class="fas fa-plus me-2"></i>Add New Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Plans List -->
+        <div class="row">
+            {% if plans %}
+                {% for plan in plans %}
+                <div class="col-lg-6 col-xl-4">
+                    <div class="plan-card" data-plan-id="{{ plan.id }}">
+                        <div class="plan-header">
+                            <div>
+                                <div class="plan-name">{{ plan.name }}</div>
+                                {% if plan.description %}
+                                <div class="text-muted small">{{ plan.description }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="plan-price">${{ "%.2f"|format(plan.price) }}</div>
+                        </div>
+                        
+                        <div class="plan-limits">
+                            <div class="limit-item">
+                                <div class="limit-value">{{ plan.max_projects }}</div>
+                                <div class="limit-label">Max Projects</div>
+                            </div>
+                            <div class="limit-item">
+                                <div class="limit-value">{{ plan.max_storage_gb }}</div>
+                                <div class="limit-label">Storage (GB)</div>
+                            </div>
+                        </div>
+                        
+                        {% if plan.features %}
+                        <div class="plan-features">
+                            {% for feature in plan.features %}
+                            <span class="feature-badge">{{ feature }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="plan-status">
+                            {% if plan.is_active %}
+                            <span class="status-badge status-active">Active</span>
+                            {% else %}
+                            <span class="status-badge status-inactive">Inactive</span>
+                            {% endif %}
+                            
+                            {% if plan.is_featured %}
+                            <span class="status-badge status-featured">Featured</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="plan-actions">
+                            <button class="btn btn-sm btn-outline-primary edit-plan-btn" 
+                                    data-plan-id="{{ plan.id }}"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editPlanModal">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-plan-btn" 
+                                    data-plan-id="{{ plan.id }}"
+                                    data-plan-name="{{ plan.name }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-layer-group fa-3x text-muted mb-3"></i>
+                        <h3 class="text-muted">No Plans Found</h3>
+                        <p class="text-muted">Create your first subscription plan to get started.</p>
+                        <button class="add-plan-btn" data-bs-toggle="modal" data-bs-target="#addPlanModal">
+                            <i class="fas fa-plus me-2"></i>Create First Plan
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Plan Modal -->
+<div class="modal fade" id="addPlanModal" tabindex="-1" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPlanModalLabel">
+                    <i class="fas fa-plus me-2"></i>Add New Plan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPlanForm">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="planName" class="form-label">Plan Name *</label>
+                                <input type="text" class="form-control" id="planName" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="planPrice" class="form-label">Price ($) *</label>
+                                <input type="number" class="form-control" id="planPrice" name="price" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="planDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="planDescription" name="description" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="maxProjects" class="form-label">Max Projects *</label>
+                                <input type="number" class="form-control" id="maxProjects" name="max_projects" min="1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="maxStorage" class="form-label">Max Storage (GB) *</label>
+                                <input type="number" class="form-control" id="maxStorage" name="max_storage_gb" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="planFeatures" class="form-label">Features</label>
+                        <div class="features-list" id="featuresList"></div>
+                        <div class="feature-input-group">
+                            <input type="text" class="form-control" id="newFeature" placeholder="Add feature...">
+                            <button type="button" class="btn btn-outline-primary" id="addFeatureBtn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="planOrder" class="form-label">Display Order</label>
+                                <input type="number" class="form-control" id="planOrder" name="order" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="isActive" name="is_active" checked>
+                                <label class="form-check-label" for="isActive">Active</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="isFeatured" name="is_featured">
+                                <label class="form-check-label" for="isFeatured">Featured</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="createPlanBtn">
+                    <i class="fas fa-save me-2"></i>Create Plan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Plan Modal -->
+<div class="modal fade" id="editPlanModal" tabindex="-1" aria-labelledby="editPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPlanModalLabel">
+                    <i class="fas fa-edit me-2"></i>Edit Plan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPlanForm">
+                    <input type="hidden" id="editPlanId" name="plan_id">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="editPlanName" class="form-label">Plan Name *</label>
+                                <input type="text" class="form-control" id="editPlanName" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="editPlanPrice" class="form-label">Price ($) *</label>
+                                <input type="number" class="form-control" id="editPlanPrice" name="price" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editPlanDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editPlanDescription" name="description" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editMaxProjects" class="form-label">Max Projects *</label>
+                                <input type="number" class="form-control" id="editMaxProjects" name="max_projects" min="1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editMaxStorage" class="form-label">Max Storage (GB) *</label>
+                                <input type="number" class="form-control" id="editMaxStorage" name="max_storage_gb" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editPlanFeatures" class="form-label">Features</label>
+                        <div class="features-list" id="editFeaturesList"></div>
+                        <div class="feature-input-group">
+                            <input type="text" class="form-control" id="editNewFeature" placeholder="Add feature...">
+                            <button type="button" class="btn btn-outline-primary" id="editAddFeatureBtn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="editPlanOrder" class="form-label">Display Order</label>
+                                <input type="number" class="form-control" id="editPlanOrder" name="order" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editIsActive" name="is_active">
+                                <label class="form-check-label" for="editIsActive">Active</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editIsFeatured" name="is_featured">
+                                <label class="form-check-label" for="editIsFeatured">Featured</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updatePlanBtn">
+                    <i class="fas fa-save me-2"></i>Update Plan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/admin/plan_settings.js') }}"></script>
+{% endblock %}

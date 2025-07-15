@@ -214,18 +214,32 @@
         try {
             console.log('submitLoginForm called');
             console.log('FormData object:', formData);
-            console.log('Form action:', loginForm.action || window.location.pathname);
+            
+            // Get form action URL, fallback to current path
+            const actionUrl = loginForm.action || `${window.location.origin}/user/login`;
+            console.log('Form action URL:', actionUrl);
             
             // Debug: Check if FormData has entries
             const hasEntries = Array.from(formData.entries()).length > 0;
             console.log('FormData has entries:', hasEntries);
             
-            const response = await fetch(loginForm.action || window.location.pathname, {
+            // Get CSRF token if available
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                             document.querySelector('input[name="csrf_token"]')?.value;
+            
+            const headers = {
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+            
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+
+            const response = await fetch(actionUrl, {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                headers: headers,
+                credentials: 'same-origin' // Include cookies for session
             });
 
             if (response.ok) {
@@ -245,7 +259,7 @@
                         
                         // Redirect after short delay
                         setTimeout(() => {
-                            window.location.href = result.redirect_url || '/dashboard';
+                            window.location.href = result.redirect_url || '/start';
                         }, 1000);
                     } else {
                         throw new Error(result.message || 'Login failed');
@@ -272,7 +286,7 @@
                         }
                         
                         setTimeout(() => {
-                            window.location.href = '/dashboard';
+                            window.location.href = '/start';
                         }, 1000);
                     }
                 }
@@ -282,13 +296,36 @@
 
         } catch (error) {
             console.error('Login error:', error);
-            Phoenix.Utils.showToast(error.message || 'Login failed. Please try again.', 'error');
             
-            // Shake the form for visual feedback
-            loginForm.classList.add('animate__animated', 'animate__shakeX');
-            setTimeout(() => {
-                loginForm.classList.remove('animate__animated', 'animate__shakeX');
-            }, 1000);
+            // Handle different types of errors
+            let errorMessage = 'Login failed. Please try again.';
+            let shouldFallback = false;
+            
+            if (error.name === 'TypeError' && error.message.includes('NetworkError')) {
+                errorMessage = 'Network connection failed. Falling back to standard form submission.';
+                shouldFallback = true;
+            } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                errorMessage = 'Unable to connect to server. Falling back to standard form submission.';
+                shouldFallback = true;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            if (shouldFallback) {
+                // Show toast and submit form normally
+                Phoenix.Utils.showToast(errorMessage, 'warning');
+                setTimeout(() => {
+                    loginForm.submit();
+                }, 1000);
+            } else {
+                Phoenix.Utils.showToast(errorMessage, 'error');
+                
+                // Shake the form for visual feedback
+                loginForm.classList.add('animate__animated', 'animate__shakeX');
+                setTimeout(() => {
+                    loginForm.classList.remove('animate__animated', 'animate__shakeX');
+                }, 1000);
+            }
             
         } finally {
             // Remove loading state
@@ -304,7 +341,8 @@
             // Enter key submits form when focused on any input
             if (event.key === 'Enter' && (event.target === usernameEmailInput || event.target === passwordInput)) {
                 event.preventDefault();
-                loginForm.dispatchEvent(new Event('submit'));
+                // Call handleFormSubmit directly instead of dispatching untrusted event
+                handleFormSubmit(event);
             }
             
             // Tab between fields

@@ -3,7 +3,7 @@
     <div class="container">
         <!-- Brand -->
         <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='img/phoenix-icon3.png') }}" alt="Phoenix" style="height: 32px; width: auto;" class="me-2">
+            <img src="{{ url_for('static', filename='img/phoenix-icon-blue.png') }}" alt="Phoenix" style="height: 32px; width: auto;" class="me-2">
             <span class="fw-bold">Phoenix</span>
         </a>
         
@@ -91,23 +91,26 @@
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-cog me-1"></i>Admin
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
+                            <ul class="dropdown-menu dropdown-menu-admin" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('admin.admin_dashboard') }}">
                                     <i class="fas fa-chart-line me-2"></i>Übersicht
                                 </a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('admin.users') }}">
                                     <i class="fas fa-users me-2"></i>Benutzerverwaltung
                                 </a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('support.all_tickets') }}">
-                                    <i class="fas fa-ticket-alt me-2"></i>Alle Tickets
+                                    <i class="fas fa-headset me-2"></i>Alle Tickets
                                 </a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('admin.vouchers') }}">
                                     <i class="fas fa-ticket-alt me-2"></i>Gutscheine
                                 </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('admin.plan_settings') }}">
+                                    <i class="fas fa-layer-group me-2"></i>Plan Settings
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('admin.settings') }}">
                                     <i class="fas fa-sliders-h me-2"></i>Einstellungen
                                 </a></li>
-                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('admin.backend_control') }}">
                                     <i class="fas fa-terminal me-2"></i>Backend-Kontrolle
                                 </a></li>
@@ -128,8 +131,30 @@
                             {{ current_user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-wide" aria-labelledby="userDropdown">
+                            <!-- Plan Status Anzeige -->
+                            <li class="plan-status-item">
+                                {% if current_user.role in ['Admin', 'Webmaster', 'Moderator'] %}
+                                    <div class="current-plan-display role-display">
+                                        <i class="fas fa-shield-alt me-1"></i>{{ current_user.role }}
+                                        <small class="d-block text-muted">Unlimited Plan</small>
+                                    </div>
+                                {% else %}
+                                    <div class="current-plan-display">
+                                        Aktueller Plan: <strong>{{ current_user.subscription_plan if current_user.subscription_plan else 'Free' }}</strong>
+                                    </div>
+                                {% endif %}
+                            </li>
+                            
+                            <!-- Upgrade Badge nur für normale User -->
+                            {% if current_user.role not in ['Admin', 'Webmaster', 'Moderator'] %}
+                            <li><a class="dropdown-item upgrade-item" href="{{ url_for('user.upgrade') }}">
+                                <i class="fas fa-crown"></i> UPGRADE <i class="fas fa-crown"></i>
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            
                             <!-- Profil-Bereich -->
-                            <li><a class="dropdown-item" href="{{ url_for('user.profile', username=current_user.username) }}">
+                            <li><a class="dropdown-item" href="{{ url_for('user.profile', username=current_user.username) if current_user.username else url_for('user.edit_profile') }}">
                                 <i class="fas fa-user me-2"></i>Mein Profil
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('user.edit_profile') }}">
@@ -140,7 +165,7 @@
                             <!-- Kommunikation -->
                             <li><a class="dropdown-item" href="{{ url_for('messages.inbox') }}">
                                 <i class="fas fa-envelope me-2"></i>Nachrichten
-                                <span id="user-dropdown-messages-badge" class="badge bg-danger ms-1 d-none">0</span>
+                                <span id="user-dropdown-messages-badge" class="badge bg-danger ms-1 d-none update-badge">0</span>
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('user.friends') }}">
                                 <i class="fas fa-user-friends me-2"></i>Freunde
@@ -153,9 +178,6 @@
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('user.privacy_settings') }}">
                                 <i class="fas fa-shield-alt me-2"></i>Datenschutz
-                            </a></li>
-                            <li><a class="dropdown-item upgrade-item" href="{{ url_for('user.upgrade') }}">
-                                <i class="fas fa-crown me-2"></i>Upgrade<i class="fas fa-crown ms-2"></i>
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             
@@ -209,21 +231,115 @@
 .upgrade-item {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     color: #1f2937 !important;
-    font-weight: 600;
-    border-radius: 6px;
-    margin: 2px 8px;
-    padding: 6px 12px !important;
-    font-size: 0.875rem !important;
+    font-weight: 700;
+    border-radius: 7px;
+    margin: 4px 12px;
+    padding: 7px 14px !important;
+    font-size: 0.81rem !important;
+    text-align: center;
+    display: block !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: calc(100% - 24px);
+    box-sizing: border-box;
 }
 
 .upgrade-item:hover {
     background: linear-gradient(135deg, #f59e0b, #d97706) !important;
     color: #1f2937 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .upgrade-item i {
-    color: #1f2937 !important;
-    font-size: 0.75rem !important;
+    color: #d97706 !important;
+    font-size: 0.72rem !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Admin Dropdown Styling */
+.dropdown-menu-admin {
+    min-width: 280px !important;
+    padding: 0.75rem 0;
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-menu-admin .dropdown-item {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0;
+    transition: all 0.2s ease;
+    color: var(--theme-text-primary);
+}
+
+.dropdown-menu-admin .dropdown-item:hover {
+    background-color: var(--phoenix-primary);
+    color: white;
+    transform: translateX(2px);
+}
+
+.dropdown-menu-admin .dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+.dropdown-menu-admin .dropdown-divider {
+    margin: 0.5rem 1rem;
+    border-color: var(--theme-border);
+}
+
+/* Update Badge Styling */
+.update-badge {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    border-radius: 9px !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Plan Status Display */
+.plan-status-item {
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: 4px;
+}
+
+.current-plan-display {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-align: center;
+    background: #f8f9fa;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.current-plan-display strong {
+    color: #495057;
+    text-transform: capitalize;
+}
+
+.role-display {
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600;
+}
+
+.role-display i {
+    color: #ffd700;
+}
+
+.role-display small {
+    color: rgba(255,255,255,0.8) !important;
+    font-size: 0.7rem;
 }
 </style>
 

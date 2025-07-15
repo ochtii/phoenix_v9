@@ -287,11 +287,11 @@ def login():
                     
                     flash(f'Welcome back, {user.username}!', 'success')
                     
-                    # Redirect to next page or dashboard
+                    # Redirect to next page or start
                     next_page = request.args.get('next')
                     if next_page:
                         return redirect(next_page)
-                    return redirect(url_for('main.index'))
+                    return redirect(url_for('main.start'))
                 else:
                     flash('Invalid credentials.', 'error')
             else:
@@ -332,18 +332,24 @@ def profile(username):
             return redirect(url_for('main.index'))
         
         user_data = user_results[0].to_dict()
+        user_data['uid'] = user_results[0].id  # Ensure UID is set
         profile_user = User.from_dict(user_data)
         
-        # Get user's project count
-        projects_query = db.collection('projects').where('owner_uid', '==', profile_user.uid)
-        project_count = len(list(projects_query.stream()))
+        # Get user's project count safely
+        try:
+            projects_query = db.collection('projects').where('owner_uid', '==', profile_user.uid)
+            project_count = len(list(projects_query.stream()))
+        except:
+            project_count = 0
         
         return render_template('user/profile.html', 
                              profile_user=profile_user,
                              project_count=project_count)
     
     except Exception as e:
-        current_app.logger.error(f"Profile view error: {e}")
+        current_app.logger.error(f"Profile view error for user {username}: {e}")
+        import traceback
+        current_app.logger.error(f"Full traceback: {traceback.format_exc()}")
         flash('Ein Fehler ist beim Laden des Profils aufgetreten.', 'error')
         return redirect(url_for('main.index'))
 
@@ -692,6 +698,32 @@ def update_communication():
     return redirect(url_for('user.privacy_settings'))
 
 
+@user_bp.route('/update_notifications', methods=['POST'])
+@login_required
+def update_notifications():
+    """Update email notification preferences."""
+    try:
+        from flask import request
+        db = current_app.db
+        
+        notification_settings = {
+            'email_projects': 'email_projects' in request.form,
+            'email_messages': 'email_messages' in request.form,
+            'email_weekly': 'email_weekly' in request.form,
+            'updated_at': datetime.now()
+        }
+        
+        db.collection('users').document(g.user['uid']).update(notification_settings)
+        
+        flash('Benachrichtigungseinstellungen erfolgreich aktualisiert', 'success')
+        
+    except Exception as e:
+        current_app.logger.error(f"Error updating notification settings: {e}")
+        flash('Fehler beim Aktualisieren der Benachrichtigungseinstellungen', 'error')
+    
+    return redirect(url_for('user.account_settings'))
+
+
 @user_bp.route('/update_data_settings', methods=['POST'])
 @login_required
 def update_data_settings():
@@ -729,9 +761,154 @@ def upgrade():
         user_data = db.collection('users').document(g.user['uid']).get().to_dict()
         subscription_status = user_data.get('subscription', {}) if user_data else {}
         
+        # Get available plans from Firestore
+        available_plans = []
+        try:
+            plans_ref = db.collection('subscription_plans')
+            for doc in plans_ref.stream():
+                plan_data = doc.to_dict()
+                plan_data['id'] = doc.id
+                available_plans.append(plan_data)
+            
+            # Sort by monthly price
+            available_plans.sort(key=lambda x: x.get('monthly_price', 0))
+        except Exception as e:
+            current_app.logger.error(f"Error fetching plans: {e}")
+            # Fallback plans
+            available_plans = [
+                {
+                    'id': 'free',
+                    'name': 'Free',
+                    'monthly_price': 0,
+                    'yearly_price': 0,
+                    'features': ['Basic features', 'Limited projects']
+                },
+                {
+                    'id': 'premium',
+                    'name': 'Premium',
+                    'monthly_price': 4.99,
+                    'yearly_price': 49.99,
+                    'features': ['All Free features', 'More projects', 'Priority support']
+                }
+            ]
+        
         return render_template('user/upgrade.html', 
-                             subscription=subscription_status)
+                             subscription=subscription_status,
+                             available_plans=available_plans,
+                             current_plan=user_data.get('subscription_plan', 'Free'))
     except Exception as e:
         current_app.logger.error(f"Error loading upgrade page: {e}")
         flash('Error loading upgrade options', 'error')
         return redirect(url_for('main.start'))
+
+
+@user_bp.route('/redeem-voucher', methods=['POST'])
+@login_required
+def redeem_voucher():
+    """Redeem a voucher code to upgrade user plan"""
+    try:
+        from flask import jsonify
+        
+        data = request.get_json()
+        if not data or 'voucher_code' not in data:
+            return jsonify({'success': False, 'message': 'Gutschein-Code ist erforderlich'}), 400
+        
+        voucher_code = data['voucher_code'].strip().upper()
+        if not voucher_code:
+            return jsonify({'success': False, 'message': 'Gutschein-Code ist erforderlich'}), 400
+        
+        db = current_app.db
+        
+        # Find voucher
+        voucher_query = db.collection('vouchers').where('code', '==', voucher_code).limit(1)
+        voucher_docs = list(voucher_query.stream())
+        
+        if not voucher_docs:
+            return jsonify({'success': False, 'message': 'Ungültiger Gutschein-Code'}), 400
+        
+        voucher_doc = voucher_docs[0]
+        voucher_data = voucher_doc.to_dict()
+        
+        # Check if voucher is active
+        if not voucher_data.get('active', True):
+            return jsonify({'success': False, 'message': 'Dieser Gutschein ist nicht mehr gültig'}), 400
+        
+        # Check if voucher is expired
+        if voucher_data.get('expires_at') and voucher_data['expires_at'] < datetime.now():
+            return jsonify({'success': False, 'message': 'Dieser Gutschein ist abgelaufen'}), 400
+        
+        # Check usage limits
+        usage_limit = voucher_data.get('usage_limit', 1)
+        usage_count = voucher_data.get('usage_count', 0)
+        
+        if usage_count >= usage_limit:
+            return jsonify({'success': False, 'message': 'Dieser Gutschein wurde bereits vollständig verwendet'}), 400
+        
+        # Check if user already used this voucher (for single-use vouchers)
+        if usage_limit == 1 and voucher_data.get('used_by') == g.user['uid']:
+            return jsonify({'success': False, 'message': 'Sie haben diesen Gutschein bereits verwendet'}), 400
+        
+        # Calculate new plan expiry date
+        current_expiry = g.user.get('plan_expires_at')
+        if current_expiry and current_expiry > datetime.now():
+            # Extend existing plan
+            base_date = current_expiry
+        else:
+            # Start from now
+            base_date = datetime.now()
+        
+        # Add voucher duration
+        if voucher_data.get('duration_months'):
+            from dateutil.relativedelta import relativedelta
+            new_expiry = base_date + relativedelta(months=voucher_data['duration_months'])
+        elif voucher_data.get('duration_days'):
+            from datetime import timedelta
+            new_expiry = base_date + timedelta(days=voucher_data['duration_days'])
+        else:
+            # Default to 1 month
+            from dateutil.relativedelta import relativedelta
+            new_expiry = base_date + relativedelta(months=1)
+        
+        # Update user plan
+        user_updates = {
+            'plan': voucher_data['plan'],
+            'plan_expires_at': new_expiry,
+            'plan_activated_at': datetime.now(),
+            'updated_at': datetime.now()
+        }
+        
+        db.collection('users').document(g.user['uid']).update(user_updates)
+        
+        # Update voucher usage
+        voucher_updates = {
+            'usage_count': usage_count + 1,
+            'updated_at': datetime.now()
+        }
+        
+        # For single-use vouchers, mark as fully used
+        if usage_limit == 1:
+            voucher_updates.update({
+                'used_by': g.user['uid'],
+                'used_by_username': g.user['username'],
+                'used_at': datetime.now(),
+                'active': False
+            })
+        
+        db.collection('vouchers').document(voucher_doc.id).update(voucher_updates)
+        
+        # Update session user data
+        g.user.update(user_updates)
+        session['user'] = g.user
+        
+        current_app.logger.info(f"User {g.user['username']} redeemed voucher {voucher_code} for {voucher_data['plan']} plan")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Gutschein erfolgreich eingelöst',
+            'plan': voucher_data['plan'],
+            'expires_at': new_expiry.strftime('%d.%m.%Y')
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Voucher redemption error: {e}")
+        return jsonify({'success': False, 'message': 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.'}), 500

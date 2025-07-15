@@ -11,11 +11,34 @@ from app import role_required, admin_required
 
 admin_bp = Blueprint('admin', __name__)
 
+def get_available_plans():
+    """Get all available subscription plans from Firestore."""
+    try:
+        db = current_app.db
+        plans_ref = db.collection('subscription_plans')
+        plans = []
+        for doc in plans_ref.stream():
+            plan_data = doc.to_dict()
+            plan_data['id'] = doc.id
+            plans.append(plan_data)
+        
+        # Sort by monthly price
+        plans.sort(key=lambda x: x.get('monthly_price', 0))
+        return plans
+    except Exception as e:
+        current_app.logger.error(f"Error fetching plans: {e}")
+        return [
+            {'id': 'free', 'name': 'Free', 'monthly_price': 0},
+            {'id': 'premium', 'name': 'Premium', 'monthly_price': 4.99},
+            {'id': 'pro', 'name': 'Pro', 'monthly_price': 9.99},
+            {'id': 'unlimited', 'name': 'Unlimited', 'monthly_price': 34.99}
+        ]
+
 
 @admin_bp.route('/')
-@admin_bp.route('/dashboard')
+@admin_bp.route('/admin_dashboard')
 @admin_required
-def dashboard():
+def admin_dashboard():
     """Enhanced admin dashboard with comprehensive system overview and statistics"""
     try:
         db = current_app.db
@@ -132,7 +155,7 @@ def dashboard():
             'open_tickets': 0  # Placeholder
         }
         
-        return render_template('admin/dashboard.html',
+        return render_template('admin/admin_dashboard.html',
                              stats=stats,
                              recent_users=recent_users,
                              recent_projects=recent_projects,
@@ -149,7 +172,7 @@ def dashboard():
             'new_projects_this_month': 0, 'total_messages': 0,
             'messages_this_week': 0, 'open_tickets': 0
         }
-        return render_template('admin/dashboard.html',
+        return render_template('admin/admin_dashboard.html',
                              stats=stats,
                              recent_users=[],
                              recent_projects=[],
@@ -342,7 +365,7 @@ def settings():
     except Exception as e:
         current_app.logger.error(f"Admin settings error: {e}")
         flash('Error loading admin settings', 'error')
-        return redirect(url_for('admin.dashboard'))
+        return redirect(url_for('admin.admin_dashboard'))
 
 
 @admin_bp.route('/analytics')
@@ -372,7 +395,8 @@ def backend_control():
             'python_version': '3.13.3',
             'firebase_connected': True,
             'debug_mode': current_app.debug,
-            'environment': current_app.config.get('ENV', 'production')
+            'environment': current_app.config.get('ENV', 'production'),
+            'current_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
         
         # Get database statistics
@@ -406,8 +430,18 @@ def backend_control():
         
     except Exception as e:
         current_app.logger.error(f"Error in backend control: {e}")
-        flash('Error loading backend control panel.', 'error')
-        return redirect(url_for('admin.dashboard'))
+        import traceback
+        current_app.logger.error(f"Full traceback: {traceback.format_exc()}")
+        
+        # Try to render with minimal data
+        try:
+            return render_template('admin/backend_control.html',
+                                 system_info={'error': f'Error: {str(e)}'},
+                                 collections_stats={'error': 'Unable to fetch statistics'},
+                                 recent_logs=[])
+        except:
+            flash('Error loading backend control panel.', 'error')
+            return redirect(url_for('admin.admin_dashboard'))
 
 
 @admin_bp.route('/users/<user_id>/suspend', methods=['POST'])
@@ -926,12 +960,16 @@ def vouchers():
             'expired_vouchers': expired_vouchers
         }
         
+        # Get available plans
+        available_plans = get_available_plans()
+        
         return render_template('admin/vouchers.html',
                              vouchers=vouchers_list,
                              stats=stats,
                              search_query=search_query,
                              plan_filter=plan_filter,
-                             status_filter=status_filter)
+                             status_filter=status_filter,
+                             available_plans=available_plans)
         
     except Exception as e:
         current_app.logger.error(f"Error in voucher management: {e}")
@@ -954,7 +992,10 @@ def create_vouchers():
         
         data = request.get_json()
         plan = data.get('plan')
-        duration = int(data.get('duration', 1))
+        duration = data.get('duration')
+        custom_duration_value = data.get('custom_duration_value')
+        custom_duration_unit = data.get('custom_duration_unit')
+        usage_limit = data.get('usage_limit')
         expires_at = data.get('expires_at')
         count = int(data.get('count', 1))
         custom_code = data.get('custom_code')
@@ -965,8 +1006,46 @@ def create_vouchers():
         if plan not in valid_plans:
             return jsonify({'success': False, 'message': 'Ungültiger Plan'}), 400
         
-        if duration < 1 or duration > 12:
-            return jsonify({'success': False, 'message': 'Ungültige Dauer'}), 400
+        # Handle duration
+        duration_months = 0
+        duration_days = 0
+        
+        if duration == 'custom':
+            # Custom duration handling
+            if not custom_duration_value or not custom_duration_unit:
+                return jsonify({'success': False, 'message': 'Benutzerdefinierte Dauer nicht vollständig angegeben'}), 400
+            
+            duration_value = int(custom_duration_value)
+            
+            if custom_duration_unit == 'days':
+                if duration_value < 1 or duration_value > 31:
+                    return jsonify({'success': False, 'message': 'Tage müssen zwischen 1 und 31 liegen'}), 400
+                duration_days = duration_value
+            elif custom_duration_unit == 'months':
+                if duration_value < 1 or duration_value > 12:
+                    return jsonify({'success': False, 'message': 'Monate müssen zwischen 1 und 12 liegen'}), 400
+                duration_months = duration_value
+        else:
+            # Standard duration
+            duration_months = int(duration)
+            if duration_months < 1 or duration_months > 12:
+                return jsonify({'success': False, 'message': 'Ungültige Dauer'}), 400
+        
+        # Handle usage limit based on multiple usage toggle
+        multiple_usage = request.form.get('multiple_usage') == 'on'
+        usage_limit_value = 1  # Default to single use
+        
+        if multiple_usage:
+            usage_limit = request.form.get('usage_limit', '').strip()
+            if usage_limit:
+                try:
+                    usage_limit_value = int(usage_limit)
+                    if usage_limit_value < 2 or usage_limit_value > 1000:
+                        return jsonify({'success': False, 'message': 'Verwendungsanzahl muss zwischen 2 und 1000 liegen'}), 400
+                except ValueError:
+                    return jsonify({'success': False, 'message': 'Ungültige Verwendungsanzahl'}), 400
+            else:
+                usage_limit_value = 5  # Default for multiple usage
         
         if count < 1 or count > 100:
             return jsonify({'success': False, 'message': 'Ungültige Anzahl'}), 400
@@ -1007,7 +1086,10 @@ def create_vouchers():
             voucher_data = {
                 'code': voucher_code,
                 'plan': plan,
-                'duration_months': duration,
+                'duration_months': duration_months,
+                'duration_days': duration_days,
+                'usage_limit': usage_limit_value,
+                'usage_count': 0,
                 'created_at': datetime.now(),
                 'created_by': g.user['uid'],
                 'expires_at': expiry_date,
@@ -1085,3 +1167,207 @@ def delete_voucher(voucher_id):
     except Exception as e:
         current_app.logger.error(f"Error deleting voucher: {e}")
         return jsonify({'success': False, 'message': 'Fehler beim Löschen'}), 500
+
+
+@admin_bp.route('/plan-settings')
+@admin_required
+def plan_settings():
+    """Plan Settings - Configure subscription plans"""
+    try:
+        db = current_app.db
+        
+        # Get current plans from the database
+        plans_ref = db.collection('plans').stream()
+        plans = []
+        for plan_doc in plans_ref:
+            plan_data = plan_doc.to_dict()
+            plan_data['id'] = plan_doc.id
+            plans.append(plan_data)
+        
+        # Sort plans by order/priority if available
+        plans.sort(key=lambda x: x.get('order', 999))
+        
+        return render_template('admin/plan_settings.html', plans=plans)
+        
+    except Exception as e:
+        current_app.logger.error(f"Error loading plan settings: {e}")
+        flash('Fehler beim Laden der Plan-Einstellungen', 'danger')
+        return redirect(url_for('admin.admin_dashboard'))
+
+
+@admin_bp.route('/api/plans', methods=['POST'])
+@admin_required
+def create_plan():
+    """Create a new subscription plan"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['name', 'price', 'max_projects', 'max_storage_gb']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'success': False, 'message': f'{field} ist erforderlich'}), 400
+        
+        # Validate data types
+        try:
+            price = float(data['price'])
+            max_projects = int(data['max_projects'])
+            max_storage_gb = int(data['max_storage_gb'])
+            order = int(data.get('order', 999))
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Ungültige Zahlenwerte'}), 400
+        
+        # Validate ranges
+        if price < 0:
+            return jsonify({'success': False, 'message': 'Preis muss positiv sein'}), 400
+        if max_projects < 1:
+            return jsonify({'success': False, 'message': 'Maximale Projekte muss mindestens 1 sein'}), 400
+        if max_storage_gb < 1:
+            return jsonify({'success': False, 'message': 'Maximaler Speicher muss mindestens 1 GB sein'}), 400
+        
+        db = current_app.db
+        
+        # Check if plan name already exists
+        existing_plan = db.collection('plans').where('name', '==', data['name']).limit(1).get()
+        if existing_plan:
+            return jsonify({'success': False, 'message': 'Plan-Name bereits vorhanden'}), 400
+        
+        # Create plan document
+        plan_data = {
+            'name': data['name'],
+            'description': data.get('description', ''),
+            'price': price,
+            'max_projects': max_projects,
+            'max_storage_gb': max_storage_gb,
+            'features': data.get('features', []),
+            'is_active': data.get('is_active', True),
+            'is_featured': data.get('is_featured', False),
+            'order': order,
+            'created_at': datetime.now(),
+            'created_by': g.user['uid'],
+            'updated_at': datetime.now(),
+            'updated_by': g.user['uid']
+        }
+        
+        # Add plan to database
+        plan_ref = db.collection('plans').add(plan_data)
+        plan_id = plan_ref[1].id
+        
+        current_app.logger.info(f"Admin {g.user['username']} created plan {data['name']} (ID: {plan_id})")
+        return jsonify({'success': True, 'message': 'Plan erstellt', 'plan_id': plan_id})
+        
+    except Exception as e:
+        current_app.logger.error(f"Error creating plan: {e}")
+        return jsonify({'success': False, 'message': 'Fehler beim Erstellen des Plans'}), 500
+
+
+@admin_bp.route('/api/plans/<plan_id>', methods=['PUT'])
+@admin_required  
+def update_plan(plan_id):
+    """Update an existing subscription plan"""
+    try:
+        data = request.get_json()
+        db = current_app.db
+        
+        # Check if plan exists
+        plan_doc = db.collection('plans').document(plan_id).get()
+        if not plan_doc.exists:
+            return jsonify({'success': False, 'message': 'Plan nicht gefunden'}), 404
+        
+        # Validate data types
+        update_data = {'updated_at': datetime.now(), 'updated_by': g.user['uid']}
+        
+        if 'name' in data:
+            # Check if new name conflicts with existing plans
+            existing_plan = db.collection('plans').where('name', '==', data['name']).limit(1).get()
+            if existing_plan and existing_plan[0].id != plan_id:
+                return jsonify({'success': False, 'message': 'Plan-Name bereits vorhanden'}), 400
+            update_data['name'] = data['name']
+        
+        if 'description' in data:
+            update_data['description'] = data['description']
+        
+        if 'price' in data:
+            try:
+                price = float(data['price'])
+                if price < 0:
+                    return jsonify({'success': False, 'message': 'Preis muss positiv sein'}), 400
+                update_data['price'] = price
+            except ValueError:
+                return jsonify({'success': False, 'message': 'Ungültiger Preis'}), 400
+        
+        if 'max_projects' in data:
+            try:
+                max_projects = int(data['max_projects'])
+                if max_projects < 1:
+                    return jsonify({'success': False, 'message': 'Maximale Projekte muss mindestens 1 sein'}), 400
+                update_data['max_projects'] = max_projects
+            except ValueError:
+                return jsonify({'success': False, 'message': 'Ungültige Projekt-Anzahl'}), 400
+        
+        if 'max_storage_gb' in data:
+            try:
+                max_storage_gb = int(data['max_storage_gb'])
+                if max_storage_gb < 1:
+                    return jsonify({'success': False, 'message': 'Maximaler Speicher muss mindestens 1 GB sein'}), 400
+                update_data['max_storage_gb'] = max_storage_gb
+            except ValueError:
+                return jsonify({'success': False, 'message': 'Ungültiger Speicher-Wert'}), 400
+        
+        if 'features' in data:
+            if isinstance(data['features'], list):
+                update_data['features'] = data['features']
+            else:
+                return jsonify({'success': False, 'message': 'Features müssen eine Liste sein'}), 400
+        
+        if 'is_active' in data:
+            update_data['is_active'] = bool(data['is_active'])
+        
+        if 'is_featured' in data:
+            update_data['is_featured'] = bool(data['is_featured'])
+        
+        if 'order' in data:
+            try:
+                update_data['order'] = int(data['order'])
+            except ValueError:
+                return jsonify({'success': False, 'message': 'Ungültige Reihenfolge'}), 400
+        
+        # Update plan in database
+        db.collection('plans').document(plan_id).update(update_data)
+        
+        current_app.logger.info(f"Admin {g.user['username']} updated plan {plan_id}")
+        return jsonify({'success': True, 'message': 'Plan aktualisiert'})
+        
+    except Exception as e:
+        current_app.logger.error(f"Error updating plan: {e}")
+        return jsonify({'success': False, 'message': 'Fehler beim Aktualisieren des Plans'}), 500
+
+
+@admin_bp.route('/api/plans/<plan_id>', methods=['DELETE'])
+@admin_required
+def delete_plan(plan_id):
+    """Delete a subscription plan"""
+    try:
+        db = current_app.db
+        
+        # Check if plan exists
+        plan_doc = db.collection('plans').document(plan_id).get()
+        if not plan_doc.exists:
+            return jsonify({'success': False, 'message': 'Plan nicht gefunden'}), 404
+        
+        plan_data = plan_doc.to_dict()
+        
+        # Check if any users are currently on this plan
+        users_with_plan = db.collection('users').where('plan', '==', plan_data['name']).limit(1).get()
+        if users_with_plan:
+            return jsonify({'success': False, 'message': 'Plan kann nicht gelöscht werden, da er von Benutzern verwendet wird'}), 400
+        
+        # Delete plan
+        db.collection('plans').document(plan_id).delete()
+        
+        current_app.logger.info(f"Admin {g.user['username']} deleted plan {plan_data['name']} (ID: {plan_id})")
+        return jsonify({'success': True, 'message': 'Plan gelöscht'})
+        
+    except Exception as e:
+        current_app.logger.error(f"Error deleting plan: {e}")
+        return jsonify({'success': False, 'message': 'Fehler beim Löschen des Plans'}), 500

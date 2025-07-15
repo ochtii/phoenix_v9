@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Phoenix Logo](app/static/img/logo7.webp)
+![Phoenix Logo](app/static/img/phoenix-icon-blue.png)
 
 **A modern, collaborative web application for project management and team collaboration**
 
@@ -105,9 +105,6 @@ phoenix_v9/
 ├── 📁 app/                         # Main Flask application directory
 │   ├── 📄 __init__.py              # App initialization and blueprint registration
 │   ├── 📄 models.py                # Data models (User, Project, etc.)
-│   ├── 📄 custom_debugger.py       # Custom debug functions
-│   ├── 📄 debugger.py              # Debug system for development
-│   ├── 📄 debugger_injection.py    # Debug code injection
 │   │
 │   ├── 📁 routes/                  # Blueprint routes for different areas
 │   │   ├── 📄 __init__.py          # Route initialization
@@ -118,9 +115,7 @@ phoenix_v9/
 │   │   ├── 📄 projects.py          # 📊 Project management and collaboration
 │   │   ├── 📄 support.py           # 🎫 Support ticket system
 │   │   ├── 📄 user.py              # 👤 User management and authentication
-│   │   ├── 📄 tasks.py             # ✅ Task management for projects
-│   │   ├── 📄 test.py              # 🧪 Test routes for development
-│   │   └── 📄 debugger.py          # 🐛 Debug routes and panels
+│   │   └── 📄 tasks.py             # ✅ Task management for projects
 │   │
 │   ├── 📁 static/                  # Static frontend files
 │   │   ├── 📁 css/                 # 🎨 Stylesheets with modern design
@@ -128,7 +123,6 @@ phoenix_v9/
 │   │   │   ├── 📄 index.css        # Landing page specific styles
 │   │   │   ├── 📄 main_dashboard.css # Dashboard layout
 │   │   │   ├── 📄 start.css        # Start page styles
-│   │   │   ├── 📄 debugger.css     # Debug panel styling
 │   │   │   │
 │   │   │   ├── 📁 admin/           # Admin panel styles
 │   │   │   │   ├── 📄 admin_dashboard.css
@@ -167,8 +161,6 @@ phoenix_v9/
 │   │   │
 │   │   ├── 📁 js/                  # 🔧 JavaScript modules
 │   │   │   ├── 📄 base.js          # Base JavaScript functions
-│   │   │   ├── 📄 debug.js         # Debug functionalities
-│   │   │   ├── 📄 debugger.js      # Debug panel interactions
 │   │   │   ├── 📄 firebase-config.js # Firebase configuration
 │   │   │   ├── 📄 function-checker.js # Function validation
 │   │   │   │
@@ -206,20 +198,18 @@ phoenix_v9/
 │   │   │       └── 📄 register.js
 │   │   │
 │   │   └── 📁 img/                 # 🖼️ Images and assets
-│   │       ├── 📄 favicon.ico      # Website favicon
-│   │       ├── 🎥 phoenix.mp4      # Video background for landing page
-│   │       ├── 🖼️ phoenix.png      # Main logo
-│   │       ├── 🖼️ logo1.png...logo9.jpg # Various logo variants
-│   │       ├── 🖼️ phoenix-icon1.png...phoenix-icon3.png # Icon variants
-│   │       ├── 🖼️ phoenix2.png...phoenix12.png # Additional Phoenix assets
-│   │       └── 🎨 background_blue.png, background_red.png # Backgrounds
+│   │       ├── �️ background_blue.png   # Blue background variant
+│   │       ├── 🖼️ background_red.png    # Red background variant
+│   │       ├── 🖼️ phoenix-icon-blue.png # Blue Phoenix icon
+│   │       ├── 🖼️ phoenix-icon-orange.png # Orange Phoenix icon
+│   │       ├── 🖼️ phoenix3.jpg          # Main background image
+│   │       └── � phoenix.mp4           # Video background
 │   │
 │   └── 📁 templates/               # 🖼️ Jinja2 templates
 │       ├── 📄 base.html            # Base template for all pages
 │       ├── 📄 index.html           # 🌟 Modern landing page with video background
 │       ├── 📄 main_dashboard.html  # Main dashboard for logged-in users
 │       ├── 📄 start.html           # Personalized start page
-│       ├── 📄 dashboard.html       # Alternative dashboard view
 │       ├── 📄 faq.html             # FAQ page
 │       │
 │       ├── 📁 admin/               # Admin templates
@@ -233,10 +223,6 @@ phoenix_v9/
 │       ├── 📁 components/          # Reusable components
 │       │   ├── 📄 header.html      # Navigation and header
 │       │   └── 📄 footer.html      # Footer with consistent width
-│       │
-│       ├── 📁 debugger/            # Debug templates
-│       │   ├── 📄 dashboard.html   # Debug dashboard
-│       │   └── 📄 debugger.html    # Debug panel
 │       │
 │       ├── 📁 discover/            # Project discovery templates
 │       │   └── 📄 explore.html     # Project exploration
@@ -302,14 +288,11 @@ phoenix_v9/
 ├── 📁 .vscode/                     # 🔧 VS Code configuration
 │   └── 📄 tasks.json               # Build tasks for VS Code
 │
-├── 📁 __pycache__/                 # 🔄 Python bytecode cache
-│
-├── 📄 .env                         # 🔐 Local environment variables (secret)
+├──  .env                         # 🔐 Local environment variables (secret)
 ├── 📄 .env.development            # 🛠️ Development environment variables
 ├── 📄 .env.example                # 📋 Template for environment variables
 ├── 📄 .firebaserc                 # Firebase project configuration
 ├── 📄 .gitignore                  # Git ignore rules
-├── 📄 app.py                      # 🚀 Alternative app entry point
 ├── 📄 build.py                    # 🏗️ Build script for deployment
 ├── 📄 config.py                   # ⚙️ Flask configuration classes
 ├── 📄 create_admin.py             # 👑 Create admin user
@@ -318,17 +301,10 @@ phoenix_v9/
 ├── 📄 firebase-service-account.json # 🔑 Firebase service account
 ├── 📄 firestore.indexes.json     # 📊 Firestore database indexes
 ├── 📄 firestore.rules             # 🛡️ Firestore security rules
-├── 📄 netlify.toml                # Netlify deployment config
-├── 📄 quick_test.py               # 🧪 Quick tests
 ├── 📄 README.md                   # 📖 This documentation
 ├── 📄 requirements.txt            # 📦 Python dependencies
 ├── 📄 run.py                      # 🏃 Production server
-├── 📄 run_simple.py               # 🎯 Simple server start
 ├── 📄 start.py                    # ▶️ Start script
-├── 📄 test_firebase.py            # 🔥 Firebase connection test
-├── 📄 test_routes.py              # 🧪 Route tests
-├── 📄 vercel.json                 # Vercel deployment config
-├── 📄 DEPLOYMENT_ALTERNATIVES.md  # 📋 Alternative deployment options
 ├── 📄 FIREBASE_SETUP.md           # 🔥 Firebase setup guide
 ├── 📄 FIREBASE_HOSTING.md         # 🌐 Firebase hosting guide
 └── 📄 SERVICE_ACCOUNT_SETUP.md    # 🔑 Service account setup
@@ -405,13 +381,12 @@ This will:
 - `python run.py` - Simple Flask server start
 - `python -m flask run` - Standard Flask development server
 
-### Debug Mode
+### Development Mode
 
 When running in development mode, Phoenix includes:
-- **Debug toolbar**: Extra development information
 - **Auto-reload**: Automatic server restart on file changes
 - **Error pages**: Detailed error information
-- **Debug indicator**: Visual indicator in the browser
+- **Development features**: Additional development information
 
 ## 🚢 Deployment
 

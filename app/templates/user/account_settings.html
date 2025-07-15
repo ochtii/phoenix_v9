@@ -11,55 +11,15 @@
     <div class="row justify-content-center">
         <div class="col-xl-10">
             <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="h3 mb-0">
-                        <i class="fas fa-cog me-2"></i>Konto-Einstellungen
-                    </h1>
-                    <p class="text-muted">Verwalte deine Kontodaten und Sicherheitseinstellungen</p>
-                </div>
-                <a href="{{ url_for('user.profile', username=g.user.username if g.user else '') }}" class="btn btn-outline-light">
-                    <i class="fas fa-arrow-left me-2"></i>Zurück zum Profil
-                </a>
+            <div class="mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-cog me-2"></i>Konto-Einstellungen
+                </h1>
+                <p class="text-muted">Verwalte deine Kontodaten und Sicherheitseinstellungen</p>
             </div>
 
             <!-- Settings Cards Grid -->
             <div class="row g-4">
-                <!-- Profile Information Card -->
-                <div class="col-lg-6">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-user me-2 text-primary"></i>Profil-Informationen
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" action="{{ url_for('user.update_profile') }}" id="profile-form">
-                                <div class="mb-3">
-                                    <label for="display_name" class="form-label">Anzeigename</label>
-                                    <input type="text" class="form-control" id="display_name" name="display_name" 
-                                           value="{{ g.user.display_name if g.user else '' }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="bio" class="form-label">Bio</label>
-                                    <textarea class="form-control" id="bio" name="bio" rows="3" 
-                                              placeholder="Erzähle anderen von dir...">{{ g.user.bio if g.user else '' }}</textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="location" class="form-label">Standort</label>
-                                    <input type="text" class="form-control" id="location" name="location" 
-                                           value="{{ g.user.location if g.user else '' }}" placeholder="z.B. Berlin, Deutschland">
-                                </div>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save me-2"></i>Profil aktualisieren
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Account Settings Card -->
                 <div class="col-lg-6">
                     <div class="card h-100">
@@ -115,20 +75,35 @@
                             <form method="POST" action="{{ url_for('user.change_password') }}" id="password-form">
                                 <div class="mb-3">
                                     <label for="current_password" class="form-label">Aktuelles Passwort</label>
-                                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('current_password')">
+                                            <i class="fas fa-eye" id="current_password_icon"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="new_password" class="form-label">Neues Passwort</label>
-                                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('new_password')">
+                                            <i class="fas fa-eye" id="new_password_icon"></i>
+                                        </button>
+                                    </div>
                                     <div class="form-text">Mindestens 8 Zeichen</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="confirm_password" class="form-label">Passwort bestätigen</label>
-                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirm_password')">
+                                            <i class="fas fa-eye" id="confirm_password_icon"></i>
+                                        </button>
+                                    </div>
                                     <div id="password-match-feedback" class="form-text"></div>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-warning">
+                                    <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-key me-2"></i>Passwort ändern
                                     </button>
                                 </div>
@@ -172,8 +147,47 @@
                                     </div>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-success">
+                                    <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save me-2"></i>Benachrichtigungen speichern
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voucher Redemption Card -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-ticket-alt me-2 text-warning"></i>Gutschein einlösen
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="voucher-form">
+                                <div class="mb-3">
+                                    <label for="voucher_code" class="form-label">Gutschein-Code</label>
+                                    <input type="text" class="form-control" id="voucher_code" name="voucher_code" 
+                                           placeholder="PREMIUM-XXXX-XXXX-XXXX" style="font-family: monospace;">
+                                    <div class="form-text">Geben Sie Ihren Gutschein-Code ein, um Ihren Plan zu erweitern</div>
+                                </div>
+                                
+                                <div id="current-plan-info" class="mb-3">
+                                    <div class="alert alert-info">
+                                        <strong>Aktueller Plan:</strong> 
+                                        <span class="text-capitalize">{{ g.user.plan if g.user and g.user.plan else 'Kostenlos' }}</span>
+                                        {% if g.user and g.user.plan_expires_at %}
+                                        <br><small>Läuft ab: {{ g.user.plan_expires_at.strftime('%d.%m.%Y') }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div id="voucher-result" style="display: none;"></div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-gift me-2"></i>Gutschein einlösen
                                     </button>
                                 </div>
                             </form>
@@ -290,6 +304,85 @@ function deleteAccount() {
         console.error('Error:', error);
         alert('Fehler beim Löschen des Kontos');
     });
+}
+
+// Password toggle functionality
+function togglePassword(fieldId) {
+    const passwordField = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + '_icon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// Voucher redemption functionality
+document.getElementById('voucher-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const voucherCode = document.getElementById('voucher_code').value.trim().toUpperCase();
+    const resultDiv = document.getElementById('voucher-result');
+    
+    if (!voucherCode) {
+        showVoucherResult('Bitte geben Sie einen Gutschein-Code ein.', 'danger');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Einlösen...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/user/redeem-voucher', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({
+                voucher_code: voucherCode
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showVoucherResult(`Gutschein erfolgreich eingelöst! Ihr ${result.plan}-Plan ist jetzt aktiv bis ${result.expires_at}.`, 'success');
+            // Clear form and reload plan info
+            document.getElementById('voucher_code').value = '';
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+            showVoucherResult(result.message || 'Fehler beim Einlösen des Gutscheins.', 'danger');
+        }
+    } catch (error) {
+        console.error('Voucher redemption error:', error);
+        showVoucherResult('Ein Netzwerkfehler ist aufgetreten. Bitte versuchen Sie es später erneut.', 'danger');
+    } finally {
+        // Restore button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+function showVoucherResult(message, type) {
+    const resultDiv = document.getElementById('voucher-result');
+    resultDiv.className = `alert alert-${type}`;
+    resultDiv.innerHTML = message;
+    resultDiv.style.display = 'block';
+}
+
+function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 }
 </script>
 {% endblock %}

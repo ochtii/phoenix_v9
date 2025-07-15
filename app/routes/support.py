@@ -363,7 +363,7 @@ def check_updates(ticket_id):
 
 @support_bp.route('/all-tickets')
 @login_required
-@role_required('admin')
+@role_required(['admin'])
 def all_tickets():
     """Display all support tickets (admin only)"""
     try:

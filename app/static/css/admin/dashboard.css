@@ -1,0 +1,179 @@
+/* Admin Dashboard Styles */
+
+.admin-header {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0 0 20px 20px;
+}
+
+.stats-card {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--phoenix-primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--theme-text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.quick-action-btn {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--theme-text-primary);
+    transition: all 0.3s ease;
+    display: block;
+    text-align: center;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    color: var(--phoenix-primary);
+    text-decoration: none;
+}
+
+.quick-action-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: var(--phoenix-primary);
+}
+
+.user-avatar, .project-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--phoenix-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.user-info, .project-info {
+    flex: 1;
+}
+
+.user-name, .project-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.user-email, .project-meta {
+    color: var(--theme-text-secondary);
+    font-size: 0.875rem;
+}
+
+.user-actions, .project-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-admin { 
+    background: #dc3545; 
+    color: white; 
+}
+
+.role-moderator { 
+    background: #ffc107; 
+    color: #000; 
+}
+
+.role-user { 
+    background: #6c757d; 
+    color: white; 
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-active { 
+    background: #28a745; 
+    color: white; 
+}
+
+.status-inactive { 
+    background: #6c757d; 
+    color: white; 
+}
+
+.status-banned { 
+    background: #dc3545; 
+    color: white; 
+}
+
+.admin-section {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    margin-right: 0.75rem;
+    color: var(--phoenix-primary);
+}
+
+.user-item, .project-item {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

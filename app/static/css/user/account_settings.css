@@ -1,0 +1,268 @@
+/* Account Settings Styling */
+
+/* Form Label Improvements */
+.form-label {
+    color: var(--theme-text-primary) !important;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-check-label {
+    color: var(--theme-text-primary) !important;
+    font-weight: 500;
+}
+
+.form-text {
+    color: var(--theme-text-secondary) !important;
+}
+
+/* Card Styling Improvements */
+.card {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+    border-bottom: none;
+    padding: 1.5rem;
+    color: white;
+}
+
+.card-header .card-title {
+    color: white !important;
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-header i {
+    color: white;
+}
+
+.card-body {
+    padding: 2rem;
+    background: var(--theme-bg-secondary);
+}
+
+/* Form Control Improvements */
+.form-control, .form-select {
+    background: var(--theme-bg-primary);
+    border: 2px solid var(--theme-border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: var(--theme-text-primary);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    background: var(--theme-bg-primary);
+    border-color: var(--phoenix-primary);
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    color: var(--theme-text-primary);
+}
+
+.form-control::placeholder {
+    color: var(--theme-text-secondary);
+}
+
+/* Button Improvements */
+.btn {
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Success Button */
+.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+}
+
+/* Primary Button */
+.btn-primary {
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--phoenix-secondary), var(--phoenix-accent));
+    color: white;
+}
+
+/* Warning Button */
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: white;
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+    color: white;
+}
+
+/* Header Section */
+.d-flex.justify-content-between.align-items-center.mb-4 h1 {
+    color: var(--theme-text-primary);
+    font-weight: 700;
+}
+
+.text-muted {
+    color: var(--theme-text-secondary) !important;
+}
+
+/* Back Button */
+.btn-outline-light {
+    border: 2px solid var(--theme-border);
+    color: var(--theme-text-primary);
+    background: transparent;
+}
+
+.btn-outline-light:hover {
+    background: var(--phoenix-primary);
+    border-color: var(--phoenix-primary);
+    color: white;
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .card-header {
+        padding: 1.25rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.25rem;
+    }
+}
+
+/* Form Check Improvements */
+.form-check {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    border: 2px solid var(--theme-border);
+    border-radius: 4px;
+}
+
+.form-check-input:checked {
+    background-color: var(--phoenix-primary);
+    border-color: var(--phoenix-primary);
+}
+
+.form-check-input:focus {
+    border-color: var(--phoenix-primary);
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+/* Badge Styling */
+.badge {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
+.badge.bg-info {
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary)) !important;
+}
+
+/* Input Group Styling for Password Fields */
+.input-group .form-control {
+    border-right: none;
+}
+
+.input-group .btn-outline-secondary {
+    border-left: none;
+    background: var(--theme-bg-primary);
+    border-color: var(--theme-border);
+    color: var(--theme-text-secondary);
+}
+
+.input-group .btn-outline-secondary:hover {
+    background: var(--phoenix-primary);
+    border-color: var(--phoenix-primary);
+    color: white;
+}
+
+.input-group .btn-outline-secondary:focus {
+    box-shadow: none;
+    background: var(--phoenix-primary);
+    border-color: var(--phoenix-primary);
+    color: white;
+}
+
+.input-group:focus-within .form-control,
+.input-group:focus-within .btn-outline-secondary {
+    border-color: var(--phoenix-primary);
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}

@@ -16,7 +16,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_dashboard') }}">Admin</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Backend Control</li>
                         </ol>
                     </nav>
@@ -81,7 +81,7 @@
                                         </tr>
                                         <tr>
                                             <td><strong>Server Time:</strong></td>
-                                            <td>{{ moment().format('YYYY-MM-DD HH:mm:ss') }}</td>
+                                            <td>{{ system_info.current_time if system_info.current_time else 'N/A' }}</td>
                                         </tr>
                                     </table>
                                 </div>

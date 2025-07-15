@@ -34,7 +34,8 @@
                     </div>
                     
                     <!-- Login Form -->
-                    <form method="POST" class="login-form" novalidate>
+                    <form method="POST" action="{{ url_for('user.login') }}" class="login-form" novalidate>
+                        {{ csrf_token() if csrf_token else '' }}
                         <div class="mb-3">
                             <label for="username_or_email" class="form-label">
                                 <i class="fas fa-user me-2"></i>Benutzername oder E-Mail
