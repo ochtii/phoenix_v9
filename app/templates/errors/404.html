@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Seite nicht gefunden - Phoenix{% endblock %}
+
+{% block head %}
+<style>
+.error-container {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    padding: 3rem 0;
+}
+
+.error-content {
+    padding: 2rem;
+}
+
+.error-icon {
+    font-size: 4rem;
+    color: var(--primary-600, #6366f1);
+    margin-bottom: 1.5rem;
+}
+
+.error-title {
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.error-subtitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .error-title {
+        font-size: 4rem;
+    }
+    
+    .error-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .error-actions .btn {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="error-content">
+                    <div class="error-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    
+                    <h1 class="error-title">404</h1>
+                    <h2 class="error-subtitle">Seite nicht gefunden</h2>
+                    
+                    <p class="error-message">
+                        Die angeforderte Seite konnte nicht gefunden werden. 
+                        Möglicherweise wurde sie verschoben oder gelöscht.
+                    </p>
+                    
+                    <div class="error-actions">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                            <i class="fas fa-home"></i>
+                            Zurück zur Startseite
+                        </a>
+                        
+                        <button type="button" class="btn btn-outline-secondary ms-2" onclick="history.back()">
+                            <i class="fas fa-arrow-left"></i>
+                            Zurück
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

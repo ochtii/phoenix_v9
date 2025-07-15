@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Konto-Einstellungen{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user/account_settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-cog me-2"></i>Konto-Einstellungen
+                    </h1>
+                    <p class="text-muted">Verwalte deine Kontodaten und Sicherheitseinstellungen</p>
+                </div>
+                <a href="{{ url_for('user.profile', username=g.user.username if g.user else '') }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Zurück zum Profil
+                </a>
+            </div>
+
+            <!-- Settings Cards Grid -->
+            <div class="row g-4">
+                <!-- Profile Information Card -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-user me-2 text-primary"></i>Profil-Informationen
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('user.update_profile') }}" id="profile-form">
+                                <div class="mb-3">
+                                    <label for="display_name" class="form-label">Anzeigename</label>
+                                    <input type="text" class="form-control" id="display_name" name="display_name" 
+                                           value="{{ g.user.display_name if g.user else '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="bio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="bio" name="bio" rows="3" 
+                                              placeholder="Erzähle anderen von dir...">{{ g.user.bio if g.user else '' }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Standort</label>
+                                    <input type="text" class="form-control" id="location" name="location" 
+                                           value="{{ g.user.location if g.user else '' }}" placeholder="z.B. Berlin, Deutschland">
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Profil aktualisieren
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Settings Card -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-cog me-2 text-info"></i>Konto-Einstellungen
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('user.update_account') }}" id="account-form">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Benutzername</label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           value="{{ g.user.username if g.user else '' }}" required>
+                                    <div class="form-text">Eindeutiger Benutzername für dein Profil</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">E-Mail-Adresse</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ g.user.email if g.user else '' }}" required>
+                                    <div class="form-text">Wird für Benachrichtigungen verwendet</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Privatsphäre</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="profile_public" name="profile_public"
+                                               {{ 'checked' if g.user and g.user.profile_public else '' }}>
+                                        <label class="form-check-label" for="profile_public">
+                                            Öffentliches Profil
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Andere Nutzer können dein Profil finden</div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="fas fa-save me-2"></i>Einstellungen speichern
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings Card -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-shield-alt me-2 text-warning"></i>Sicherheit
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('user.change_password') }}" id="password-form">
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label">Aktuelles Passwort</label>
+                                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new_password" class="form-label">Neues Passwort</label>
+                                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                    <div class="form-text">Mindestens 8 Zeichen</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm_password" class="form-label">Passwort bestätigen</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                    <div id="password-match-feedback" class="form-text"></div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-key me-2"></i>Passwort ändern
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings Card -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-bell me-2 text-success"></i>Benachrichtigungen
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('user.update_notifications') }}" id="notifications-form">
+                                <div class="mb-3">
+                                    <label class="form-label">E-Mail-Benachrichtigungen</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="email_projects" name="email_projects"
+                                               {{ 'checked' if g.user and g.user.email_projects else '' }}>
+                                        <label class="form-check-label" for="email_projects">
+                                            Projekt-Updates
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="email_messages" name="email_messages"
+                                               {{ 'checked' if g.user and g.user.email_messages else '' }}>
+                                        <label class="form-check-label" for="email_messages">
+                                            Neue Nachrichten
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="email_weekly" name="email_weekly"
+                                               {{ 'checked' if g.user and g.user.email_weekly else '' }}>
+                                        <label class="form-check-label" for="email_weekly">
+                                            Wöchentliche Zusammenfassung
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save me-2"></i>Benachrichtigungen speichern
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone Card -->
+                <div class="col-12">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="mb-1">Konto löschen</h6>
+                                    <p class="text-muted mb-0">
+                                        Lösche dein Konto und alle damit verbundenen Daten permanent. 
+                                        Diese Aktion kann nicht rückgängig gemacht werden.
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                        <i class="fas fa-trash me-2"></i>Konto löschen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark border-danger">
+            <div class="modal-header border-danger">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Konto löschen
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <strong>Diese Aktion kann nicht rückgängig gemacht werden!</strong>
+                </div>
+                <p>Bist du sicher, dass du dein Konto löschen möchtest? Alle deine Daten werden permanent entfernt.</p>
+                <div class="mb-3">
+                    <label for="delete_confirmation" class="form-label">Gib "LÖSCHEN" ein, um zu bestätigen:</label>
+                    <input type="text" class="form-control" id="delete_confirmation" placeholder="LÖSCHEN">
+                </div>
+            </div>
+            <div class="modal-footer border-danger">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-danger" onclick="deleteAccount()" id="confirmDeleteBtn" disabled>
+                    <i class="fas fa-trash me-2"></i>Konto löschen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/user/account_settings.js') }}"></script>
+<script>
+// Password confirmation validation
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = this.value;
+    
+    if (newPassword !== confirmPassword) {
+        this.setCustomValidity('Passwords do not match');
+        document.getElementById('password-match-feedback').innerHTML = '<span class="text-danger">Passwörter stimmen nicht überein</span>';
+    } else {
+        this.setCustomValidity('');
+        document.getElementById('password-match-feedback').innerHTML = '<span class="text-success">Passwörter stimmen überein</span>';
+    }
+});
+
+// Delete confirmation validation
+document.getElementById('delete_confirmation').addEventListener('input', function() {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (this.value === 'LÖSCHEN') {
+        confirmBtn.disabled = false;
+    } else {
+        confirmBtn.disabled = true;
+    }
+});
+
+// Delete account function
+function deleteAccount() {
+    // Add delete account logic here
+    fetch('/api/user/delete', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = '/';
+        } else {
+            alert('Fehler beim Löschen des Kontos');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Fehler beim Löschen des Kontos');
+    });
+}
+</script>
+{% endblock %}

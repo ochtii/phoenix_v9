@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/dashboard.css') }}">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .stats-card {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--phoenix-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--theme-text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-action-btn {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--theme-text-primary);
+            transition: all 0.3s ease;
+            display: block;
+            text-align: center;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            color: var(--phoenix-primary);
+            text-decoration: none;
+        }
+        
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+            color: var(--phoenix-primary);
+        }
+    </style>
+{% endblock %}
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px var(--theme-shadow);
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-label {
+            color: var(--theme-text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stats-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stats-up { color: #28a745; }
+        .stats-down { color: #dc3545; }
+        
+        .admin-section {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 0.75rem;
+            color: var(--phoenix-primary);
+        }
+        
+        .user-item, .project-item {
+            background: var(--theme-bg-primary);
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .user-avatar, .project-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--phoenix-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .user-info, .project-info {
+            flex: 1;
+        }
+        
+        .user-name, .project-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-email, .project-meta {
+            color: var(--theme-text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .user-actions, .project-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .role-admin { background: #dc3545; color: white; }
+        .role-moderator { background: #ffc107; color: #000; }
+        .role-user { background: #6c757d; color: white; }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-active { background: #28a745; color: white; }
+        .status-inactive { background: #6c757d; color: white; }
+        .status-banned { background: #dc3545; color: white; }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--theme-bg-primary);
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--phoenix-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-time {
+            color: var(--theme-text-secondary);
+            font-size: 0.75rem;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-action-btn {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--theme-text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-btn:hover {
+            border-color: var(--phoenix-primary);
+            background: rgba(37, 99, 235, 0.05);
+            color: var(--phoenix-primary);
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+        
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 1.5rem 0;
+                text-align: center;
+            }
+            
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+            
+            .user-item, .project-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .user-actions, .project-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Admin Header -->
+    <div class="admin-header text-center">
+        <div class="container">
+            <h1 class="h2 mb-3">
+                <i class="fas fa-shield-alt me-3"></i>Admin Dashboard
+            </h1>
+            <p class="mb-0 opacity-75">System overview and management tools</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stats-card text-center">
+                <div class="stat-number">{{ stats.total_users if stats else 0 }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stats-card text-center">
+                <div class="stat-number">{{ stats.total_projects if stats else 0 }}</div>
+                <div class="stat-label">Total Projects</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stats-card text-center">
+                <div class="stat-number">{{ stats.active_users if stats else 0 }}</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stats-card text-center">
+                <div class="stat-number">{{ stats.pending_tickets if stats else 0 }}</div>
+                <div class="stat-label">Open Tickets</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">
+                <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
+            </h3>
+            <div class="quick-actions">
+                <a href="{{ url_for('admin.users') }}" class="quick-action-btn">
+                    <i class="fas fa-users quick-action-icon"></i>
+                    <strong>User Management</strong>
+                    <div class="text-muted">Manage user accounts</div>
+                </a>
+                
+                <a href="{{ url_for('admin.projects') }}" class="quick-action-btn">
+                    <i class="fas fa-folder-open quick-action-icon"></i>
+                    <strong>Project Management</strong>
+                    <div class="text-muted">Moderate projects</div>
+                </a>
+                
+                <a href="{{ url_for('admin.settings') }}" class="quick-action-btn">
+                    <i class="fas fa-cogs quick-action-icon"></i>
+                    <strong>System Settings</strong>
+                    <div class="text-muted">Configure system</div>
+                </a>
+                
+                <a href="{{ url_for('support.all_tickets') }}" class="quick-action-btn">
+                    <i class="fas fa-headset quick-action-icon"></i>
+                    <strong>Support Center</strong>
+                    <div class="text-muted">Manage tickets</div>
+                </a>
+                
+                <a href="{{ url_for('admin.backend_control') }}" class="quick-action-btn">
+                    <i class="fas fa-terminal quick-action-icon"></i>
+                    <strong>Backend Control</strong>
+                    <div class="text-muted">System administration</div>
+                </a>
+                
+                <a href="{{ url_for('admin.analytics') }}" class="quick-action-btn">
+                    <i class="fas fa-chart-line quick-action-icon"></i>
+                    <strong>Analytics</strong>
+                    <div class="text-muted">View insights</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="row">
+        <div class="col-12">
+            <div class="stats-card">
+                <h5 class="mb-3">
+                    <i class="fas fa-server text-primary me-2"></i>System Status
+                </h5>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-circle text-success"></i>
+                            <strong class="ms-2">Database</strong>
+                        </div>
+                        <small class="text-muted">Connected</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-circle text-success"></i>
+                            <strong class="ms-2">Storage</strong>
+                        </div>
+                        <small class="text-muted">75% Used</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-circle text-warning"></i>
+                            <strong class="ms-2">Cache</strong>
+                        </div>
+                        <small class="text-muted">85% Used</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-circle text-success"></i>
+                            <strong class="ms-2">Backup</strong>
+                        </div>
+                        <small class="text-muted">Up to date</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        // User management functions
+        function editUser(userId) {
+            window.location.href = `/admin/users/${userId}/edit`;
+        }
+        
+        function suspendUser(userId) {
+            if (confirm('Are you sure you want to suspend this user?')) {
+                fetch(`/admin/users/${userId}/suspend`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Phoenix.Utils.showToast('User suspended successfully', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        Phoenix.Utils.showToast(data.message || 'Failed to suspend user', 'error');
+                    }
+                });
+            }
+        }
+        
+        function activateUser(userId) {
+            fetch(`/admin/users/${userId}/activate`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Phoenix.Utils.showToast('User activated successfully', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    Phoenix.Utils.showToast(data.message || 'Failed to activate user', 'error');
+                }
+            });
+        }
+        
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                fetch(`/admin/users/${userId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Phoenix.Utils.showToast('User deleted successfully', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        Phoenix.Utils.showToast(data.message || 'Failed to delete user', 'error');
+                    }
+                });
+            }
+        }
+        
+        // Project management functions
+        function moderateProject(projectId) {
+            window.location.href = `/admin/projects/${projectId}/moderate`;
+        }
+        
+        function featureProject(projectId) {
+            fetch(`/admin/projects/${projectId}/feature`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Phoenix.Utils.showToast('Project featured successfully', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    Phoenix.Utils.showToast(data.message || 'Failed to feature project', 'error');
+                }
+            });
+        }
+        
+        function unfeatureProject(projectId) {
+            fetch(`/admin/projects/${projectId}/unfeature`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Phoenix.Utils.showToast('Project unfeatured successfully', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    Phoenix.Utils.showToast(data.message || 'Failed to unfeature project', 'error');
+                }
+            });
+        }
+        
+        function deleteProject(projectId) {
+            if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+                fetch(`/admin/projects/${projectId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Phoenix.Utils.showToast('Project deleted successfully', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        Phoenix.Utils.showToast(data.message || 'Failed to delete project', 'error');
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}

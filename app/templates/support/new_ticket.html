@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Neues Support-Ticket - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .support-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%),
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-support {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            opacity: 0.3;
+            z-index: 5;
+            animation: phoenixGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes phoenixGlow {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.1); }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<!-- Full width support without base container constraints -->
+</div> <!-- Close any existing container -->
+
+<div class="support-phoenix-bg" style="width: 100vw; margin: 0; padding: 0;">
+    <img src="{{ url_for('static', filename='img/phoenix8.png') }}" alt="Phoenix" class="phoenix-accent-support">
+    
+    <div class="container-fluid py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="phoenix-card phoenix-card-content mb-4">
+                    <div class="text-center">
+                        <h1 class="h2 mb-3">
+                            <i class="fas fa-headset text-primary me-3"></i>
+                            Neues Support-Ticket erstellen
+                        </h1>
+                        <p class="text-muted">
+                            Beschreiben Sie Ihr Anliegen so detailliert wie möglich. 
+                            Unser Support-Team wird sich schnellstmöglich bei Ihnen melden.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Ticket Form -->
+                <div class="phoenix-card phoenix-card-form">
+                    <form method="POST" enctype="multipart/form-data" id="ticketForm">
+                        <div class="row">
+                            <!-- Kategorie -->
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">
+                                    <i class="fas fa-tags me-2"></i>Kategorie
+                                </label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Bitte wählen...</option>
+                                    <option value="technical">🔧 Technisches Problem</option>
+                                    <option value="billing">💳 Abrechnung & Bezahlung</option>
+                                    <option value="feature">💡 Feature-Anfrage</option>
+                                    <option value="bug">🐛 Bug-Report</option>
+                                    <option value="account">👤 Konto-Problem</option>
+                                    <option value="general">❓ Allgemeine Frage</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Priorität -->
+                            <div class="col-md-6 mb-3">
+                                <label for="priority" class="form-label">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Priorität
+                                </label>
+                                <select class="form-select" id="priority" name="priority" required>
+                                    <option value="low">🔵 Niedrig</option>
+                                    <option value="medium" selected>🟡 Mittel</option>
+                                    <option value="high">🟠 Hoch</option>
+                                    <option value="urgent">🔴 Dringend</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Betreff -->
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">
+                                <i class="fas fa-heading me-2"></i>Betreff
+                            </label>
+                            <input type="text" class="form-control" id="subject" name="subject" 
+                                   placeholder="Kurze Beschreibung Ihres Problems..." required>
+                        </div>
+                        
+                        <!-- Beschreibung -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left me-2"></i>Detaillierte Beschreibung
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="8" 
+                                      placeholder="Bitte beschreiben Sie Ihr Problem so detailliert wie möglich...
+                                      
+• Was haben Sie versucht zu tun?
+• Was ist stattdessen passiert?
+• Wann ist das Problem aufgetreten?
+• Fehlermeldungen oder Screenshots?" required></textarea>
+                        </div>
+                        
+                        <!-- Umgebung (für technische Probleme) -->
+                        <div class="mb-3" id="environmentSection" style="display: none;">
+                            <label for="environment" class="form-label">
+                                <i class="fas fa-desktop me-2"></i>System-Informationen
+                            </label>
+                            <textarea class="form-control" id="environment" name="environment" rows="3" 
+                                      placeholder="Browser: Chrome 96.0
+Betriebssystem: Windows 11
+Bildschirmauflösung: 1920x1080"></textarea>
+                        </div>
+                        
+                        <!-- Datei-Anhang -->
+                        <div class="mb-4">
+                            <label for="attachment" class="form-label">
+                                <i class="fas fa-paperclip me-2"></i>Anhang (optional)
+                            </label>
+                            <input type="file" class="form-control" id="attachment" name="attachment" 
+                                   accept=".jpg,.jpeg,.png,.gif,.pdf,.txt,.doc,.docx">
+                            <div class="form-text">
+                                Unterstützte Dateitypen: JPG, PNG, PDF, TXT, DOC (Max. 10MB)
+                            </div>
+                        </div>
+                        
+                        <!-- E-Mail für Updates -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="emailUpdates" name="email_updates" checked>
+                                <label class="form-check-label" for="emailUpdates">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    E-Mail-Benachrichtigungen über Ticket-Updates erhalten
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Ticket erstellen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- FAQ Quick Links -->
+                <div class="phoenix-card phoenix-card-subtle mt-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-question-circle text-info me-2"></i>
+                        Häufig gestellte Fragen
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <i class="fas fa-chevron-right me-2 text-primary"></i>
+                                        Wie ändere ich mein Passwort?
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <i class="fas fa-chevron-right me-2 text-primary"></i>
+                                        Projekt-Freigabe funktioniert nicht
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <i class="fas fa-chevron-right me-2 text-primary"></i>
+                                        Wie kann ich mein Konto löschen?
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <i class="fas fa-chevron-right me-2 text-primary"></i>
+                                        Upload-Probleme beheben
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <i class="fas fa-chevron-right me-2 text-primary"></i>
+                                        Team-Mitglieder einladen
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        <i class="fas fa-chevron-right me-2 text-primary"></i>
+                                        Premium-Features aktivieren
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category');
+    const environmentSection = document.getElementById('environmentSection');
+    
+    // Show environment section for technical problems
+    categorySelect.addEventListener('change', function() {
+        if (this.value === 'technical' || this.value === 'bug') {
+            environmentSection.style.display = 'block';
+            document.getElementById('environment').required = true;
+        } else {
+            environmentSection.style.display = 'none';
+            document.getElementById('environment').required = false;
+        }
+    });
+    
+    // Form submission
+    document.getElementById('ticketForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        // Add timestamp and user info
+        formData.append('created_at', new Date().toISOString());
+        formData.append('status', 'open');
+        
+        fetch('/support/tickets/create', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success alert-dismissible fade show mb-4';
+                successAlert.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Ticket erfolgreich erstellt!</strong> 
+                    Ihre Ticket-ID ist: <strong>#${data.ticket_id}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                // Insert before the first phoenix-card
+                const firstCard = document.querySelector('.phoenix-card');
+                if (firstCard && firstCard.parentNode) {
+                    firstCard.parentNode.insertBefore(successAlert, firstCard);
+                }
+                
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = `/support/tickets/${data.ticket_id}`;
+                }, 3000);
+            } else {
+                throw new Error(data.message || 'Fehler beim Erstellen des Tickets');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-danger alert-dismissible fade show mb-4';
+            errorAlert.innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Fehler!</strong> ${error.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Insert before the first phoenix-card
+            const firstCard = document.querySelector('.phoenix-card');
+            if (firstCard && firstCard.parentNode) {
+                firstCard.parentNode.insertBefore(errorAlert, firstCard);
+            }
+        });
+    });
+});
+</script>
+
+<!-- Reopen container for base template -->
+<div class="container">
+{% endblock %}

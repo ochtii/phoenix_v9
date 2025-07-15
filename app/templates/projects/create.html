@@ -1,0 +1,543 @@
+{% extends "base.html" %}
+
+{% block title %}Projekt erstellen - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/projects/create.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="create-project-container">
+        <!-- Page Header -->
+        <div class="text-center mb-4">
+            <h1 class="h2">
+                <i class="fas fa-plus-circle text-primary me-3"></i>Neues Projekt erstellen
+            </h1>
+            <p class="text-muted">Starten Sie Ihre neue Projektreise mit Phoenix</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('projects.create') }}">
+            <!-- Project Name -->
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="projectName" name="project_name" 
+                       placeholder="Projektname" required maxlength="100">
+                <label for="projectName">
+                    <i class="fas fa-project-diagram me-2"></i>Projektname
+                </label>
+            </div>
+
+            <!-- Project Description -->
+            <div class="form-floating mb-3">
+                <textarea class="form-control" id="projectDescription" name="description" 
+                          placeholder="Projektbeschreibung" style="height: 120px" maxlength="500"></textarea>
+                <label for="projectDescription">
+                    <i class="fas fa-align-left me-2"></i>Projektbeschreibung
+                </label>
+                <div class="form-text text-end">
+                    <span id="descriptionCount">0</span>/500 Zeichen
+                </div>
+            </div>
+
+            <!-- Separator -->
+            <hr class="my-4">
+
+            <!-- Category and Template Selection -->
+            <div class="category-template-row">
+                <div>
+                    <label for="projectCategory" class="form-label">
+                        <i class="fas fa-tags me-2"></i>Projektkategorie
+                    </label>
+                    <select class="form-select category-select" id="projectCategory" name="category" required>
+                        <option value="">Kategorie auswählen</option>
+                        <option value="Web Development" data-icon="fas fa-globe">🌐 Web-Entwicklung</option>
+                        <option value="Mobile App" data-icon="fas fa-mobile-alt">📱 Mobile App</option>
+                        <option value="Desktop Software" data-icon="fas fa-desktop">🖥️ Desktop-Software</option>
+                        <option value="Game Development" data-icon="fas fa-gamepad">🎮 Spielentwicklung</option>
+                        <option value="Data Science" data-icon="fas fa-chart-bar">📊 Data Science</option>
+                        <option value="AI/ML" data-icon="fas fa-brain">🧠 KI/ML</option>
+                        <option value="DevOps" data-icon="fas fa-server">⚙️ DevOps</option>
+                        <option value="Design" data-icon="fas fa-paint-brush">🎨 Design</option>
+                        <option value="Marketing" data-icon="fas fa-bullhorn">📢 Marketing</option>
+                        <option value="Research" data-icon="fas fa-microscope">🔬 Forschung</option>
+                        <option value="E-Commerce" data-icon="fas fa-shopping-cart">🛒 E-Commerce</option>
+                        <option value="IoT" data-icon="fas fa-microchip">🔌 IoT</option>
+                        <option value="Blockchain" data-icon="fas fa-link">⛓️ Blockchain</option>
+                        <option value="Cybersecurity" data-icon="fas fa-shield-alt">🔒 Cybersicherheit</option>
+                        <option value="Education" data-icon="fas fa-graduation-cap">🎓 Bildung</option>
+                        <option value="Healthcare" data-icon="fas fa-heartbeat">❤️ Gesundheitswesen</option>
+                        <option value="Finance" data-icon="fas fa-chart-line">💰 Finanzen</option>
+                        <option value="Entertainment" data-icon="fas fa-film">🎬 Unterhaltung</option>
+                        <option value="Social Media" data-icon="fas fa-share-alt">📲 Social Media</option>
+                        <option value="Productivity" data-icon="fas fa-tasks">✅ Produktivität</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="projectTemplate" class="form-label">
+                        <i class="fas fa-clipboard-list me-2"></i>Projektvorlage
+                    </label>
+                    <select class="form-select template-select" id="projectTemplate" name="template">
+                        <option value="">Select a template (optional)</option>
+                        <option value="ecommerce">E-Commerce Platform</option>
+                        <option value="saas">SaaS Application</option>
+                        <option value="mobile_app">Mobile App Development</option>
+                        <option value="healthcare">Healthcare Management</option>
+                        <option value="fintech">FinTech Solution</option>
+                        <option value="edtech">Educational Platform</option>
+                        <option value="real_estate">Real Estate Portal</option>
+                        <option value="restaurant">Restaurant Management</option>
+                        <option value="logistics">Logistics & Supply Chain</option>
+                        <option value="ai_ml">AI/ML Project</option>
+                        <option value="blockchain">Blockchain Application</option>
+                        <option value="iot">IoT Platform</option>
+                        <option value="gaming">Game Development</option>
+                        <option value="crm">CRM System</option>
+                        <option value="hr">HR Management</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Separator -->
+            <hr class="my-4">
+
+            <!-- Privacy Options -->
+            <div class="mb-4">
+                <label class="form-label">
+                    <i class="fas fa-shield-alt me-2"></i>Privacy Settings
+                </label>
+                <div class="privacy-options">
+                    <div class="privacy-card" onclick="selectPrivacy('public')" id="publicCard">
+                        <i class="fas fa-globe"></i>
+                        <h6>Public Project</h6>
+                        <p>Anyone can view this project. Only team members can edit.</p>
+                    </div>
+                    <div class="privacy-card selected" onclick="selectPrivacy('private')" id="privateCard">
+                        <i class="fas fa-lock"></i>
+                        <h6>Private Project</h6>
+                        <p>Only you and invited members can access this project</p>
+                    </div>
+                </div>
+                <input type="hidden" id="privacyType" name="privacy" value="private">
+                
+                <!-- Public Project Note -->
+                <div id="publicNote" class="public-project-note" style="display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Note:</strong> Public projects can be viewed by anyone, but only team members can make changes or contribute to the project.
+                </div>
+            </div>
+
+            <!-- Team Members Section -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <label class="form-label mb-0" style="color: var(--phoenix-primary); font-weight: 600;">
+                        <i class="fas fa-users me-2"></i>Teammitglieder (Optional)
+                    </label>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="showInviteModal()" 
+                            style="border-radius: 10px; background: var(--phoenix-primary); border: none; font-weight: 500;">
+                        <i class="fas fa-user-plus me-2"></i>Team einladen
+                    </button>
+                </div>
+                
+                <div class="team-member-card" style="background: rgba(255, 255, 255, 0.05); border: 2px solid var(--phoenix-secondary); border-radius: 15px; padding: 1.5rem;">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                                    <i class="fas fa-envelope me-2"></i>E-Mail-Adresse hinzufügen:
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="memberEmail" 
+                                           placeholder="E-Mail-Adresse eingeben..."
+                                           style="border-radius: 10px 0 0 10px; border: 2px solid var(--phoenix-primary); background: rgba(255, 255, 255, 0.1); color: #f8f9fa; padding: 12px;">
+                                    <button type="button" class="btn btn-primary" onclick="addTeamMember()"
+                                            style="border-radius: 0 10px 10px 0; background: var(--phoenix-primary); border: 2px solid var(--phoenix-primary); border-left: none;">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="team-stats" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1rem; text-align: center;">
+                                <h6 style="color: var(--phoenix-primary); margin-bottom: 0.5rem;">
+                                    <i class="fas fa-chart-line me-2"></i>Team-Status
+                                </h6>
+                                <div style="font-size: 1.5rem; font-weight: bold; color: #f8f9fa;" id="teamCount">1</div>
+                                <small style="color: #adb5bd;">Mitglieder</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="teamMembersList" class="mt-3">
+                        <!-- Current user is automatically included -->
+                        <div class="team-member-item" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                            <div class="d-flex align-items-center">
+                                <div class="member-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: var(--phoenix-primary); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                    <i class="fas fa-user" style="color: white;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #f8f9fa;">Sie (Projektleiter)</div>
+                                    <small style="color: #adb5bd;">{{ g.user.email }}</small>
+                                </div>
+                            </div>
+                            <span class="badge" style="background: var(--phoenix-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px;">
+                                <i class="fas fa-crown me-1"></i>Owner
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 text-center">
+                        <small style="color: #adb5bd;">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Sie können jederzeit weitere Teammitglieder in den Projekteinstellungen hinzufügen
+                        </small>
+                    </div>
+                    <div class="form-text">
+                        Team members will receive an invitation email to join your project
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Timeline -->
+            <div class="mb-4">
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt me-2"></i>Project Timeline
+                </label>
+                <div class="timeline-card">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="startDate" name="start_date">
+                                <label for="startDate">Start Date (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="endDate" name="end_date">
+                                <label for="endDate">Target End Date (Optional)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        You can adjust the timeline later. Creation date will remain fixed.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{{ url_for('projects.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-rocket me-2"></i>Projekt erstellen
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Team Invite Modal -->
+<div class="modal fade" id="inviteModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; backdrop-filter: blur(10px); background: rgba(45, 45, 45, 0.8);">
+            <div class="modal-header" style="border-radius: 15px 15px 0 0; background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary)); color: white; border: none;">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus me-2"></i>Teammitglieder einladen
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem; background: rgba(45, 45, 45, 0.9); color: #f8f9fa;">
+                <div class="invite-options">
+                    <div class="invite-option-card active" data-method="email" style="background: rgba(255, 255, 255, 0.1); border: 2px solid var(--phoenix-primary); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-envelope" style="color: var(--phoenix-primary); font-size: 1.5rem;"></i>
+                        <h6 style="color: #f8f9fa; margin-top: 0.5rem;">Email-Einladung</h6>
+                        <p style="color: #adb5bd; margin-bottom: 0;">Senden Sie direkte Einladungen per E-Mail</p>
+                    </div>
+                    <div class="invite-option-card" data-method="code" style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-link" style="color: var(--phoenix-secondary); font-size: 1.5rem;"></i>
+                        <h6 style="color: #f8f9fa; margin-top: 0.5rem;">Invite-Code</h6>
+                        <p style="color: #adb5bd; margin-bottom: 0;">Erstellen Sie einen Code zum Teilen</p>
+                    </div>
+                </div>
+                
+                <div class="invite-method" id="emailMethod">
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                            <i class="fas fa-envelope me-2"></i>E-Mail-Adressen eingeben:
+                        </label>
+                        <textarea class="form-control" id="bulkEmails" rows="4" 
+                                  placeholder="Geben Sie E-Mail-Adressen ein (eine pro Zeile oder durch Komma getrennt)"
+                                  style="background: rgba(255, 255, 255, 0.1); border: 2px solid var(--phoenix-primary); border-radius: 10px; color: #f8f9fa; padding: 12px;"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                            <i class="fas fa-comment me-2"></i>Persönliche Nachricht (optional):
+                        </label>
+                        <textarea class="form-control" id="inviteMessage" rows="3" 
+                                  placeholder="Schreiben Sie eine persönliche Nachricht..."
+                                  style="background: rgba(255, 255, 255, 0.1); border: 2px solid var(--phoenix-secondary); border-radius: 10px; color: #f8f9fa; padding: 12px;"></textarea>
+                    </div>
+                </div>
+                
+                <div class="invite-method" id="codeMethod" style="display: none;">
+                    <div class="text-center py-4">
+                        <i class="fas fa-code fa-3x mb-3" style="color: var(--phoenix-primary);"></i>
+                        <h5 style="color: #f8f9fa;">Invite-Code wird nach Projekterstellung verfügbar</h5>
+                        <p style="color: #adb5bd;">Nach dem Erstellen des Projekts können Sie Invite-Codes in den Projekteinstellungen verwalten.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border: none; padding: 1.5rem 2rem; background: rgba(45, 45, 45, 0.9);">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 500;">
+                    <i class="fas fa-times me-2"></i>Schließen
+                </button>
+                <button type="button" class="btn btn-primary" onclick="processInvites()" style="border-radius: 10px; background: var(--phoenix-primary); border: none; font-weight: 500;">
+                    <i class="fas fa-paper-plane me-2"></i>Einladungen verarbeiten
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        let teamMembers = new Set();
+
+        // Description counter
+        document.getElementById('projectDescription').addEventListener('input', function() {
+            const count = this.value.length;
+            document.getElementById('descriptionCount').textContent = count;
+        });
+
+        // Privacy selection
+        function selectPrivacy(type) {
+            document.querySelectorAll('.privacy-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const publicNote = document.getElementById('publicNote');
+            
+            if (type === 'public') {
+                document.getElementById('publicCard').classList.add('selected');
+                document.getElementById('privacyType').value = 'public';
+                publicNote.style.display = 'block';
+            } else {
+                document.getElementById('privateCard').classList.add('selected');
+                document.getElementById('privacyType').value = 'private';
+                publicNote.style.display = 'none';
+            }
+        }
+
+        // Team member management
+        function addTeamMember() {
+            const emailInput = document.getElementById('memberEmail');
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                alert('Bitte geben Sie eine E-Mail-Adresse ein');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                alert('Bitte geben Sie eine gültige E-Mail-Adresse ein');
+                return;
+            }
+            
+            if (teamMembers.has(email)) {
+                alert('Dieses Mitglied wurde bereits hinzugefügt');
+                return;
+            }
+            
+            teamMembers.add(email);
+            displayTeamMembers();
+            updateTeamCount();
+            emailInput.value = '';
+        }
+
+        function removeMember(email) {
+            teamMembers.delete(email);
+            displayTeamMembers();
+            updateTeamCount();
+        }
+
+        function updateTeamCount() {
+            const countElement = document.getElementById('teamCount');
+            countElement.textContent = teamMembers.size + 1; // +1 for current user
+        }
+
+        function displayTeamMembers() {
+            const container = document.getElementById('teamMembersList');
+            
+            // Clear existing members (except current user)
+            const currentUserElement = container.querySelector('.team-member-item');
+            container.innerHTML = '';
+            if (currentUserElement) {
+                container.appendChild(currentUserElement);
+            }
+            
+            teamMembers.forEach(email => {
+                const memberElement = document.createElement('div');
+                memberElement.className = 'team-member-item';
+                memberElement.style.cssText = 'background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;';
+                memberElement.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <div class="member-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: var(--phoenix-secondary); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                            <i class="fas fa-user" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #f8f9fa;">${email}</div>
+                            <small style="color: #adb5bd;">Teammitglied</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeMember('${email}')" style="border-radius: 50%; width: 32px; height: 32px; padding: 0;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(memberElement);
+            });
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Handle form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // Add team members to form data
+            const teamMembersArray = Array.from(teamMembers);
+            teamMembersArray.forEach((email, index) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `team_members[${index}]`;
+                input.value = email;
+                this.appendChild(input);
+            });
+        });
+
+        // Enter key support for adding members
+        document.getElementById('memberEmail').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTeamMember();
+            }
+        });
+
+        // Show invite modal
+        function showInviteModal() {
+            const modal = new bootstrap.Modal(document.getElementById('inviteModal'));
+            modal.show();
+        }
+
+        // Invite method selection
+        document.querySelectorAll('.invite-option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.invite-option-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                
+                const method = this.dataset.method;
+                document.querySelectorAll('.invite-method').forEach(m => m.style.display = 'none');
+                document.getElementById(method + 'Method').style.display = 'block';
+            });
+        });
+
+        // Process invites from modal
+        function processInvites() {
+            const bulkEmails = document.getElementById('bulkEmails').value.trim();
+            if (!bulkEmails) {
+                alert('Bitte geben Sie mindestens eine E-Mail-Adresse ein');
+                return;
+            }
+            
+            // Parse emails (by line or comma)
+            const emails = bulkEmails.split(/[,\n]/).map(email => email.trim()).filter(email => email);
+            
+            // Validate and add emails
+            let addedCount = 0;
+            emails.forEach(email => {
+                if (isValidEmail(email) && !teamMembers.has(email)) {
+                    teamMembers.add(email);
+                    addedCount++;
+                }
+            });
+            
+            if (addedCount > 0) {
+                displayTeamMembers();
+                document.getElementById('bulkEmails').value = '';
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('inviteModal'));
+                modal.hide();
+                
+                // Show success message
+                showToast(`${addedCount} Teammitglieder hinzugefügt`, 'success');
+            } else {
+                alert('Keine gültigen E-Mail-Adressen gefunden oder alle bereits hinzugefügt');
+            }
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // Date validation
+        document.getElementById('startDate').addEventListener('change', function() {
+            const startDate = new Date(this.value);
+            const endDateInput = document.getElementById('endDate');
+            
+            if (endDateInput.value) {
+                const endDate = new Date(endDateInput.value);
+                if (startDate > endDate) {
+                    endDateInput.value = '';
+                    showToast('End date must be after start date', 'warning');
+                }
+            }
+        });
+
+        document.getElementById('endDate').addEventListener('change', function() {
+            const endDate = new Date(this.value);
+            const startDateInput = document.getElementById('startDate');
+            
+            if (startDateInput.value) {
+                const startDate = new Date(startDateInput.value);
+                if (endDate < startDate) {
+                    this.value = '';
+                    showToast('End date must be after start date', 'warning');
+                }
+            }
+        });
+    </script>
+{% endblock %}

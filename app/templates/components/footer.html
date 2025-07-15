@@ -1,0 +1,199 @@
+<!-- Footer -->
+<footer class="bg-dark text-light py-5 mt-auto">
+    <div class="container-fluid d-flex justify-content-center">
+        <div class="footer-content-wrapper">
+            <div class="row">
+            <!-- About Phoenix -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5 class="text-primary mb-3">
+                    <i class="fas fa-fire me-2"></i>Phoenix
+                </h5>
+                <p class="text-muted">
+                    Eine kollaborative Plattform für die Verwaltung und Entdeckung großartiger Projekte. 
+                    Vernetzen Sie sich mit Entwicklern, treten Sie spannenden Projekten bei und verwirklichen Sie Ihre Ideen.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="text-light me-3" title="Folgen Sie uns auf Twitter">
+                        <i class="fab fa-twitter fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-light me-3" title="Treten Sie unserem Discord bei">
+                        <i class="fab fa-discord fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-light me-3" title="GitHub Repository">
+                        <i class="fab fa-github fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-light" title="LinkedIn">
+                        <i class="fab fa-linkedin fa-lg"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="text-uppercase fw-bold mb-3">Schnellzugriff</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="{{ url_for('main.index') }}" class="text-muted text-decoration-none">Startseite</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{{ url_for('discover.explore') }}" class="text-muted text-decoration-none">Projekte entdecken</a>
+                    </li>
+                    {% if current_user %}
+                        <li class="mb-2">
+                            <a href="{{ url_for('projects.new_project') }}" class="text-muted text-decoration-none">Projekt erstellen</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('main.index') }}" class="text-muted text-decoration-none">Dashboard</a>
+                        </li>
+                    {% else %}
+                        <li class="mb-2">
+                            <a href="{{ url_for('user.register') }}" class="text-muted text-decoration-none">Registrieren</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('user.login') }}" class="text-muted text-decoration-none">Anmelden</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <!-- Support -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="text-uppercase fw-bold mb-3">Support</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="{{ url_for('main.about') }}" class="text-muted text-decoration-none">Über uns</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{{ url_for('main.contact') }}" class="text-muted text-decoration-none">Kontakt</a>
+                    </li>
+                    {% if current_user %}
+                        <li class="mb-2">
+                            <a href="{{ url_for('support.new_ticket') }}" class="text-muted text-decoration-none">Problem melden</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('support.tickets') }}" class="text-muted text-decoration-none">Meine Tickets</a>
+                        </li>
+                    {% endif %}
+                    <li class="mb-2">
+                        <a href="#" class="text-muted text-decoration-none" data-bs-toggle="modal" data-bs-target="#helpModal">Hilfe</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Resources -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="text-uppercase fw-bold mb-3">Ressourcen</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="#" class="text-muted text-decoration-none">API Dokumentation</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="text-muted text-decoration-none">Datenschutzerklärung</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="text-muted text-decoration-none">Nutzungsbedingungen</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="text-muted text-decoration-none">Community-Richtlinien</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Newsletter Signup -->
+            <div class="col-lg-2 col-md-12 mb-4">
+                <h6 class="text-uppercase fw-bold mb-3">Stay Updated</h6>
+                <p class="text-muted small">Get notified about new features and community updates.</p>
+                <form class="newsletter-form">
+                    <div class="input-group input-group-sm">
+                        <input type="email" class="form-control" placeholder="Your email" required>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Bottom Bar -->
+        <hr class="my-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="text-muted small mb-0">
+                    &copy; 2025 Phoenix Platform. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-muted small mb-0">
+                    Built with <i class="fas fa-heart text-danger"></i> for the developer community
+                    {% if config.DEBUG %}
+                        <span class="badge bg-warning text-dark ms-2">DEV MODE</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">
+                    <i class="fas fa-question-circle me-2"></i>Help & Support
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-book me-2"></i>Getting Started</h6>
+                        <ul class="list-unstyled text-muted">
+                            <li>• Profil erstellen</li>
+                            <li>• Projekten beitreten oder erstellen</li>
+                            <li>• Connect with other developers</li>
+                            <li>• Collaborate and build amazing things</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-headset me-2"></i>Need Help?</h6>
+                        <ul class="list-unstyled text-muted">
+                            <li>• Check our FAQ section</li>
+                            <li>• Contact support team</li>
+                            <li>• Join our community Discord</li>
+                            <li>• Browse documentation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h6><i class="fas fa-keyboard me-2"></i>Keyboard Shortcuts</h6>
+                    <div class="row text-muted small">
+                        <div class="col-md-6">
+                            <kbd>Ctrl + K</kbd> - Search projects<br>
+                            <kbd>G + D</kbd> - Go to dashboard<br>
+                            <kbd>G + P</kbd> - Go to projects
+                        </div>
+                        <div class="col-md-6">
+                            <kbd>G + M</kbd> - Go to messages<br>
+                            <kbd>?</kbd> - Show help<br>
+                            <kbd>Esc</kbd> - Close modals
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                {% if current_user %}
+                    <a href="{{ url_for('support.new_ticket') }}" class="btn btn-primary">Support-Ticket erstellen</a>
+                {% endif %}
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back to Top Button -->
+<button id="backToTop" class="btn btn-primary rounded-circle position-fixed d-none" 
+        style="bottom: 2rem; right: 2rem; z-index: 1000;" title="Back to top">
+    <i class="fas fa-chevron-up"></i>
+</button>

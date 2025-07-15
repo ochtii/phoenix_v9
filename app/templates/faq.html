@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - Häufig gestellte Fragen{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-primary mb-3">
+            <i class="fas fa-question-circle me-3"></i>Häufig gestellte Fragen
+        </h1>
+        <p class="lead text-muted">Hier finden Sie Antworten auf die häufigsten Fragen zu Phoenix</p>
+    </div>
+
+    <!-- FAQ Categories -->
+    <div class="row">
+        <!-- Allgemein -->
+        <div class="col-lg-6 mb-4">
+            <div class="card phoenix-card h-100">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>Allgemein
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="generalAccordion">
+                        <!-- Was ist Phoenix? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#general1">
+                                    Was ist Phoenix?
+                                </button>
+                            </h2>
+                            <div id="general1" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                                <div class="accordion-body text-light">
+                                    Phoenix ist eine moderne Projektmanagement-Plattform, die Teams dabei hilft, ihre Projekte effizient zu verwalten und zusammenzuarbeiten. Mit Features wie Aufgabenverwaltung, Timeline-Tracking und Team-Kommunikation.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wie registriere ich mich? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#general2">
+                                    Wie registriere ich mich?
+                                </button>
+                            </h2>
+                            <div id="general2" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                                <div class="accordion-body text-light">
+                                    Klicken Sie auf "Registrieren" in der oberen Navigation. Geben Sie Ihre E-Mail-Adresse, einen Benutzernamen und ein sicheres Passwort ein. Nach der Bestätigung können Sie sofort loslegen.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ist Phoenix kostenlos? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#general3">
+                                    Ist Phoenix kostenlos?
+                                </button>
+                            </h2>
+                            <div id="general3" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
+                                <div class="accordion-body text-light">
+                                    Ja, Phoenix bietet einen kostenlosen Plan mit grundlegenden Features. Für erweiterte Funktionen stehen Premium-Pläne zur Verfügung.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projekte -->
+        <div class="col-lg-6 mb-4">
+            <div class="card phoenix-card h-100">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-project-diagram me-2 text-success"></i>Projekte
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="projectsAccordion">
+                        <!-- Wie erstelle ich ein Projekt? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#projects1">
+                                    Wie erstelle ich ein Projekt?
+                                </button>
+                            </h2>
+                            <div id="projects1" class="accordion-collapse collapse" data-bs-parent="#projectsAccordion">
+                                <div class="accordion-body text-light">
+                                    Gehen Sie zu "Meine Projekte" und klicken Sie auf "Neues Projekt erstellen". Füllen Sie die Projektdetails aus und laden Sie bei Bedarf Teammitglieder ein.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kann ich andere Benutzer einladen? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#projects2">
+                                    Kann ich andere Benutzer einladen?
+                                </button>
+                            </h2>
+                            <div id="projects2" class="accordion-collapse collapse" data-bs-parent="#projectsAccordion">
+                                <div class="accordion-body text-light">
+                                    Ja, als Projektersteller können Sie Teammitglieder per E-Mail-Adresse oder Benutzername zu Ihren Projekten einladen und deren Berechtigungen verwalten.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wie verwalte ich Aufgaben? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#projects3">
+                                    Wie verwalte ich Aufgaben?
+                                </button>
+                            </h2>
+                            <div id="projects3" class="accordion-collapse collapse" data-bs-parent="#projectsAccordion">
+                                <div class="accordion-body text-light">
+                                    In jedem Projekt können Sie Aufgaben erstellen, Prioritäten setzen, Deadlines festlegen und den Fortschritt verfolgen. Nutzen Sie die Kanban-Ansicht für eine übersichtliche Verwaltung.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div class="col-lg-6 mb-4">
+            <div class="card phoenix-card h-100">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-headset me-2 text-warning"></i>Support
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="supportAccordion">
+                        <!-- Wie kontaktiere ich den Support? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#support1">
+                                    Wie kontaktiere ich den Support?
+                                </button>
+                            </h2>
+                            <div id="support1" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                                <div class="accordion-body text-light">
+                                    Gehen Sie zu "Support" in der Navigation und erstellen Sie ein neues Ticket. Beschreiben Sie Ihr Problem detailliert, damit wir Ihnen schnell helfen können.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wie schnell bekomme ich eine Antwort? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#support2">
+                                    Wie schnell bekomme ich eine Antwort?
+                                </button>
+                            </h2>
+                            <div id="support2" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                                <div class="accordion-body text-light">
+                                    Wir bemühen uns, alle Support-Anfragen innerhalb von 24 Stunden zu beantworten. Dringende Probleme werden prioritär behandelt.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kann ich meine Tickets verfolgen? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#support3">
+                                    Kann ich meine Tickets verfolgen?
+                                </button>
+                            </h2>
+                            <div id="support3" class="accordion-collapse collapse" data-bs-parent="#supportAccordion">
+                                <div class="accordion-body text-light">
+                                    Ja, unter "Support" → "Meine Tickets" können Sie alle Ihre Support-Anfragen einsehen und den Status verfolgen.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account & Sicherheit -->
+        <div class="col-lg-6 mb-4">
+            <div class="card phoenix-card h-100">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-shield-alt me-2 text-danger"></i>Account & Sicherheit
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="securityAccordion">
+                        <!-- Wie ändere ich mein Passwort? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#security1">
+                                    Wie ändere ich mein Passwort?
+                                </button>
+                            </h2>
+                            <div id="security1" class="accordion-collapse collapse" data-bs-parent="#securityAccordion">
+                                <div class="accordion-body text-light">
+                                    Gehen Sie zu Ihrem Benutzerprofil → "Konto-Einstellungen" → "Sicherheit" und klicken Sie auf "Passwort ändern".
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wie kann ich mein Profil bearbeiten? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#security2">
+                                    Wie kann ich mein Profil bearbeiten?
+                                </button>
+                            </h2>
+                            <div id="security2" class="accordion-collapse collapse" data-bs-parent="#securityAccordion">
+                                <div class="accordion-body text-light">
+                                    Klicken Sie auf Ihren Benutzernamen in der oberen rechten Ecke und wählen Sie "Profil bearbeiten". Dort können Sie Ihre Informationen aktualisieren.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ist meine Daten sicher? -->
+                        <div class="accordion-item bg-transparent border-secondary">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#security3">
+                                    Sind meine Daten sicher?
+                                </button>
+                            </h2>
+                            <div id="security3" class="accordion-collapse collapse" data-bs-parent="#securityAccordion">
+                                <div class="accordion-body text-light">
+                                    Ja, wir verwenden modernste Sicherheitstechnologien und verschlüsseln alle Daten. Ihre Privatsphäre und Datensicherheit haben höchste Priorität.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kontakt Section -->
+    <div class="text-center mt-5">
+        <div class="card phoenix-card">
+            <div class="card-body">
+                <h3 class="text-primary mb-3">Ihre Frage war nicht dabei?</h3>
+                <p class="text-muted mb-4">Zögern Sie nicht, uns zu kontaktieren. Unser Support-Team hilft Ihnen gerne weiter!</p>
+                <div class="d-flex justify-content-center gap-3">
+                    {% if current_user %}
+                        <a href="{{ url_for('support.new_ticket') }}" class="btn btn-primary">
+                            <i class="fas fa-ticket-alt me-2"></i>Support-Ticket erstellen
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('user.register') }}" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>Registrieren
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i>Zur Startseite
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.accordion-button:not(.collapsed) {
+    background-color: var(--phoenix-primary) !important;
+    color: white !important;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+}
+
+.accordion-item {
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.accordion-button {
+    border-radius: 0.5rem !important;
+    border: 1px solid var(--theme-border);
+}
+</style>
+
+<script>
+// FAQ functionality
+function openFAQ() {
+    window.location.href = "{{ url_for('main.faq') }}";
+}
+
+// Smooth scrolling for anchor links
+document.addEventListener('DOMContentLoaded', function() {
+    // Add search functionality if needed
+    const searchInput = document.getElementById('faqSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            
+            accordionItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

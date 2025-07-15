@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Registrierung - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/register.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Full width register without base container constraints -->
+</div> <!-- Close any existing container -->
+
+<div class="register-container">
+    <!-- Phoenix Background Video -->
+    <video class="register-video-bg" autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='img/phoenix.mp4') }}" type="video/mp4">
+    </video>
+    
+    <!-- Video Overlay -->
+    <div class="register-video-overlay"></div>
+    
+    <div class="container">
+        <div class="row justify-content-center" style="margin-top: 50px;">
+            <div class="col-md-8 col-lg-6 col-xl-5">
+                <div class="register-card">
+                    <!-- Header -->
+                    <div class="register-header text-center mb-4">
+                        <div class="register-logo">
+                            <i class="fas fa-fire text-primary fa-3x mb-3"></i>
+                        </div>
+                        <h2 class="h3 mb-2">Phoenix beitreten</h2>
+                        <p class="text-muted">Beginnen Sie die Zusammenarbeit an fantastischen Projekten</p>
+                    </div>
+                    
+                    <!-- Registration Form -->
+                    <form method="POST" class="register-form" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Benutzername *
+                                </label>
+                                <input type="text" class="form-control" id="username" 
+                                       name="username" required autocomplete="username"
+                                       placeholder="Wählen Sie einen Benutzernamen" maxlength="20"
+                                       pattern="[a-zA-Z0-9_]{3,20}">
+                                <div class="form-text">3-20 Zeichen, nur Buchstaben, Zahlen und Unterstriche</div>
+                                <div class="invalid-feedback">
+                                    Bitte wählen Sie einen gültigen Benutzernamen.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i>E-Mail-Adresse *
+                                </label>
+                                <input type="email" class="form-control" id="email" 
+                                       name="email" required autocomplete="email"
+                                       placeholder="Geben Sie Ihre E-Mail ein">
+                                <div class="invalid-feedback">
+                                    Bitte geben Sie eine gültige E-Mail-Adresse ein.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Passwort *
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" 
+                                           name="password" required autocomplete="new-password"
+                                           placeholder="Erstellen Sie ein Passwort" minlength="8">
+                                    <button class="btn btn-outline-secondary toggle-password" type="button" 
+                                            data-target="password" title="Passwort anzeigen">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Mindestens 8 Zeichen</div>
+                                <div class="invalid-feedback">
+                                    Passwort muss mindestens 8 Zeichen lang sein.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Passwort bestätigen *
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirm_password" 
+                                           name="confirm_password" required autocomplete="new-password"
+                                           placeholder="Passwort bestätigen">
+                                    <button class="btn btn-outline-secondary toggle-password" type="button" 
+                                            data-target="confirm_password" title="Passwort anzeigen">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Passwörter stimmen nicht überein.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Password Strength Indicator -->
+                        <div class="mb-3">
+                            <div class="password-strength">
+                                <div class="password-strength-bar">
+                                    <div class="password-strength-fill" id="passwordStrengthFill"></div>
+                                </div>
+                                <div class="password-strength-text" id="passwordStrengthText">
+                                    Password strength
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-primary">Terms of Service</a> 
+                                and <a href="#" class="text-primary">Privacy Policy</a> *
+                            </label>
+                            <div class="invalid-feedback">
+                                You must agree to the terms and conditions.
+                            </div>
+                        </div>
+                        
+                        <!-- Newsletter Subscription -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="newsletter">
+                            <label class="form-check-label" for="newsletter">
+                                Subscribe to our newsletter for updates and tips
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Konto erstellen
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Additional Options -->
+                    <div class="register-footer">
+                        <hr class="my-3">
+                        
+                        <div class="text-center">
+                            <p class="text-muted mb-2">Already have an account?</p>
+                            <a href="{{ url_for('user.login') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Benefits Section -->
+                <div class="benefits-section mt-4">
+                    <h5 class="text-center mb-4">Why Join Phoenix?</h5>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-handshake text-primary fa-2x mb-3"></i>
+                                </div>
+                                <h6>Collaborate</h6>
+                                <p class="text-muted small">Work together on exciting projects with developers worldwide</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-lightbulb text-primary fa-2x mb-3"></i>
+                                </div>
+                                <h6>Innovate</h6>
+                                <p class="text-muted small">Turn your ideas into reality with the right team and tools</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
+                                </div>
+                                <h6>Grow</h6>
+                                <p class="text-muted small">Expand your skills and network in our vibrant community</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container"> <!-- Reopen container for base template -->
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/user/register.js') }}"></script>
+{% endblock %}

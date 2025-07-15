@@ -1,0 +1,834 @@
+{% extends "base.html" %}
+
+{% block title %}Benutzerverwaltung - Phoenix Admin{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/user_management.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Full width admin without base container constraints -->
+</div> <!-- Close any existing container -->
+
+<div class="admin-phoenix-bg" style="width: 100vw; margin: 0; padding: 0; min-height: 100vh;">
+<div class="container-fluid" style="padding: 20px;">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Start</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Benutzerverwaltung</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0 mt-2">
+                        <i class="fas fa-users me-2"></i>Benutzerverwaltung
+                    </h1>
+                    <p class="text-muted mb-0">Verwalten Sie Benutzerkonten, Rollen und Berechtigungen</p>
+                </div>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fas fa-user-plus me-1"></i>Benutzer hinzufügen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-0 bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="mb-0">{{ stats.total_users }}</h3>
+                                    <p class="mb-0">Benutzer gesamt</p>
+                                </div>
+                                <i class="fas fa-users fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-0 bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="mb-0">{{ stats.active_users }}</h3>
+                                    <p class="mb-0">Aktive Benutzer</p>
+                                </div>
+                                <i class="fas fa-user-check fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-0 bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="mb-0">{{ stats.suspended_users }}</h3>
+                                    <p class="mb-0">Gesperrt</p>
+                                </div>
+                                <i class="fas fa-user-times fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-0 bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="mb-0">{{ stats.admin_users }}</h3>
+                                    <p class="mb-0">Administratoren</p>
+                                </div>
+                                <i class="fas fa-user-shield fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Benutzer suchen</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search_query }}" placeholder="Benutzername, E-Mail, Rolle...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="role" class="form-label">Rolle</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="">Alle Rollen</option>
+                                {% for role in available_roles %}
+                                    <option value="{{ role }}" {{ 'selected' if role_filter == role }}>{{ role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">Alle Status</option>
+                                {% for status in available_statuses %}
+                                    <option value="{{ status }}" {{ 'selected' if status_filter == status }}>
+                                        {{ status.title() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="sort" class="form-label">Sortieren nach</label>
+                            <select class="form-select" id="sort" name="sort">
+                                <option value="newest" {{ 'selected' if sort_order == 'newest' }}>Neueste zuerst</option>
+                                <option value="oldest" {{ 'selected' if sort_order == 'oldest' }}>Älteste zuerst</option>
+                                <option value="alphabetical" {{ 'selected' if sort_order == 'alphabetical' }}>Alphabetisch</option>
+                                <option value="role" {{ 'selected' if sort_order == 'role' }}>Nach Rolle</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-1"></i>Filtern
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Benutzer ({{ users|length }})
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Benutzer</th>
+                                    <th>E-Mail</th>
+                                    <th>Rolle</th>
+                                    <th>Status</th>
+                                    <th>Projekte</th>
+                                    <th>Beigetreten</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr data-user-id="{{ user.uid }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if user.profile_data and user.profile_data.avatar_url %}
+                                                <img src="{{ user.profile_data.avatar_url }}" alt="Avatar" 
+                                                     class="rounded-circle me-2" width="32" height="32">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                                     style="width: 32px; height: 32px;">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <strong>{{ user.username }}</strong>
+                                                {% if user.uid == current_user.uid %}
+                                                    <span class="badge bg-info ms-1">Sie</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if user.role in ['Admin', 'Webmaster'] else 'warning' if user.role == 'Moderator' else 'secondary' }}">
+                                            {{ user.role }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if user.status == 'active' else 'danger' if user.status == 'suspended' else 'warning' }}">
+                                            {{ user.status.title() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ user.project_count }}</td>
+                                    <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'Unknown' }}</td>
+                                    <td>
+                                        {% if user.uid != current_user.uid %}
+                                            <button class="btn btn-sm btn-outline-secondary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#userActionsModal"
+                                                    onclick="setUserForAction('{{ user.uid }}', '{{ user.username }}', '{{ user.role }}', '{{ user.status }}')">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">Keine Benutzer gefunden, die Ihren Kriterien entsprechen.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
+            <div class="modal-header" style="border-radius: 15px 15px 0 0; background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary)); color: white; border: none;">
+                <h5 class="modal-title" id="addUserModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>Neuen Benutzer hinzufügen
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <form id="addUserForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="newUsername" class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                                <i class="fas fa-user me-2"></i>Benutzername *
+                            </label>
+                            <input type="text" class="form-control" id="newUsername" required 
+                                   style="border-radius: 10px; border: 2px solid var(--phoenix-primary); background: rgba(255, 255, 255, 0.9); padding: 12px;"
+                                   placeholder="Eindeutiger Benutzername">
+                            <div class="invalid-feedback" id="usernameError"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="newEmail" class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                                <i class="fas fa-envelope me-2"></i>E-Mail-Adresse *
+                            </label>
+                            <input type="email" class="form-control" id="newEmail" required 
+                                   style="border-radius: 10px; border: 2px solid var(--phoenix-primary); background: rgba(255, 255, 255, 0.9); padding: 12px;"
+                                   placeholder="user@example.com">
+                            <div class="invalid-feedback" id="emailError"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="newRole" class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                                <i class="fas fa-user-tag me-2"></i>Rolle
+                            </label>
+                            <select class="form-select" id="newRole" 
+                                    style="border-radius: 10px; border: 2px solid var(--phoenix-secondary); background: rgba(255, 255, 255, 0.9); padding: 12px;">
+                                {% for role in available_roles %}
+                                    <option value="{{ role }}" {{ 'selected' if role == 'User' }}>{{ role.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="newStatus" class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                                <i class="fas fa-toggle-on me-2"></i>Status
+                            </label>
+                            <select class="form-select" id="newStatus" 
+                                    style="border-radius: 10px; border: 2px solid var(--phoenix-secondary); background: rgba(255, 255, 255, 0.9); padding: 12px;">
+                                <option value="active" selected>Aktiv</option>
+                                <option value="suspended">Gesperrt</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label" style="color: var(--phoenix-primary); font-weight: 600;">
+                            <i class="fas fa-lock me-2"></i>Temporäres Passwort *
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="newPassword" required 
+                                   style="border-radius: 10px 0 0 10px; border: 2px solid var(--phoenix-primary); background: rgba(255, 255, 255, 0.9); padding: 12px;"
+                                   placeholder="Mindestens 8 Zeichen">
+                            <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword" 
+                                    style="border-radius: 0 10px 10px 0; border: 2px solid var(--phoenix-primary); border-left: none;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text" style="color: var(--phoenix-secondary);">
+                            <i class="fas fa-info-circle me-1"></i>Der Benutzer sollte das Passwort bei der ersten Anmeldung ändern.
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Options -->
+                    <div class="card" style="border-radius: 12px; border: 1px solid var(--phoenix-primary); background: rgba(255, 255, 255, 0.5);">
+                        <div class="card-body">
+                            <h6 class="card-title" style="color: var(--phoenix-primary);">
+                                <i class="fas fa-cog me-2"></i>Zusätzliche Optionen
+                            </h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sendWelcomeEmail" checked>
+                                <label class="form-check-label" for="sendWelcomeEmail">
+                                    Willkommens-E-Mail senden
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="forcePasswordChange" checked>
+                                <label class="form-check-label" for="forcePasswordChange">
+                                    Passwort-Änderung bei erster Anmeldung erzwingen
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="border: none; padding: 1.5rem 2rem;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 500;">
+                    <i class="fas fa-times me-2"></i>Abbrechen
+                </button>
+                <button type="button" class="btn btn-primary" id="createUserBtn" style="border-radius: 10px; background: var(--phoenix-primary); border: none; font-weight: 500;">
+                    <i class="fas fa-user-plus me-2"></i>Benutzer erstellen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Actions Modal -->
+<div class="modal fade" id="userActionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
+            <div class="modal-header" style="border-radius: 15px 15px 0 0; background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary)); color: white; border: none;">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-cog me-2"></i>
+                    Benutzer verwalten: <span id="modalUsername"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <!-- Role Section -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3" style="color: var(--phoenix-primary);">
+                        <i class="fas fa-user-tag me-2"></i>Rolle ändern
+                    </h6>
+                    <select class="form-select" id="roleSelect" style="border-radius: 10px; border: 2px solid var(--phoenix-primary); background: rgba(255, 255, 255, 0.9);">
+                        {% for role in available_roles %}
+                        <option value="{{ role }}">{{ role.title() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Status Section -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3" style="color: var(--phoenix-primary);">
+                        <i class="fas fa-toggle-on me-2"></i>Status ändern
+                    </h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button class="btn btn-outline-success w-100 status-btn" 
+                                    data-status="active" style="border-radius: 10px; font-weight: 500;">
+                                <i class="fas fa-user-check me-2"></i>Aktivieren
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-warning w-100 status-btn" 
+                                    data-status="suspended" style="border-radius: 10px; font-weight: 500;">
+                                <i class="fas fa-user-times me-2"></i>Sperren
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan Management Section -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3" style="color: var(--phoenix-primary);">
+                        <i class="fas fa-crown me-2"></i>Plan-Verwaltung
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="planSelect" class="form-label">Aktueller Plan:</label>
+                            <select class="form-select" id="planSelect" style="border-radius: 10px; border: 2px solid var(--phoenix-primary);">
+                                <option value="free">Free Plan</option>
+                                <option value="premium">Premium Plan</option>
+                                <option value="pro">Pro Plan</option>
+                                <option value="enterprise">Enterprise Plan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="planExpiry" class="form-label">Gültig bis:</label>
+                            <input type="date" class="form-control" id="planExpiry" 
+                                   style="border-radius: 10px; border: 2px solid var(--phoenix-primary);"
+                                   min="{{ today }}">
+                            <div class="form-text">Leer lassen für unbegrenzte Gültigkeit</div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-info" id="updatePlanBtn" style="border-radius: 10px; font-weight: 500;">
+                            <i class="fas fa-crown me-2"></i>Plan aktualisieren
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Message Section -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3" style="color: var(--phoenix-primary);">
+                        <i class="fas fa-envelope me-2"></i>Schnellnachricht senden
+                    </h6>
+                    
+                    <!-- Sender Selection -->
+                    <div class="mb-3">
+                        <label for="senderSelect" class="form-label">Absender auswählen:</label>
+                        <select class="form-select" id="senderSelect" style="border-radius: 10px; border: 2px solid var(--phoenix-secondary);">
+                            <option value="administrator">Administrator</option>
+                            <option value="system">System</option>
+                            <option value="moderation">Moderation</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Message Content -->
+                    <div class="mb-3">
+                        <label for="quickMessage" class="form-label">Nachricht:</label>
+                        <textarea class="form-control" id="quickMessage" rows="3" 
+                                  placeholder="Geben Sie Ihre Nachricht ein..." 
+                                  style="border-radius: 10px; border: 2px solid var(--phoenix-secondary); resize: vertical;"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="sendMessageBtn" style="border-radius: 10px; background: var(--phoenix-primary); border: none; font-weight: 500;">
+                        <i class="fas fa-paper-plane me-2"></i>Nachricht senden
+                    </button>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="border rounded p-3" style="border-color: #dc3545 !important; border-radius: 15px !important; background: rgba(220, 53, 69, 0.05);">
+                    <h6 class="fw-bold text-danger mb-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Gefahrenbereich
+                    </h6>
+                    <button class="btn btn-outline-danger w-100" id="deleteUserBtn" style="border-radius: 10px; font-weight: 500;">
+                        <i class="fas fa-trash me-2"></i>Benutzer löschen
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer" style="border: none; padding: 1.5rem 2rem;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 500;">
+                    <i class="fas fa-times me-2"></i>Schließen
+                </button>
+                <button type="button" class="btn btn-primary" id="saveChangesBtn" style="border-radius: 10px; background: var(--phoenix-primary); border: none; font-weight: 500;">
+                    <i class="fas fa-save me-2"></i>Änderungen speichern
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Suspend/Activate Confirmation Modal -->
+<div class="modal fade" id="statusChangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 15px; border: none; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
+            <div class="modal-header" style="border-radius: 15px 15px 0 0; background: linear-gradient(135deg, #ffc107, #fd7e14); color: white; border: none;">
+                <h5 class="modal-title" id="statusChangeTitle">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Benutzer-Status ändern
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i id="statusChangeIcon" class="fas fa-user-times fa-3x text-warning"></i>
+                    </div>
+                    <h6 id="statusChangeMessage" class="mb-3">Sind Sie sicher, dass Sie diesen Benutzer sperren möchten?</h6>
+                    <p id="statusChangeDetails" class="text-muted">
+                        Diese Aktion wird den Zugang des Benutzers zur Anwendung einschränken.
+                    </p>
+                </div>
+                
+                <!-- Reason for action -->
+                <div class="mb-3">
+                    <label for="statusChangeReason" class="form-label">Grund (optional):</label>
+                    <textarea class="form-control" id="statusChangeReason" rows="3" 
+                              placeholder="Geben Sie einen Grund für diese Aktion an..."
+                              style="border-radius: 10px; border: 2px solid #ffc107;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="border: none; padding: 1.5rem 2rem;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+                    <i class="fas fa-times me-2"></i>Abbrechen
+                </button>
+                <button type="button" class="btn" id="confirmStatusChange" style="border-radius: 10px; font-weight: 500;">
+                    <i class="fas fa-check me-2"></i>Bestätigen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/admin/user_management.js') }}"></script>
+    <script>
+        let currentUserId = null;
+        let currentUserRole = null;
+        let currentUserStatus = null;
+
+        // Set user data for modal
+        function setUserForAction(userId, username, role, status) {
+            currentUserId = userId;
+            currentUserRole = role;
+            currentUserStatus = status;
+            
+            document.getElementById('modalUsername').textContent = username;
+            
+            // Set role dropdown
+            const roleSelect = document.getElementById('roleSelect');
+            roleSelect.value = role;
+            
+            // Update status buttons
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.classList.remove('btn-success', 'btn-warning', 'btn-outline-success', 'btn-outline-warning');
+                if (btn.dataset.status === status) {
+                    btn.classList.add(status === 'active' ? 'btn-success' : 'btn-warning');
+                } else {
+                    btn.classList.add(status === 'active' ? 'btn-outline-warning' : 'btn-outline-success');
+                }
+            });
+            
+            // Load current plan data
+            loadUserPlan(userId);
+        }
+        
+        // Load user plan data
+        async function loadUserPlan(userId) {
+            try {
+                const response = await fetch(`/admin/api/users/${userId}/plan`);
+                if (response.ok) {
+                    const planData = await response.json();
+                    document.getElementById('planSelect').value = planData.plan || 'free';
+                    document.getElementById('planExpiry').value = planData.expiry || '';
+                }
+            } catch (error) {
+                console.error('Error loading user plan:', error);
+            }
+        }
+        
+        // Update user plan
+        document.getElementById('updatePlanBtn').addEventListener('click', async function() {
+            const plan = document.getElementById('planSelect').value;
+            const expiry = document.getElementById('planExpiry').value;
+            
+            if (!currentUserId) {
+                alert('Fehler: Kein Benutzer ausgewählt');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/api/users/${currentUserId}/plan`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        plan: plan,
+                        expiry: expiry || null
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Plan erfolgreich aktualisiert!');
+                    // Refresh the page to show updated data
+                    location.reload();
+                } else {
+                    const error = await response.json();
+                    alert(`Fehler beim Aktualisieren des Plans: ${error.message}`);
+                }
+            } catch (error) {
+                console.error('Error updating plan:', error);
+                alert('Fehler beim Aktualisieren des Plans');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle for add user modal
+            document.getElementById('toggleNewPassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('newPassword');
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+
+            // Create user button
+            document.getElementById('createUserBtn').addEventListener('click', function() {
+                const username = document.getElementById('newUsername').value.trim();
+                const email = document.getElementById('newEmail').value.trim();
+                const role = document.getElementById('newRole').value;
+                const status = document.getElementById('newStatus').value;
+                const password = document.getElementById('newPassword').value;
+                const sendWelcomeEmail = document.getElementById('sendWelcomeEmail').checked;
+                const forcePasswordChange = document.getElementById('forcePasswordChange').checked;
+                
+                // Basic validation
+                if (!username || !email || !password) {
+                    alert('Bitte füllen Sie alle Pflichtfelder aus.');
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    alert('Das Passwort muss mindestens 8 Zeichen lang sein.');
+                    return;
+                }
+                
+                if (confirm(`Neuen Benutzer "${username}" erstellen?`)) {
+                    createNewUser({
+                        username: username,
+                        email: email,
+                        role: role,
+                        status: status,
+                        password: password,
+                        sendWelcomeEmail: sendWelcomeEmail,
+                        forcePasswordChange: forcePasswordChange
+                    });
+                }
+            });
+
+            // Handle save changes button
+            document.getElementById('saveChangesBtn').addEventListener('click', function() {
+                const newRole = document.getElementById('roleSelect').value;
+                
+                if (newRole !== currentUserRole) {
+                    if (confirm(`Sind Sie sicher, dass Sie die Rolle zu "${newRole}" ändern möchten?`)) {
+                        updateUserData('role', newRole);
+                    }
+                }
+            });
+
+            // Handle status changes
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const newStatus = this.dataset.status;
+                    if (newStatus === currentUserStatus) return;
+                    
+                    // Show confirmation modal instead of simple confirm
+                    showStatusChangeModal(newStatus);
+                });
+            });
+
+            // Handle status change confirmation
+            document.getElementById('confirmStatusChange').addEventListener('click', function() {
+                const reason = document.getElementById('statusChangeReason').value.trim();
+                const newStatus = this.dataset.newStatus;
+                
+                updateUserStatus(newStatus, reason);
+                bootstrap.Modal.getInstance(document.getElementById('statusChangeModal')).hide();
+            });
+
+            // Handle send message
+            document.getElementById('sendMessageBtn').addEventListener('click', function() {
+                const sender = document.getElementById('senderSelect').value;
+                const message = document.getElementById('quickMessage').value.trim();
+                
+                if (!message) {
+                    alert('Bitte geben Sie eine Nachricht ein.');
+                    return;
+                }
+                
+                if (confirm(`Nachricht von "${sender}" senden?`)) {
+                    sendQuickMessage(sender, message);
+                }
+            });
+
+            // Handle delete
+            document.getElementById('deleteUserBtn').addEventListener('click', function() {
+                if (confirm('Sind Sie SICHER, dass Sie diesen Benutzer PERMANENT löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!')) {
+                    if (confirm('Letzte Warnung: Benutzer wird permanent gelöscht!')) {
+                        alert('Löschfunktion ist noch nicht implementiert.');
+                    }
+                }
+            });
+        });
+
+        function updateUserData(type, value) {
+            const endpoint = type === 'role' ? 'update-role' : 'update-status';
+            const data = {};
+            data[type] = value;
+
+            fetch(`/admin/users/${currentUserId}/${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('userActionsModal')).hide();
+                    setTimeout(() => location.reload(), 300);
+                } else {
+                    alert(data.message || 'Fehler beim Aktualisieren');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ein Fehler ist aufgetreten');
+            });
+        }
+
+        function showStatusChangeModal(newStatus) {
+            const modal = new bootstrap.Modal(document.getElementById('statusChangeModal'));
+            const title = document.getElementById('statusChangeTitle');
+            const icon = document.getElementById('statusChangeIcon');
+            const message = document.getElementById('statusChangeMessage');
+            const details = document.getElementById('statusChangeDetails');
+            const confirmBtn = document.getElementById('confirmStatusChange');
+            
+            if (newStatus === 'suspended') {
+                title.innerHTML = '<i class="fas fa-user-times me-2"></i>Benutzer sperren';
+                icon.className = 'fas fa-user-times fa-3x text-danger';
+                message.textContent = 'Sind Sie sicher, dass Sie diesen Benutzer sperren möchten?';
+                details.textContent = 'Der Benutzer wird sich nicht mehr anmelden können und alle aktiven Sitzungen werden beendet.';
+                confirmBtn.className = 'btn btn-danger';
+                confirmBtn.innerHTML = '<i class="fas fa-user-times me-2"></i>Benutzer sperren';
+            } else {
+                title.innerHTML = '<i class="fas fa-user-check me-2"></i>Benutzer aktivieren';
+                icon.className = 'fas fa-user-check fa-3x text-success';
+                message.textContent = 'Sind Sie sicher, dass Sie diesen Benutzer aktivieren möchten?';
+                details.textContent = 'Der Benutzer wird wieder Zugang zur Anwendung erhalten.';
+                confirmBtn.className = 'btn btn-success';
+                confirmBtn.innerHTML = '<i class="fas fa-user-check me-2"></i>Benutzer aktivieren';
+            }
+            
+            confirmBtn.dataset.newStatus = newStatus;
+            document.getElementById('statusChangeReason').value = '';
+            modal.show();
+        }
+
+        function updateUserStatus(newStatus, reason) {
+            const data = { 
+                status: newStatus,
+                reason: reason || undefined
+            };
+
+            fetch(`/admin/users/${currentUserId}/update-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('userActionsModal')).hide();
+                    setTimeout(() => location.reload(), 300);
+                } else {
+                    alert(data.message || 'Fehler beim Aktualisieren des Status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ein Fehler ist aufgetreten');
+            });
+        }
+
+        function createNewUser(userData) {
+            fetch('/admin/users/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Benutzer erfolgreich erstellt!');
+                    bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+                    setTimeout(() => location.reload(), 300);
+                } else {
+                    alert(data.message || 'Fehler beim Erstellen des Benutzers');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ein Fehler ist beim Erstellen des Benutzers aufgetreten');
+            });
+        }
+
+        function sendQuickMessage(sender, message) {
+            fetch(`/admin/users/${currentUserId}/send-message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sender: sender,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Nachricht erfolgreich gesendet!');
+                    document.getElementById('quickMessage').value = '';
+                } else {
+                    alert(data.message || 'Fehler beim Senden der Nachricht');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ein Fehler ist beim Senden der Nachricht aufgetreten');
+            });
+        }
+    </script>
+</div> <!-- Ende admin-phoenix-bg -->
+
+<!-- Reopen container for base template -->
+<div class="container">
+{% endblock %}

@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings - Admin{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">System Settings</h1>
+                    <p class="text-muted">Configure system-wide preferences and limits</p>
+                </div>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <!-- System Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users text-primary fs-3 mb-2"></i>
+                            <h5 class="card-title">{{ stats.total_users }}</h5>
+                            <p class="card-text text-muted small">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-folder text-success fs-3 mb-2"></i>
+                            <h5 class="card-title">{{ stats.total_projects }}</h5>
+                            <p class="card-text text-muted small">Projects</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-envelope text-info fs-3 mb-2"></i>
+                            <h5 class="card-title">{{ stats.total_messages }}</h5>
+                            <p class="card-text text-muted small">Messages</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-headset text-warning fs-3 mb-2"></i>
+                            <h5 class="card-title">{{ stats.total_tickets }}</h5>
+                            <p class="card-text text-muted small">Support Tickets</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-hdd text-secondary fs-3 mb-2"></i>
+                            <h5 class="card-title">{{ stats.storage_used }}</h5>
+                            <p class="card-text text-muted small">Storage Used</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-server text-success fs-3 mb-2"></i>
+                            <h5 class="card-title">{{ stats.uptime }}</h5>
+                            <p class="card-text text-muted small">Uptime</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Form -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-bottom-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cog me-2"></i>System Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.update_settings') }}" id="settingsForm">
+                        <div class="row">
+                            <!-- Site Information -->
+                            <div class="col-md-6">
+                                <div class="card border-0 phoenix-card mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h6 class="mb-0"><i class="fas fa-globe me-2"></i>Site Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="site_name" class="form-label">Site Name</label>
+                                            <input type="text" class="form-control" id="site_name" name="site_name" 
+                                                   value="{{ settings.site_name or 'Phoenix Project Planner' }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="site_description" class="form-label">Site Description</label>
+                                            <textarea class="form-control" id="site_description" name="site_description" rows="3">{{ settings.site_description or 'Collaborative project management platform' }}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="default_language" class="form-label">Default Language</label>
+                                            <select class="form-select" id="default_language" name="default_language">
+                                                <option value="en" {% if settings.default_language == 'en' %}selected{% endif %}>English</option>
+                                                <option value="de" {% if settings.default_language == 'de' %}selected{% endif %}>Deutsch</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User Settings -->
+                            <div class="col-md-6">
+                                <div class="card border-0 phoenix-card mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>User Settings</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="default_user_role" class="form-label">Default User Role</label>
+                                            <select class="form-select" id="default_user_role" name="default_user_role">
+                                                <option value="User" {% if settings.default_user_role == 'User' %}selected{% endif %}>User</option>
+                                                <option value="Premium" {% if settings.default_user_role == 'Premium' %}selected{% endif %}>Premium</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="session_timeout" class="form-label">Session Timeout (hours)</label>
+                                            <input type="number" class="form-control" id="session_timeout" name="session_timeout" 
+                                                   value="{{ settings.session_timeout or 24 }}" min="1" max="168">
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="enable_user_registration" 
+                                                   name="enable_user_registration" {% if settings.enable_user_registration %}checked{% endif %}>
+                                            <label class="form-check-label" for="enable_user_registration">
+                                                Enable User Registration
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="require_email_verification" 
+                                                   name="require_email_verification" {% if settings.require_email_verification %}checked{% endif %}>
+                                            <label class="form-check-label" for="require_email_verification">
+                                                Require Email Verification
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Project Limits -->
+                            <div class="col-md-6">
+                                <div class="card border-0 phoenix-card mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h6 class="mb-0"><i class="fas fa-folder me-2"></i>Project Limits</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="max_projects_per_user" class="form-label">Max Projects per User</label>
+                                            <input type="number" class="form-control" id="max_projects_per_user" 
+                                                   name="max_projects_per_user" value="{{ settings.max_projects_per_user or 10 }}" min="1">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="max_members_per_project" class="form-label">Max Members per Project</label>
+                                            <input type="number" class="form-control" id="max_members_per_project" 
+                                                   name="max_members_per_project" value="{{ settings.max_members_per_project or 50 }}" min="1">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="file_upload_limit" class="form-label">File Upload Limit (MB)</label>
+                                            <input type="number" class="form-control" id="file_upload_limit" 
+                                                   name="file_upload_limit" value="{{ settings.file_upload_limit or 10 }}" min="1">
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="enable_public_projects" 
+                                                   name="enable_public_projects" {% if settings.enable_public_projects %}checked{% endif %}>
+                                            <label class="form-check-label" for="enable_public_projects">
+                                                Enable Public Projects
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- System Settings -->
+                            <div class="col-md-6">
+                                <div class="card border-0 phoenix-card mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h6 class="mb-0"><i class="fas fa-server me-2"></i>System Settings</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="backup_frequency" class="form-label">Backup Frequency</label>
+                                            <select class="form-select" id="backup_frequency" name="backup_frequency">
+                                                <option value="hourly" {% if settings.backup_frequency == 'hourly' %}selected{% endif %}>Hourly</option>
+                                                <option value="daily" {% if settings.backup_frequency == 'daily' %}selected{% endif %}>Daily</option>
+                                                <option value="weekly" {% if settings.backup_frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="backup_enabled" 
+                                                   name="backup_enabled" {% if settings.backup_enabled %}checked{% endif %}>
+                                            <label class="form-check-label" for="backup_enabled">
+                                                Enable Automatic Backups
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="email_notifications" 
+                                                   name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
+                                            <label class="form-check-label" for="email_notifications">
+                                                Enable Email Notifications
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="maintenance_mode" 
+                                                   name="maintenance_mode" {% if settings.maintenance_mode %}checked{% endif %}>
+                                            <label class="form-check-label" for="maintenance_mode">
+                                                <span class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Maintenance Mode</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-outline-secondary me-2" onclick="location.reload()">
+                                <i class="fas fa-undo me-2"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('settingsForm').addEventListener('submit', function(e) {
+    // Show confirmation for maintenance mode
+    const maintenanceMode = document.getElementById('maintenance_mode').checked;
+    if (maintenanceMode) {
+        if (!confirm('Are you sure you want to enable maintenance mode? This will prevent users from accessing the site.')) {
+            e.preventDefault();
+            return false;
+        }
+    }
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+    submitBtn.disabled = true;
+});
+
+// Real-time preview for some settings
+document.getElementById('site_name').addEventListener('input', function() {
+    console.log('Site name changed to:', this.value);
+});
+</script>
+{% endblock %}

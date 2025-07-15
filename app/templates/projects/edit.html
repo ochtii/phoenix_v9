@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Project - Phoenix{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/projects/project_settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}">Projects</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('projects.view_project', project_id=project.uid) }}">{{ project.name }}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0 mt-2">
+                        <i class="fas fa-edit me-2"></i>Edit Project
+                    </h1>
+                </div>
+                <div>
+                    <a href="{{ url_for('projects.view_project', project_id=project.uid) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>Project Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <!-- Basic Information -->
+                                <div class="mb-4">
+                                    <h6 class="text-muted mb-3">Basic Information</h6>
+                                    
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Project Name *</label>
+                                        <input type="text" class="form-control" id="name" name="name" 
+                                               value="{{ project.name }}" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <textarea class="form-control" id="description" name="description" 
+                                                  rows="4" placeholder="Describe your project...">{{ project.description or '' }}</textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Project Settings -->
+                                <div class="mb-4">
+                                    <h6 class="text-muted mb-3">Project Settings</h6>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">Category</label>
+                                                <select class="form-select" id="category" name="category">
+                                                    <option value="">Select a category</option>
+                                                    <option value="Web Development" {{ 'selected' if project.category == 'Web Development' }}>🌐 Web Development</option>
+                                                    <option value="Mobile App" {{ 'selected' if project.category == 'Mobile App' }}>📱 Mobile App</option>
+                                                    <option value="Desktop Software" {{ 'selected' if project.category == 'Desktop Software' }}>🖥️ Desktop Software</option>
+                                                    <option value="Game Development" {{ 'selected' if project.category == 'Game Development' }}>🎮 Game Development</option>
+                                                    <option value="Data Science" {{ 'selected' if project.category == 'Data Science' }}>📊 Data Science</option>
+                                                    <option value="AI/ML" {{ 'selected' if project.category == 'AI/ML' }}>🧠 AI/ML</option>
+                                                    <option value="DevOps" {{ 'selected' if project.category == 'DevOps' }}>⚙️ DevOps</option>
+                                                    <option value="Design" {{ 'selected' if project.category == 'Design' }}>🎨 Design</option>
+                                                    <option value="Marketing" {{ 'selected' if project.category == 'Marketing' }}>📢 Marketing</option>
+                                                    <option value="Research" {{ 'selected' if project.category == 'Research' }}>🔬 Research</option>
+                                                    <option value="E-Commerce" {{ 'selected' if project.category == 'E-Commerce' }}>🛒 E-Commerce</option>
+                                                    <option value="IoT" {{ 'selected' if project.category == 'IoT' }}>🔌 IoT</option>
+                                                    <option value="Blockchain" {{ 'selected' if project.category == 'Blockchain' }}>⛓️ Blockchain</option>
+                                                    <option value="Cybersecurity" {{ 'selected' if project.category == 'Cybersecurity' }}>🔒 Cybersecurity</option>
+                                                    <option value="Education" {{ 'selected' if project.category == 'Education' }}>🎓 Education</option>
+                                                    <option value="Healthcare" {{ 'selected' if project.category == 'Healthcare' }}>❤️ Healthcare</option>
+                                                    <option value="Finance" {{ 'selected' if project.category == 'Finance' }}>💰 Finance</option>
+                                                    <option value="Entertainment" {{ 'selected' if project.category == 'Entertainment' }}>🎬 Entertainment</option>
+                                                    <option value="Social Media" {{ 'selected' if project.category == 'Social Media' }}>📲 Social Media</option>
+                                                    <option value="Productivity" {{ 'selected' if project.category == 'Productivity' }}>✅ Productivity</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="status" class="form-label">Status</label>
+                                                <select class="form-select" id="status" name="status">
+                                                    <option value="Planning" {{ 'selected' if project.status == 'Planning' }}>Planning</option>
+                                                    <option value="Active" {{ 'selected' if project.status == 'Active' }}>Active</option>
+                                                    <option value="On Hold" {{ 'selected' if project.status == 'On Hold' }}>On Hold</option>
+                                                    <option value="Completed" {{ 'selected' if project.status == 'Completed' }}>Completed</option>
+                                                    <option value="Cancelled" {{ 'selected' if project.status == 'Cancelled' }}>Cancelled</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Visibility Settings -->
+                                <div class="mb-4">
+                                    <h6 class="text-muted mb-3">Visibility</h6>
+                                    
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="is_public" name="is_public" 
+                                               value="true" {{ 'checked' if project.is_public }}>
+                                        <label class="form-check-label" for="is_public">
+                                            <strong>Make this project public</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                Public projects are visible in the discovery section and can receive join requests.
+                                            </small>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Save Changes
+                                    </button>
+                                    <a href="{{ url_for('projects.view_project', project_id=project.uid) }}" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <!-- Project Info -->
+                                <div class="card border-0 phoenix-card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-info-circle me-2"></i>Project Information
+                                        </h6>
+                                        
+                                        <div class="mb-3">
+                                            <small class="text-muted">Created</small>
+                                            <br>
+                                            <span>{{ project.created_at.strftime('%B %d, %Y') if project.created_at else 'Unknown' }}</span>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <small class="text-muted">Last Updated</small>
+                                            <br>
+                                            <span>{{ project.updated_at.strftime('%B %d, %Y') if project.updated_at else 'Unknown' }}</span>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <small class="text-muted">Team Size</small>
+                                            <br>
+                                            <span>{{ project.members|length if project.members else 1 }} member{{ 's' if (project.members|length) != 1 else '' }}</span>
+                                        </div>
+                                        
+                                        <div class="mb-0">
+                                            <small class="text-muted">Current Status</small>
+                                            <br>
+                                            <span class="badge bg-{{ 'success' if project.status == 'Active' else 'secondary' }}">
+                                                {{ project.status or 'Planning' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Help Text -->
+                                <div class="card border-0 bg-info bg-opacity-10 mt-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-info">
+                                            <i class="fas fa-lightbulb me-2"></i>Tips
+                                        </h6>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-2">
+                                                <small>• Choose a clear, descriptive project name</small>
+                                            </li>
+                                            <li class="mb-2">
+                                                <small>• Public projects can attract contributors</small>
+                                            </li>
+                                            <li class="mb-2">
+                                                <small>• Update status regularly to track progress</small>
+                                            </li>
+                                            <li class="mb-0">
+                                                <small>• Categories help others discover your project</small>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/projects/project_settings.js') }}"></script>
+{% endblock %}

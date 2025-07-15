@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_dashboard.css') }}">
+    <style>
+        .dashboard-phoenix-bg {
+            position: relative;
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
+            background-attachment: fixed;
+            overflow: hidden;
+        }
+        
+        .phoenix-accent {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            opacity: 0.4;
+            z-index: 1;
+        }
+        
+        .dashboard-card {
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<!-- Full width dashboard without base container constraints -->
+</div> <!-- Close any existing container -->
+
+<div class="dashboard-phoenix-bg" style="min-height: 100vh; width: 100vw; margin: 0; padding: 0;">
+    <div class="container-fluid py-4">
+        <!-- Welcome Header -->
+        <div class="welcome-header position-relative">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="h2 mb-2">
+                        <img src="{{ url_for('static', filename='img/phoenix-icon3.png') }}" alt="Phoenix" 
+                             style="width: 40px; height: 40px; margin-right: 1rem;">Welcome back, {{ g.user.username }}!
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Here's what's happening with your projects and activities.
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('projects.index') }}" class="btn btn-light">
+                            <i class="fas fa-folder me-2"></i>Projects
+                        </a>
+                        <a href="{{ url_for('messages.inbox') }}" class="btn btn-light">
+                            <i class="fas fa-envelope me-2"></i>Messages
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card stat-card">
+                    <div class="stat-number">{{ stats.total_projects if stats else projects|length }}</div>
+                    <div class="stat-label">Total Projects</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card stat-card">
+                    <div class="stat-number">{{ stats.owned_projects if stats else 0 }}</div>
+                    <div class="stat-label">Owned Projects</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card stat-card">
+                    <div class="stat-number">{{ stats.unread_messages if stats else unread_count }}</div>
+                    <div class="stat-label">Unread Messages</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card stat-card">
+                    <div class="stat-number">{{ stats.completion_rate if stats else 0 }}%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        {% if quick_actions %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3 px-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="row">
+                            {% for action in quick_actions %}
+                            <div class="col-md-3 col-sm-6 mb-2">
+                                <a href="{{ action.url }}" class="btn btn-outline-{{ action.color }} w-100">
+                                    <i class="{{ action.icon }} me-2"></i>{{ action.title }}
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <!-- Recent Projects -->
+            <div class="col-lg-6 mb-4">
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3 px-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-folder-open text-primary me-2"></i>Recent Projects
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        {% if projects %}
+                            {% for project in projects %}
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon bg-primary bg-opacity-10 text-primary me-3">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ project.name }}</h6>
+                                    <small class="text-muted">{{ project.description[:50] }}...</small>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('projects.view', project_id=project.uid) }}" 
+                                       class="btn btn-sm btn-outline-primary">View</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-folder-plus fa-3x mb-3 opacity-50"></i>
+                                <p>No projects yet. <a href="{{ url_for('projects.index') }}">Create your first project</a>!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Messages -->
+            <div class="col-lg-6 mb-4">
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3 px-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-envelope text-info me-2"></i>Recent Messages
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        {% if recent_messages %}
+                            {% for message in recent_messages %}
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon bg-info bg-opacity-10 text-info me-3">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ message.sender_username or 'Unknown' }}</h6>
+                                    <small class="text-muted">{{ message.content[:50] }}...</small>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('messages.conversation', user_id=message.sender_uid) }}" 
+                                       class="btn btn-sm btn-outline-info">Reply</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-envelope-open fa-3x mb-3 opacity-50"></i>
+                                <p>No messages yet. <a href="{{ url_for('messages.inbox') }}">Check your inbox</a>!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Tickets and Discovery -->
+        <div class="row">
+            <!-- Open Support Tickets -->
+            <div class="col-lg-6 mb-4">
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3 px-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-life-ring text-warning me-2"></i>Support Tickets
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        {% if open_tickets %}
+                            {% for ticket in open_tickets %}
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon bg-warning bg-opacity-10 text-warning me-3">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ ticket.title }}</h6>
+                                    <small class="text-muted">Status: {{ ticket.status }} | Priority: {{ ticket.priority }}</small>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('support.view_ticket', ticket_id=ticket.uid) }}" 
+                                       class="btn btn-sm btn-outline-warning">View</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-check-circle fa-3x mb-3 opacity-50"></i>
+                                <p>No open tickets. <a href="{{ url_for('support.new_ticket') }}">Need help?</a></p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discover New Projects -->
+            <div class="col-lg-6 mb-4">
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3 px-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-compass text-success me-2"></i>Discover Projects
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        {% if discovery_projects %}
+                            {% for project in discovery_projects %}
+                            <div class="activity-item d-flex align-items-center">
+                                <div class="activity-icon bg-success bg-opacity-10 text-success me-3">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ project.name }}</h6>
+                                    <small class="text-muted">by {{ project.owner_username or 'Unknown' }}</small>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('discover.view_project', project_id=project.uid) }}" 
+                                       class="btn btn-sm btn-outline-success">Explore</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-search fa-3x mb-3 opacity-50"></i>
+                                <p><a href="{{ url_for('discover.explore') }}">Discover amazing projects</a> from the community!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        {% if recent_activity %}
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3 px-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock text-success me-2"></i>Recent Activity
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        {% for activity in recent_activity %}
+                        <div class="activity-item d-flex align-items-center">
+                            <div class="activity-icon bg-{% if activity.type == 'project' %}primary{% elif activity.type == 'team' %}success{% elif activity.type == 'support' %}warning{% else %}info{% endif %} bg-opacity-10 text-{% if activity.type == 'project' %}primary{% elif activity.type == 'team' %}success{% elif activity.type == 'support' %}warning{% else %}info{% endif %} me-3">
+                                <i class="{{ activity.icon }}"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ activity.title }}</h6>
+                                <small class="text-muted">{{ activity.description }}</small>
+                            </div>
+                            <div>
+                                <small class="text-muted">{{ activity.timestamp.strftime('%b %d, %H:%M') if activity.timestamp else 'Now' }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stat numbers
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalNumber = parseInt(stat.textContent);
+                let currentNumber = 0;
+                const increment = finalNumber / 20;
+                
+                const timer = setInterval(() => {
+                    currentNumber += increment;
+                    if (currentNumber >= finalNumber) {
+                        stat.textContent = finalNumber;
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(currentNumber);
+                    }
+                }, 50);
+            });
+        });
+    </script>
+    
+    <!-- Reopen container for base template -->
+    <div class="container">
+{% endblock %}

@@ -1,0 +1,1030 @@
+{% extends "base.html" %}
+
+{% block title %}Phoenix - Moderne Projektplattform{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        /* Root Variables */
+        :root {
+            --phoenix-primary: #3b82f6;
+            --phoenix-primary-dark: #2563eb;
+            --phoenix-secondary: #8b5cf6;
+            --phoenix-accent: #f59e0b;
+            --phoenix-success: #10b981;
+            --phoenix-gradient: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+            --phoenix-glow: 0 0 40px rgba(59, 130, 246, 0.3);
+            --section-padding: 5rem 0;
+        }
+
+        /* Modern Hero Section */
+        .hero-wrapper {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Video Background */
+        .hero-video-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 1;
+            transform: translateX(-50%) translateY(-50%);
+            object-fit: cover;
+        }
+
+        .hero-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.7) 100%);
+            z-index: 2;
+        }
+
+        .hero-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .particle:nth-child(odd) {
+            animation-direction: reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+
+        /* Modern Buttons */
+        .btn-modern {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-modern {
+            background: var(--phoenix-gradient);
+            color: white;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary-modern:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.6);
+            color: white;
+        }
+
+        .btn-outline-modern {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-modern:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-3px);
+            color: white;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: var(--section-padding);
+            background: var(--theme-bg-primary);
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--theme-text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--theme-text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: var(--theme-bg-secondary);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            border: 1px solid var(--theme-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--phoenix-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border-color: var(--phoenix-primary);
+        }
+
+        .feature-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--phoenix-gradient);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--theme-text-primary);
+        }
+
+        .feature-description {
+            color: var(--theme-text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-highlight {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--phoenix-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: var(--section-padding);
+            background: var(--phoenix-gradient);
+            color: white;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            animation: countUp 2s ease-out;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: var(--section-padding);
+            background: var(--theme-bg-primary);
+        }
+
+        .testimonial-card {
+            background: var(--theme-bg-secondary);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid var(--theme-border);
+            text-align: center;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .testimonial-quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--theme-text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--phoenix-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .author-info h5 {
+            margin: 0;
+            color: var(--theme-text-primary);
+        }
+
+        .author-info small {
+            color: var(--theme-text-secondary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: var(--section-padding);
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Video Controls */
+        .video-controls {
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            z-index: 15;
+            opacity: 0.6;
+            transition: opacity 0.5s ease;
+        }
+        
+        .video-controls:hover {
+            opacity: 1;
+        }
+        
+        .video-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+        
+        .video-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .video-toggle i {
+            font-size: 16px;
+        }
+
+        /* Scroll Hint Styles */
+        .scroll-hint {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            text-align: center;
+            opacity: 0.8;
+        }
+        
+        .scroll-arrow {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: scrollBounce 2s infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .scroll-arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.9);
+            transform: translateX(-50%) scale(1.1);
+            opacity: 1;
+        }
+        
+        .scroll-arrow i {
+            font-size: 16px;
+        }
+        
+        .scroll-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        
+        @keyframes scrollBounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-8px);
+            }
+            60% {
+                transform: translateY(-4px);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content {
+                width: 95%;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-modern {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .hero-content {
+                width: 90%;
+            }
+        }
+        /* Scroll Animation */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-wrapper">
+    <!-- Video Background -->
+    <video class="hero-video-bg" autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='img/phoenix.mp4') }}" type="video/mp4">
+        <!-- Fallback for browsers that don't support video -->
+    </video>
+    
+    <!-- Video Overlay -->
+    <div class="hero-video-overlay"></div>
+    
+    <div class="hero-background">
+        <div class="hero-particles">
+            <!-- Animated particles -->
+            <div class="particle" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
+            <div class="particle" style="top: 20%; left: 80%; animation-delay: 1s;"></div>
+            <div class="particle" style="top: 80%; left: 20%; animation-delay: 2s;"></div>
+            <div class="particle" style="top: 60%; left: 90%; animation-delay: 3s;"></div>
+            <div class="particle" style="top: 30%; left: 60%; animation-delay: 4s;"></div>
+            <div class="particle" style="top: 70%; left: 40%; animation-delay: 5s;"></div>
+        </div>
+    </div>
+    
+    <div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+        <div style="width: 80%; max-width: 1200px;">
+            <div class="hero-content">
+                    <h1 class="hero-title">
+                        Willkommen bei <span style="background: linear-gradient(135deg, #f59e0b, #f97316); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Phoenix</span>
+                    </h1>
+                    
+                    <p class="hero-subtitle">
+                        Die moderne Projektplattform für Teams und Einzelpersonen. Kollaborativ, intuitiv und kraftvoll.
+                        <br><strong>Verwirklichen Sie Ihre Ideen mit der nächsten Generation des Projektmanagements.</strong>
+                    </p>
+                    
+                    <div class="hero-buttons">
+                        {% if g.user %}
+                            <a href="{{ url_for('projects.index') }}" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-rocket"></i>
+                                Meine Projekte
+                            </a>
+                            <a href="{{ url_for('discover.explore') }}" class="btn-modern btn-outline-modern">
+                                <i class="fas fa-compass"></i>
+                                Entdecken
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('user.register') }}" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-user-plus"></i>
+                                Kostenlos starten
+                            </a>
+                            <a href="{{ url_for('user.login') }}" class="btn-modern btn-outline-modern">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Anmelden
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+    </div>
+    
+    <!-- Video Controls -->
+    <div class="video-controls">
+        <button class="video-toggle" onclick="toggleVideo()" title="Video pausieren/abspielen">
+            <i class="fas fa-pause" id="videoIcon"></i>
+        </button>
+    </div>
+    
+    <!-- Scroll Hint -->
+    <div class="scroll-hint">
+        <div class="scroll-arrow" onclick="scrollToFeatures()">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="scroll-text">Mehr erfahren</div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <h2 class="section-title">Warum Phoenix wählen?</h2>
+            <p class="section-subtitle">
+                Alles was Sie für erfolgreiches Projektmanagement brauchen - modern, intuitiv und leistungsstark
+            </p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-12" style="max-width: 80%;">
+                <div class="features-grid">
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="feature-title">Kollaborative Teamarbeit</h3>
+                        <p class="feature-description">
+                            Arbeiten Sie nahtlos mit Ihrem Team zusammen. Echtzeit-Zusammenarbeit, 
+                            intelligente Benachrichtigungen und intuitive Kommunikationstools.
+                        </p>
+                        <div class="feature-highlight">
+                            <i class="fas fa-bolt"></i>
+                            Echtzeit-Sync
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="feature-title">KI-gestütztes Management</h3>
+                        <p class="feature-description">
+                            Intelligente Projektvorschläge, automatische Terminplanung und 
+                            prädiktive Analysen helfen bei optimaler Ressourcennutzung.
+                        </p>
+                        <div class="feature-highlight">
+                            <i class="fas fa-magic"></i>
+                            Smart Features
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Enterprise-Sicherheit</h3>
+                        <p class="feature-description">
+                            Höchste Sicherheitsstandards, End-zu-End-Verschlüsselung und 
+                            GDPR-Konformität für den Schutz Ihrer sensiblen Daten.
+                        </p>
+                        <div class="feature-highlight">
+                            <i class="fas fa-lock"></i>
+                            256-bit SSL
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Mobile-First Design</h3>
+                        <p class="feature-description">
+                            Perfekt optimiert für alle Geräte. Arbeiten Sie von überall - 
+                            Desktop, Tablet oder Smartphone mit nativer App-Performance.
+                        </p>
+                        <div class="feature-highlight">
+                            <i class="fas fa-devices"></i>
+                            Alle Geräte
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="feature-title">Advanced Analytics</h3>
+                        <p class="feature-description">
+                            Detaillierte Insights, interaktive Dashboards und Echtzeit-Metriken 
+                            für datengetriebene Entscheidungen und kontinuierliche Verbesserung.
+                        </p>
+                        <div class="feature-highlight">
+                            <i class="fas fa-chart-pie"></i>
+                            Live Insights
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <h3 class="feature-title">Nahtlose Integration</h3>
+                        <p class="feature-description">
+                            Verbinden Sie Phoenix mit über 100+ Tools und Services. 
+                            Slack, GitHub, Google Workspace und viele mehr - alles an einem Ort.
+                        </p>
+                        <div class="feature-highlight">
+                            <i class="fas fa-link"></i>
+                            100+ Apps
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title" style="color: white;">Phoenix in Zahlen</h2>
+            <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">
+                Vertrauen Sie der Plattform, die bereits Tausende Teams nutzen
+            </p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-12" style="max-width: 80%;">
+                <div class="stats-grid">
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-number">{{ stats.users if stats and stats.users > 0 else '1,247' }}</div>
+                        <div class="stat-label">Aktive Nutzer</div>
+                    </div>
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-number">{{ stats.projects if stats and stats.projects > 0 else '156' }}</div>
+                        <div class="stat-label">Erfolgreiche Projekte</div>
+                    </div>
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-number">{{ stats.completed_tasks if stats and stats.completed_tasks > 0 else '623' }}</div>
+                        <div class="stat-label">Erledigte Aufgaben</div>
+                    </div>
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <h2 class="section-title">Was unsere Nutzer sagen</h2>
+            <p class="section-subtitle">
+                Erfahren Sie, wie Phoenix Teams dabei hilft, ihre Ziele zu erreichen
+            </p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-12" style="max-width: 80%;">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="testimonial-card animate-on-scroll">
+                            <p class="testimonial-quote">
+                                "Phoenix hat unsere Produktivität um 40% gesteigert. 
+                                Die intuitive Benutzeroberfläche und die KI-Features sind gamechanging!"
+                            </p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">SM</div>
+                                <div class="author-info">
+                                    <h5>Sarah Müller</h5>
+                                    <small>Projektleiterin, TechStartup GmbH</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="testimonial-card animate-on-scroll">
+                            <p class="testimonial-quote">
+                                "Endlich eine Projektmanagement-Lösung, die nicht nur funktioniert, 
+                                sondern auch Spaß macht. Unser ganzes Team ist begeistert!"
+                            </p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">MK</div>
+                                <div class="author-info">
+                                    <h5>Marcus Klein</h5>
+                                    <small>CTO, InnovateCorp</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="testimonial-card animate-on-scroll">
+                            <p class="testimonial-quote">
+                                "Die Kollaborations-Features sind unübertroffen. 
+                                Remote-Arbeit war noch nie so effizient und koordiniert."
+                            </p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">LB</div>
+                                <div class="author-info">
+                                    <h5>Lisa Bauer</h5>
+                                    <small>Team Lead, DigitalAgency</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+{% if not g.user %}
+<section class="cta-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12" style="max-width: 80%;">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h2 class="cta-title animate-on-scroll">
+                            Bereit für die Zukunft des Projektmanagements?
+                        </h2>
+                        <p class="cta-description animate-on-scroll">
+                            Treten Sie über 12.000 Teams bei, die bereits mit Phoenix arbeiten. 
+                            Starten Sie heute kostenlos und erleben Sie den Unterschied.
+                        </p>
+                        
+                        <div class="hero-buttons animate-on-scroll">
+                            <a href="{{ url_for('user.register') }}" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-rocket"></i>
+                                Kostenlos starten
+                            </a>
+                            <a href="{{ url_for('discover.explore') }}" class="btn-modern btn-outline-modern">
+                                <i class="fas fa-play-circle"></i>
+                                Demo ansehen
+                            </a>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; opacity: 0.8; font-size: 0.9rem;">
+                            <i class="fas fa-check-circle" style="color: #10b981; margin-right: 0.5rem;"></i>
+                            Keine Kreditkarte erforderlich
+                            <span style="margin: 0 1rem;">•</span>
+                            <i class="fas fa-check-circle" style="color: #10b981; margin-right: 0.5rem;"></i>
+                            14 Tage kostenlos testen
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll Animation Observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all animated elements
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+    
+    // Counter animation for stats
+    function animateCounters() {
+        const counters = document.querySelectorAll('.stat-number');
+        counters.forEach(counter => {
+            const target = counter.textContent.replace(/[^\d.]/g, '');
+            const isDecimal = target.includes('.');
+            const numTarget = parseFloat(target);
+            const suffix = counter.textContent.replace(/[\d.]/g, '');
+            
+            let current = 0;
+            const increment = numTarget / 50;
+            
+            const updateCounter = () => {
+                if (current < numTarget) {
+                    current += increment;
+                    if (isDecimal) {
+                        counter.textContent = current.toFixed(1) + suffix;
+                    } else {
+                        counter.textContent = Math.ceil(current).toLocaleString() + suffix;
+                    }
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent = numTarget.toLocaleString() + suffix;
+                }
+            };
+            
+            // Start animation when stats section is visible
+            const statsSection = document.querySelector('.stats-section');
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        updateCounter();
+                        statsObserver.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            if (statsSection) {
+                statsObserver.observe(statsSection);
+            }
+        });
+    }
+    
+    animateCounters();
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Add particle animation with random movement
+    function createParticles() {
+        const particlesContainer = document.querySelector('.hero-particles');
+        if (!particlesContainer) return;
+        
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+            particlesContainer.appendChild(particle);
+        }
+    }
+    
+    createParticles();
+    
+    // Video Controls
+    window.toggleVideo = function() {
+        const video = document.querySelector('.hero-video-bg');
+        const icon = document.getElementById('videoIcon');
+        
+        if (!video) return;
+        
+        if (video.paused) {
+            video.play();
+            icon.className = 'fas fa-pause';
+        } else {
+            video.pause();
+            icon.className = 'fas fa-play';
+        }
+    };
+    
+    // Auto-hide video controls
+    let controlsTimeout;
+    const videoControls = document.querySelector('.video-controls');
+    
+    function showControls() {
+        if (videoControls) {
+            videoControls.style.opacity = '0.6';
+            clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(() => {
+                videoControls.style.opacity = '0.3';
+            }, 3000);
+        }
+    }
+    
+    // Show controls on mouse movement
+    document.addEventListener('mousemove', showControls);
+    showControls(); // Initial show
+    
+    // Smooth scroll to features section
+    window.scrollToFeatures = function() {
+        const featuresSection = document.querySelector('.features-section');
+        if (featuresSection) {
+            featuresSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    };
+});
+</script>
+{% endblock %}

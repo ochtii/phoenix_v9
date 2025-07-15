@@ -1,0 +1,100 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      // Users can read and write their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Admins can read all user data
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'moderator'];
+    }
+    
+    // Projects collection
+    match /projects/{projectId} {
+      // Anyone can read public projects
+      allow read: if resource.data.visibility == 'public';
+      
+      // Authenticated users can read projects they're members of
+      allow read: if request.auth != null && 
+        (request.auth.uid in resource.data.members || 
+         request.auth.uid == resource.data.owner_id);
+      
+      // Project owners can write to their projects
+      allow write: if request.auth != null && 
+        request.auth.uid == resource.data.owner_id;
+      
+      // Users can create new projects
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.owner_id;
+    }
+    
+    // Messages collection
+    match /messages/{messageId} {
+      // Users can read messages they sent or received
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.sender_id || 
+         request.auth.uid == resource.data.recipient_id);
+      
+      // Users can send messages
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.sender_id;
+      
+      // Users can update their own messages
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.sender_id;
+    }
+    
+    // Support tickets collection
+    match /tickets/{ticketId} {
+      // Users can read their own tickets
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.user_id;
+      
+      // Support staff can read all tickets
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'moderator'];
+      
+      // Users can create tickets
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.user_id;
+      
+      // Support staff can update tickets
+      allow update: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'moderator'];
+    }
+    
+    // Activities collection (for user activity tracking)
+    match /activities/{activityId} {
+      // Users can read their own activities
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.user_id;
+      
+      // System can create activities
+      allow create: if request.auth != null;
+    }
+    
+    // Notifications collection
+    match /notifications/{notificationId} {
+      // Users can read their own notifications
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.user_id;
+      
+      // Users can update their own notifications (mark as read)
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.user_id;
+      
+      // System can create notifications
+      allow create: if request.auth != null;
+    }
+    
+    // Admin functions
+    match /{document=**} {
+      // Admins have full access
+      allow read, write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

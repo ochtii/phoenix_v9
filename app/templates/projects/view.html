@@ -1,0 +1,827 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .project-view-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(0,0,0,0.6)), 
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .phoenix-accent-project {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            opacity: 0.4;
+            z-index: 5;
+        }
+        
+        .project-header {
+            background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+        }
+        
+        .project-status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+        
+        .status-active { background: #28a745; }
+        .status-completed { background: #17a2b8; }
+        .status-paused { background: #ffc107; color: #000; }
+        .status-planning { background: #dc3545; }
+        
+        .project-nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .project-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .project-nav .nav-link.active {
+            background: var(--phoenix-primary);
+            color: white;
+            border-color: var(--phoenix-primary);
+        }
+        
+        .project-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .content-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .member-card {
+            background: var(--theme-bg-primary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--theme-shadow);
+        }
+        
+        .member-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: var(--phoenix-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .member-role {
+            background: var(--phoenix-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .task-item {
+            background: var(--theme-bg-primary);
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item:hover {
+            border-color: var(--phoenix-primary);
+            background: rgba(37, 99, 235, 0.05);
+        }
+        
+        .task-priority {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .priority-high { background: #dc3545; color: white; }
+        .priority-medium { background: #ffc107; color: #000; }
+        .priority-low { background: #28a745; color: white; }
+        
+        .progress-bar-container {
+            background: var(--theme-bg-tertiary);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--phoenix-primary), var(--phoenix-secondary));
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .file-item {
+            background: var(--theme-bg-primary);
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        
+        .file-item:hover {
+            background: rgba(37, 99, 235, 0.05);
+            border-color: var(--phoenix-primary);
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+        }
+        
+        .file-pdf { background: #dc3545; }
+        .file-doc { background: #007bff; }
+        .file-img { background: #28a745; }
+        .file-zip { background: #6c757d; }
+        .file-default { background: var(--phoenix-primary); }
+        
+        .activity-item {
+            display: flex;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .activity-item::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 50px;
+            bottom: -20px;
+            width: 2px;
+            background: var(--theme-border);
+        }
+        
+        .activity-item:last-child::before {
+            display: none;
+        }
+        
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--phoenix-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            z-index: 1;
+        }
+        
+        .activity-content {
+            flex: 1;
+            background: var(--theme-bg-primary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--theme-text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .project-header {
+                padding: 2rem 0;
+                text-align: center;
+            }
+            
+            .project-nav .nav {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="project-view-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix-icon2.png') }}" alt="Phoenix" class="phoenix-accent-project">
+    
+    <div class="container py-4">
+        <!-- Project Header -->
+        <div class="project-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="h2 mb-2">{{ project.name }}</h1>
+                        <p class="mb-3 opacity-90">{{ project.description }}</p>
+                        <div class="d-flex align-items-center">
+                            <span class="project-status-badge status-{{ project.status|lower }}">
+                                {{ project.status }}
+                            </span>
+                            <span class="ms-3 opacity-75">
+                                <i class="fas fa-users me-1"></i>{{ project.member_count }} members
+                            </span>
+                            <span class="ms-3 opacity-75">
+                                <i class="fas fa-calendar me-1"></i>{{ project.created_at.strftime('%B %d, %Y') if project.created_at else 'N/A' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        {% if project.is_owner %}
+                            <a href="{{ url_for('projects.edit', project_id=project.uid) }}" class="btn btn-light me-2">
+                                <i class="fas fa-edit me-2"></i>Edit Project
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('projects.index') }}" class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Projects
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="project-nav">
+            <ul class="nav nav-pills justify-content-center" id="projectTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="pill" 
+                            data-bs-target="#overview" type="button" role="tab">
+                        <i class="fas fa-home me-2"></i>Overview
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tasks-tab" data-bs-toggle="pill" 
+                            data-bs-target="#tasks" type="button" role="tab">
+                        <i class="fas fa-tasks me-2"></i>Tasks
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="timeline-tab" data-bs-toggle="pill" 
+                            data-bs-target="#timeline" type="button" role="tab">
+                        <i class="fas fa-calendar-alt me-2"></i>Timeline
+                    </button>
+                </li>
+                {% if project.settings and project.settings.enable_financials %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="financials-tab" data-bs-toggle="pill" 
+                            data-bs-target="#financials" type="button" role="tab">
+                        <i class="fas fa-chart-line me-2"></i>Financials
+                    </button>
+                </li>
+                {% endif %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="team-tab" data-bs-toggle="pill" 
+                            data-bs-target="#team" type="button" role="tab">
+                        <i class="fas fa-users me-2"></i>Team
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="files-tab" data-bs-toggle="pill" 
+                            data-bs-target="#files" type="button" role="tab">
+                        <i class="fas fa-folder-open me-2"></i>Files
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="projectTabsContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="content-section">
+                            <h4 class="mb-4">
+                                <i class="fas fa-chart-line text-primary me-2"></i>Project Progress
+                            </h4>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Overall Progress</span>
+                                    <span>{{ project.progress or 0 }}%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: {{ project.progress or 0 }}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-3">
+                                    <div class="bg-primary text-white p-3 rounded">
+                                        <h3 class="mb-1">{{ project.task_stats.total or 0 }}</h3>
+                                        <small>Total Tasks</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="bg-success text-white p-3 rounded">
+                                        <h3 class="mb-1">{{ project.task_stats.completed or 0 }}</h3>
+                                        <small>Completed</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="bg-warning text-white p-3 rounded">
+                                        <h3 class="mb-1">{{ project.task_stats.in_progress or 0 }}</h3>
+                                        <small>In Progress</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="bg-danger text-white p-3 rounded">
+                                        <h3 class="mb-1">{{ project.task_stats.overdue or 0 }}</h3>
+                                        <small>Overdue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="content-section">
+                            <h4 class="mb-3">
+                                <i class="fas fa-clock text-warning me-2"></i>Recent Activity
+                            </h4>
+                            
+                            {% if project.recent_activity %}
+                                {% for activity in project.recent_activity[:5] %}
+                                <div class="activity-item">
+                                    <div class="activity-avatar">
+                                        {{ activity.user.username[0]|upper if activity.user else 'U' }}
+                                    </div>
+                                    <div class="activity-content">
+                                        <strong>{{ activity.user.username if activity.user else 'Unknown User' }}</strong>
+                                        {{ activity.description }}
+                                        <div class="text-muted mt-1">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ activity.created_at.strftime('%B %d, %Y at %I:%M %p') if activity.created_at else 'Unknown time' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <div class="text-center">
+                                    <button class="btn btn-outline-primary" onclick="showTab('activity')">
+                                        View All Activity
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-history"></i>
+                                    <h5>No Recent Activity</h5>
+                                    <p>Project activity will appear here</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="content-section">
+                            <h4 class="mb-3">
+                                <i class="fas fa-info-circle text-info me-2"></i>Project Details
+                            </h4>
+                            
+                            <div class="mb-3">
+                                <strong>Category:</strong>
+                                <span class="ms-2">
+                                    <i class="{{ get_category_icon(project.category) }} me-2"></i>{{ project.category or 'Uncategorized' }}
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Privacy:</strong>
+                                <span class="ms-2">
+                                    {% if project.is_public %}
+                                        <i class="fas fa-globe text-success me-1"></i>Public
+                                    {% else %}
+                                        <i class="fas fa-lock text-warning me-1"></i>Private
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            {% if project.start_date %}
+                            <div class="mb-3">
+                                <strong>Start Date:</strong>
+                                <span class="ms-2">{{ project.start_date.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if project.end_date %}
+                            <div class="mb-3">
+                                <strong>Target End Date:</strong>
+                                <span class="ms-2">{{ project.end_date.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <strong>Last Updated:</strong>
+                                <span class="ms-2">{{ project.updated_at.strftime('%B %d, %Y') if project.updated_at else 'Never' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="content-section">
+                            <h4 class="mb-3">
+                                <i class="fas fa-users text-success me-2"></i>Quick Team View
+                            </h4>
+                            
+                            {% if project.team_members %}
+                                {% for member in project.team_members[:3] %}
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="member-avatar" style="width: 40px; height: 40px; font-size: 1rem;">
+                                        {{ member.username[0]|upper }}
+                                    </div>
+                                    <div class="ms-2">
+                                        <div class="fw-bold">{{ member.username }}</div>
+                                        <small class="text-muted">{{ member.role }}</small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                {% if project.team_members|length > 3 %}
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="showTab('team')">
+                                        View All {{ project.team_members|length }} Members
+                                    </button>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-user-plus"></i>
+                                    <h6>No Team Members</h6>
+                                    <p class="mb-0">Invite team members to collaborate</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Tab -->
+            <div class="tab-pane fade" id="tasks" role="tabpanel">
+                <div class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="h4 mb-0" style="color: white;">
+                            <i class="fas fa-tasks me-2 text-warning"></i>Projekt-Aufgaben
+                        </h3>
+                        <button class="btn btn-primary" onclick="showCreateTaskModal()">
+                            <i class="fas fa-plus me-2"></i>Neue Aufgabe
+                        </button>
+                    </div>
+                    <div id="tasks-content">
+                        <div class="text-center py-4" style="color: rgba(255,255,255,0.7);">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                            <p>Lade Aufgaben...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Tab -->
+            <div class="tab-pane fade" id="timeline" role="tabpanel">
+                <div class="content-section">
+                    <h3 class="h4 mb-4" style="color: white;">
+                        <i class="fas fa-calendar-alt me-2 text-info"></i>Project Timeline
+                    </h3>
+                    <div id="timeline-content">
+                        <div class="text-center py-4" style="color: rgba(255,255,255,0.7);">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                            <p>Loading timeline...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financials Tab -->
+            {% if project.settings and project.settings.enable_financials %}
+            <div class="tab-pane fade" id="financials" role="tabpanel">
+                <div class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="h4 mb-0" style="color: white;">
+                            <i class="fas fa-chart-line me-2 text-success"></i>Financial Tracking
+                        </h3>
+                        <button class="btn btn-success" onclick="showAddFinancialModal()">
+                            <i class="fas fa-plus me-2"></i>Add Entry
+                        </button>
+                    </div>
+                    <div id="financials-content">
+                        <div class="text-center py-4" style="color: rgba(255,255,255,0.7);">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                            <p>Loading financial data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Team Tab -->
+            <div class="tab-pane fade" id="team" role="tabpanel">
+                <div class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">
+                            <i class="fas fa-users text-primary me-2"></i>Team Members
+                        </h4>
+                        {% if project.is_owner %}
+                        <button class="btn btn-primary" onclick="inviteTeamMember()">
+                            <i class="fas fa-user-plus me-2"></i>Invite Member
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    {% if project.team_members %}
+                    <div class="row">
+                        {% for member in project.team_members %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="member-card">
+                                <div class="member-avatar">
+                                    {{ member.username[0]|upper }}
+                                </div>
+                                <h5 class="mb-1">{{ member.username }}</h5>
+                                <p class="text-muted mb-2">{{ member.email }}</p>
+                                <span class="member-role">{{ member.role }}</span>
+                                
+                                <div class="mt-3">
+                                    <small class="text-muted">
+                                        Joined {{ member.joined_at.strftime('%B %Y') if member.joined_at else 'Unknown' }}
+                                    </small>
+                                </div>
+                                
+                                {% if project.is_owner and member.uid != project.owner_id %}
+                                <div class="dropdown mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                            data-bs-toggle="dropdown">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="changeRole('{{ member.uid }}')">
+                                            <i class="fas fa-user-cog me-2"></i>Change Role
+                                        </a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="removeMember('{{ member.uid }}')">
+                                            <i class="fas fa-user-times me-2"></i>Remove
+                                        </a></li>
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-user-friends"></i>
+                            <h5>No Team Members</h5>
+                            <p>Invite team members to start collaborating</p>
+                            {% if project.is_owner %}
+                            <button class="btn btn-primary" onclick="inviteTeamMember()">
+                                <i class="fas fa-user-plus me-2"></i>Invite First Member
+                            </button>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Files Tab -->
+            <div class="tab-pane fade" id="files" role="tabpanel">
+                <div class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">
+                            <i class="fas fa-folder text-primary me-2"></i>Project Files
+                        </h4>
+                        <button class="btn btn-primary" onclick="uploadFile()">
+                            <i class="fas fa-upload me-2"></i>Upload File
+                        </button>
+                    </div>
+                    
+                    {% if project.files %}
+                        {% for file in project.files %}
+                        <div class="file-item">
+                            <div class="d-flex align-items-center">
+                                <div class="file-icon file-{{ file.type }}">
+                                    <i class="fas fa-file{% if file.type == 'pdf' %}-pdf{% elif file.type == 'doc' %}-word{% elif file.type == 'img' %}-image{% elif file.type == 'zip' %}-archive{% endif %}"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">{{ file.name }}</h6>
+                                    <small class="text-muted">
+                                        {{ file.size_formatted }} • 
+                                        Uploaded by {{ file.uploaded_by.username if file.uploaded_by else 'Unknown' }} • 
+                                        {{ file.created_at.strftime('%b %d, %Y') if file.created_at else 'Unknown' }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <a href="{{ url_for('projects.download_file', project_id=project.uid, file_id=file.uid) }}" 
+                                   class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                {% if project.is_owner or file.uploaded_by_id == current_user.uid %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteFile('{{ file.uid }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h5>No Files Yet</h5>
+                            <p>Upload files to share with your team</p>
+                            <button class="btn btn-primary" onclick="uploadFile()">
+                                <i class="fas fa-upload me-2"></i>Upload First File
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        function showTab(tabName) {
+            const tab = document.getElementById(tabName + '-tab');
+            if (tab) {
+                tab.click();
+                
+                // Load content for specific tabs
+                if (tabName === 'financials') {
+                    loadFinancialContent();
+                }
+            }
+        }
+        
+        function loadFinancialContent() {
+            const financialContent = document.getElementById('financials-content');
+            if (financialContent && !financialContent.dataset.loaded) {
+                financialContent.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading financial data...</div>';
+                
+                fetch(`/tasks/project/{{ project.uid }}/financials`)
+                .then(response => response.text())
+                .then(html => {
+                    financialContent.innerHTML = html;
+                    financialContent.dataset.loaded = 'true';
+                })
+                .catch(error => {
+                    console.error('Error loading financial content:', error);
+                    financialContent.innerHTML = '<div class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error loading financial data</div>';
+                });
+            }
+        }
+        
+        // Add event listener for tab switching
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listen for tab clicks
+            const financialTab = document.getElementById('financials-tab');
+            if (financialTab) {
+                financialTab.addEventListener('click', function() {
+                    setTimeout(loadFinancialContent, 100); // Small delay to ensure tab is active
+                });
+            }
+        });
+        
+        function leaveProject() {
+            if (confirm('Are you sure you want to leave this project?')) {
+                fetch(`/projects/{{ project.uid }}/leave`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Phoenix.Utils.showToast('Left project successfully', 'success');
+                        setTimeout(() => window.location.href = '/projects', 1000);
+                    } else {
+                        Phoenix.Utils.showToast(data.message || 'Failed to leave project', 'error');
+                    }
+                })
+                .catch(error => {
+                    Phoenix.Utils.showToast('An error occurred', 'error');
+                });
+            }
+        }
+        
+        // Task functions
+        function createTask() {
+            // Implementation for creating tasks
+            Phoenix.Utils.showToast('Task creation feature coming soon', 'info');
+        }
+        
+        function toggleTask(taskId) {
+            // Implementation for toggling task completion
+            Phoenix.Utils.showToast('Task toggle feature coming soon', 'info');
+        }
+        
+        function editTask(taskId) {
+            // Implementation for editing tasks
+            Phoenix.Utils.showToast('Task editing feature coming soon', 'info');
+        }
+        
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                // Implementation for deleting tasks
+                Phoenix.Utils.showToast('Task deletion feature coming soon', 'info');
+            }
+        }
+        
+        // Team functions
+        function inviteTeamMember() {
+            // Implementation for inviting team members
+            Phoenix.Utils.showToast('Member invitation feature coming soon', 'info');
+        }
+        
+        function changeRole(memberId) {
+            // Implementation for changing member roles
+            Phoenix.Utils.showToast('Role change feature coming soon', 'info');
+        }
+        
+        function removeMember(memberId) {
+            if (confirm('Are you sure you want to remove this member?')) {
+                // Implementation for removing members
+                Phoenix.Utils.showToast('Member removal feature coming soon', 'info');
+            }
+        }
+        
+        // File functions
+        function uploadFile() {
+            // Implementation for file upload
+            Phoenix.Utils.showToast('File upload feature coming soon', 'info');
+        }
+        
+        function deleteFile(fileId) {
+            if (confirm('Are you sure you want to delete this file?')) {
+                // Implementation for deleting files
+                Phoenix.Utils.showToast('File deletion feature coming soon', 'info');
+            }
+        }
+        
+        // Task functions
+        function showCreateTaskModal(type = 'task', parentId = null) {
+            // Redirect to tasks page for now
+            window.location.href = `/projects/{{ project.id }}/tasks`;
+        }
+        
+        function showAddFinancialModal() {
+            Phoenix.Utils.showToast('Financial feature will be available soon', 'info');
+        }
+    </script>
+{% endblock %}

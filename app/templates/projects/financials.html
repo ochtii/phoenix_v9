@@ -1,0 +1,644 @@
+{% extends "base.html" %}
+
+{% block title %}Financials - {{ project.name }} - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .financials-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.95) 100%),
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-financials {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            opacity: 0.4;
+            z-index: 5;
+        }
+        
+        .financials-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .financial-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .summary-card.income {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+        
+        .summary-card.expense {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .summary-card.balance {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .summary-card.budget {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+        }
+        
+        .summary-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .summary-card.income .summary-amount {
+            color: #22c55e;
+        }
+        
+        .summary-card.expense .summary-amount {
+            color: #ef4444;
+        }
+        
+        .summary-card.balance .summary-amount {
+            color: #3b82f6;
+        }
+        
+        .summary-card.budget .summary-amount {
+            color: #fbbf24;
+        }
+        
+        .summary-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+        
+        .entries-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .entries-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-controls select,
+        .filter-controls input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .filter-controls select option {
+            background: #2d2d2d;
+            color: white;
+        }
+        
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .entries-table th,
+        .entries-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .entries-table th {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .entries-table td {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .entry-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .entry-type.income {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .entry-type.expense {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .entry-amount.income {
+            color: #22c55e;
+        }
+        
+        .entry-amount.expense {
+            color: #ef4444;
+        }
+        
+        .entry-category {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+        }
+        
+        .entry-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .entry-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .empty-entries {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .empty-entries i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .floating-add-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .floating-add-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="financials-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix-icon2.png') }}" alt="Phoenix" class="phoenix-accent-financials">
+    
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-2" style="color: white;">
+                    <i class="fas fa-chart-line me-3 text-success"></i>{{ project.name }} - Financials
+                </h1>
+                <p style="color: rgba(255,255,255,0.7);">Track income and expenses for your project</p>
+            </div>
+            <div>
+                <a href="{{ url_for('projects.view', project_id=project_id) }}" class="btn btn-outline-light me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Project
+                </a>
+                <button class="btn btn-success" onclick="showAddEntryModal('income')">
+                    <i class="fas fa-plus me-2"></i>Add Income
+                </button>
+                <button class="btn btn-danger ms-2" onclick="showAddEntryModal('expense')">
+                    <i class="fas fa-minus me-2"></i>Add Expense
+                </button>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="financials-container">
+            <div class="financial-summary">
+                <div class="summary-card income">
+                    <i class="fas fa-arrow-up summary-icon"></i>
+                    <div class="summary-label">Total Income</div>
+                    <div class="summary-amount">€{{ "%.2f"|format(total_income) }}</div>
+                </div>
+                
+                <div class="summary-card expense">
+                    <i class="fas fa-arrow-down summary-icon"></i>
+                    <div class="summary-label">Total Expenses</div>
+                    <div class="summary-amount">€{{ "%.2f"|format(total_expenses) }}</div>
+                </div>
+                
+                <div class="summary-card balance">
+                    <i class="fas fa-balance-scale summary-icon"></i>
+                    <div class="summary-label">Net Balance</div>
+                    <div class="summary-amount">€{{ "%.2f"|format(net_balance) }}</div>
+                </div>
+                
+                <div class="summary-card budget">
+                    <i class="fas fa-wallet summary-icon"></i>
+                    <div class="summary-label">Budget Status</div>
+                    <div class="summary-amount">
+                        {% if project.budget %}
+                            {{ "%.1f"|format((net_balance / project.budget) * 100) }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-container">
+                <h4 style="color: white; margin-bottom: 1rem;">
+                    <i class="fas fa-chart-pie me-2"></i>Financial Overview
+                </h4>
+                <canvas id="financialChart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Entries Section -->
+            <div class="entries-section">
+                <div class="entries-header">
+                    <h4 style="color: white; margin: 0;">
+                        <i class="fas fa-list me-2"></i>Financial Entries
+                    </h4>
+                    <div class="filter-controls">
+                        <select id="typeFilter" onchange="filterEntries()">
+                            <option value="">All Types</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                        <select id="categoryFilter" onchange="filterEntries()">
+                            <option value="">All Categories</option>
+                            <!-- Categories will be populated dynamically -->
+                        </select>
+                        <input type="month" id="monthFilter" onchange="filterEntries()">
+                        <button class="btn btn-outline-light btn-sm" onclick="clearFilters()">
+                            <i class="fas fa-times me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                {% if entries %}
+                <div class="table-responsive">
+                    <table class="entries-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entriesTableBody">
+                            {% for entry in entries %}
+                            <tr class="entry-row" 
+                                data-type="{{ entry.entry_type }}" 
+                                data-category="{{ entry.category }}"
+                                data-date="{{ entry.date.strftime('%Y-%m') }}">
+                                <td>{{ entry.date.strftime('%m/%d/%Y') }}</td>
+                                <td>
+                                    <span class="entry-type {{ entry.entry_type }}">
+                                        {{ entry.entry_type|title }}
+                                    </span>
+                                </td>
+                                <td>{{ entry.description or 'No description' }}</td>
+                                <td>
+                                    {% if entry.category %}
+                                        <span class="entry-category">{{ entry.category }}</span>
+                                    {% else %}
+                                        <span style="color: rgba(255,255,255,0.5);">Uncategorized</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="entry-amount {{ entry.entry_type }}">
+                                        {{ '+' if entry.entry_type == 'income' else '-' }}€{{ "%.2f"|format(entry.amount) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="entry-actions">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="editEntry('{{ entry.entry_id }}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="deleteEntry('{{ entry.entry_id }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-entries">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>No Financial Entries</h3>
+                    <p>Start tracking your project finances by adding income and expenses.</p>
+                    <button class="btn btn-success" onclick="showAddEntryModal('income')">
+                        <i class="fas fa-plus me-2"></i>Add First Entry
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Add Button -->
+<button class="floating-add-btn" onclick="showQuickAddMenu()" title="Quick Add">
+    <i class="fas fa-plus"></i>
+</button>
+
+<!-- Add/Edit Entry Modal -->
+<div class="modal fade" id="entryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: #2d2d2d; color: white;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="entryModalTitle">Add Financial Entry</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="entryForm">
+                    <input type="hidden" id="entryId" name="entry_id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Type *</label>
+                                <select class="form-select" id="entryType" name="entry_type" required>
+                                    <option value="income">Income</option>
+                                    <option value="expense">Expense</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Amount (€) *</label>
+                                <input type="number" class="form-control" id="entryAmount" name="amount" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                <input type="text" class="form-control" id="entryCategory" name="category" placeholder="e.g., Materials, Labor, Sales">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control" id="entryDate" name="date" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="entryDescription" name="description" rows="3" placeholder="Describe this transaction..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="saveEntry()">Save Entry</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let currentProjectId = '{{ project_id }}';
+
+function showAddEntryModal(type = 'income') {
+    document.getElementById('entryModalTitle').textContent = `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    document.getElementById('entryForm').reset();
+    document.getElementById('entryId').value = '';
+    document.getElementById('entryType').value = type;
+    document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+    
+    new bootstrap.Modal(document.getElementById('entryModal')).show();
+}
+
+function editEntry(entryId) {
+    // Load entry data and populate form
+    // This would fetch entry details from the server
+    alert('Edit entry functionality would be implemented here');
+}
+
+function deleteEntry(entryId) {
+    if (confirm('Are you sure you want to delete this entry?')) {
+        fetch(`/tasks/project/${currentProjectId}/financials/${entryId}/delete`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Error deleting entry');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting entry:', error);
+            alert('Error deleting entry');
+        });
+    }
+}
+
+function saveEntry() {
+    const form = document.getElementById('entryForm');
+    const formData = new FormData(form);
+    
+    fetch(`/tasks/project/${currentProjectId}/financials/add`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('entryModal')).hide();
+            location.reload();
+        } else {
+            alert(data.message || 'Error saving entry');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving entry:', error);
+        alert('Error saving entry');
+    });
+}
+
+function filterEntries() {
+    const typeFilter = document.getElementById('typeFilter').value;
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    const monthFilter = document.getElementById('monthFilter').value;
+    
+    const rows = document.querySelectorAll('.entry-row');
+    
+    rows.forEach(row => {
+        let show = true;
+        
+        if (typeFilter && row.dataset.type !== typeFilter) {
+            show = false;
+        }
+        
+        if (categoryFilter && row.dataset.category !== categoryFilter) {
+            show = false;
+        }
+        
+        if (monthFilter && row.dataset.date !== monthFilter) {
+            show = false;
+        }
+        
+        row.style.display = show ? 'table-row' : 'none';
+    });
+}
+
+function clearFilters() {
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('categoryFilter').value = '';
+    document.getElementById('monthFilter').value = '';
+    filterEntries();
+}
+
+function showQuickAddMenu() {
+    showAddEntryModal('expense');
+}
+
+// Initialize chart
+function initializeChart() {
+    const ctx = document.getElementById('financialChart').getContext('2d');
+    
+    const totalIncome = {{ total_income|default(0) }};
+    const totalExpenses = {{ total_expenses|default(0) }};
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Income', 'Expenses'],
+            datasets: [{
+                data: [totalIncome, totalExpenses],
+                backgroundColor: ['#22c55e', '#ef4444'],
+                borderColor: ['#16a34a', '#dc2626'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Populate category filter
+function populateCategories() {
+    const categories = new Set();
+    document.querySelectorAll('.entry-row').forEach(row => {
+        const category = row.dataset.category;
+        if (category) categories.add(category);
+    });
+    
+    const categoryFilter = document.getElementById('categoryFilter');
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChart();
+    populateCategories();
+});
+</script>
+{% endblock %}

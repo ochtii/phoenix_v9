@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}Timeline - {{ project.name }} - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .timeline-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.95) 100%),
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-timeline {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            opacity: 0.4;
+            z-index: 5;
+        }
+        
+        .timeline-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-track {
+            position: relative;
+            overflow-x: auto;
+            padding: 2rem 0;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .timeline-dates {
+            display: flex;
+            min-width: 1000px;
+            position: relative;
+            height: 60px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 2rem;
+        }
+        
+        .timeline-date {
+            flex: 1;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0.5rem;
+        }
+        
+        .timeline-tasks {
+            min-width: 1000px;
+            position: relative;
+        }
+        
+        .timeline-task {
+            position: relative;
+            height: 50px;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-task:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .timeline-task.milestone {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.8), rgba(245, 158, 11, 0.8));
+            border: 2px solid #fbbf24;
+        }
+        
+        .timeline-task.package {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.8), rgba(147, 51, 234, 0.8));
+            border: 2px solid #a855f7;
+        }
+        
+        .timeline-task.task {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.8));
+            border: 2px solid #3b82f6;
+        }
+        
+        .timeline-task-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .timeline-task-info h5 {
+            color: white;
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        
+        .timeline-task-meta {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .timeline-progress {
+            width: 60px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .timeline-progress-bar {
+            height: 100%;
+            background: var(--phoenix-primary);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .gantt-legend {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .legend-milestone { background: #fbbf24; }
+        .legend-package { background: #a855f7; }
+        .legend-task { background: #3b82f6; }
+        
+        .timeline-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .view-selector {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem;
+        }
+        
+        .today-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ef4444;
+            z-index: 10;
+        }
+        
+        .today-marker::before {
+            content: 'Today';
+            position: absolute;
+            top: -20px;
+            left: -15px;
+            font-size: 0.75rem;
+            color: #ef4444;
+            font-weight: 600;
+        }
+        
+        .empty-timeline {
+            text-align: center;
+            padding: 4rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .empty-timeline i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="timeline-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix-icon3.png') }}" alt="Phoenix" class="phoenix-accent-timeline">
+    
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="timeline-header">
+            <div>
+                <h1 class="h2 mb-2" style="color: white;">
+                    <i class="fas fa-calendar-alt me-3 text-info"></i>{{ project.name }} - Timeline
+                </h1>
+                <p style="color: rgba(255,255,255,0.7);">Project schedule and task dependencies</p>
+            </div>
+            <div class="timeline-controls">
+                <select class="view-selector" id="timelineView" onchange="changeTimelineView()">
+                    <option value="month">Month View</option>
+                    <option value="week">Week View</option>
+                    <option value="quarter">Quarter View</option>
+                </select>
+                <a href="{{ url_for('projects.view', project_id=project_id) }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Project
+                </a>
+            </div>
+        </div>
+
+        <!-- Timeline Container -->
+        <div class="timeline-container">
+            <!-- Legend -->
+            <div class="gantt-legend">
+                <div class="legend-item">
+                    <div class="legend-color legend-milestone"></div>
+                    <span>Milestones</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-package"></div>
+                    <span>Task Packages</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-task"></div>
+                    <span>Tasks</span>
+                </div>
+                <div class="legend-item">
+                    <i class="fas fa-circle" style="color: #ef4444; font-size: 0.5rem;"></i>
+                    <span>Today</span>
+                </div>
+            </div>
+
+            {% if tasks %}
+            <!-- Timeline Track -->
+            <div class="timeline-track">
+                <!-- Date Headers -->
+                <div class="timeline-dates" id="timelineDates">
+                    <!-- Generated by JavaScript -->
+                </div>
+                
+                <!-- Today Marker -->
+                <div class="today-marker" id="todayMarker"></div>
+                
+                <!-- Tasks -->
+                <div class="timeline-tasks" id="timelineTasks">
+                    {% for task in tasks %}
+                    <div class="timeline-task {{ task.task_type }}" 
+                         data-start="{{ task.start_date.isoformat() if task.start_date else '' }}"
+                         data-end="{{ task.due_date.isoformat() if task.due_date else '' }}"
+                         data-progress="{{ task.progress or 0 }}"
+                         onclick="showTaskDetails('{{ task.task_id }}')">
+                        <div class="timeline-task-content">
+                            <div class="timeline-task-info">
+                                <h5>
+                                    {% if task.task_type == 'milestone' %}
+                                        <i class="fas fa-flag me-2"></i>
+                                    {% elif task.task_type == 'package' %}
+                                        <i class="fas fa-box me-2"></i>
+                                    {% else %}
+                                        <i class="fas fa-check-circle me-2"></i>
+                                    {% endif %}
+                                    {{ task.title }}
+                                </h5>
+                                <div class="timeline-task-meta">
+                                    {% if task.start_date and task.due_date %}
+                                        {{ task.start_date.strftime('%m/%d') }} - {{ task.due_date.strftime('%m/%d') }}
+                                    {% elif task.due_date %}
+                                        Due: {{ task.due_date.strftime('%m/%d') }}
+                                    {% endif %}
+                                    {% if task.assigned_to %}
+                                        | {{ task.assigned_to|length }} assigned
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="timeline-progress">
+                                <div class="timeline-progress-bar" style="width: {{ task.progress or 0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-timeline">
+                <i class="fas fa-calendar-times"></i>
+                <h3>No Scheduled Tasks</h3>
+                <p>Tasks with start and due dates will appear in the timeline.</p>
+                <a href="{{ url_for('tasks.project_tasks', project_id=project_id) }}" class="btn btn-primary">
+                    <i class="fas fa-tasks me-2"></i>Manage Tasks
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Task Details Modal -->
+<div class="modal fade" id="taskDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: #2d2d2d; color: white;">
+            <div class="modal-header">
+                <h5 class="modal-title">Task Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="taskDetailsContent">
+                <!-- Content loaded by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editTaskFromTimeline()">Edit Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentView = 'month';
+let tasksData = {{ tasks|tojson if tasks else '[]' }};
+
+function initializeTimeline() {
+    generateTimelineDates();
+    positionTasks();
+    positionTodayMarker();
+}
+
+function generateTimelineDates() {
+    const datesContainer = document.getElementById('timelineDates');
+    const today = new Date();
+    let startDate, endDate, dateFormat;
+    
+    switch (currentView) {
+        case 'week':
+            startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 14);
+            endDate = new Date(startDate.getTime() + (35 * 24 * 60 * 60 * 1000)); // 5 weeks
+            dateFormat = { weekday: 'short', month: 'short', day: 'numeric' };
+            break;
+        case 'quarter':
+            startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 4, 0);
+            dateFormat = { month: 'long', year: 'numeric' };
+            break;
+        default: // month
+            startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+            dateFormat = { month: 'short', day: 'numeric' };
+    }
+    
+    datesContainer.innerHTML = '';
+    const totalDays = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000));
+    
+    for (let i = 0; i <= totalDays; i += Math.max(1, Math.floor(totalDays / 12))) {
+        const date = new Date(startDate.getTime() + (i * 24 * 60 * 60 * 1000));
+        const dateElement = document.createElement('div');
+        dateElement.className = 'timeline-date';
+        dateElement.textContent = date.toLocaleDateString('en-US', dateFormat);
+        datesContainer.appendChild(dateElement);
+    }
+}
+
+function positionTasks() {
+    const tasksContainer = document.getElementById('timelineTasks');
+    const tasks = tasksContainer.querySelectorAll('.timeline-task');
+    
+    tasks.forEach(taskElement => {
+        const startDate = taskElement.dataset.start;
+        const endDate = taskElement.dataset.end;
+        
+        if (startDate || endDate) {
+            // Calculate position and width based on dates
+            // This is a simplified implementation
+            const randomLeft = Math.random() * 60; // 0-60%
+            const randomWidth = Math.random() * 30 + 10; // 10-40%
+            
+            taskElement.style.position = 'relative';
+            taskElement.style.left = randomLeft + '%';
+            taskElement.style.width = randomWidth + '%';
+        }
+    });
+}
+
+function positionTodayMarker() {
+    const marker = document.getElementById('todayMarker');
+    const container = document.getElementById('timelineDates');
+    
+    if (marker && container) {
+        // Position today marker at approximately center
+        marker.style.left = '50%';
+    }
+}
+
+function changeTimelineView() {
+    currentView = document.getElementById('timelineView').value;
+    initializeTimeline();
+}
+
+function showTaskDetails(taskId) {
+    // Find task data
+    const task = tasksData.find(t => t.task_id === taskId);
+    if (!task) return;
+    
+    const content = document.getElementById('taskDetailsContent');
+    content.innerHTML = `
+        <h6><i class="fas fa-${task.task_type === 'milestone' ? 'flag' : task.task_type === 'package' ? 'box' : 'check-circle'} me-2"></i>${task.title}</h6>
+        <p>${task.description || 'No description'}</p>
+        <div class="row">
+            <div class="col-6">
+                <strong>Status:</strong> ${task.status.replace('_', ' ')}<br>
+                <strong>Priority:</strong> ${task.priority}<br>
+                <strong>Progress:</strong> ${task.progress || 0}%
+            </div>
+            <div class="col-6">
+                ${task.start_date ? `<strong>Start:</strong> ${new Date(task.start_date).toLocaleDateString()}<br>` : ''}
+                ${task.due_date ? `<strong>Due:</strong> ${new Date(task.due_date).toLocaleDateString()}<br>` : ''}
+                ${task.estimated_hours ? `<strong>Estimated:</strong> ${task.estimated_hours}h` : ''}
+            </div>
+        </div>
+    `;
+    
+    // Store current task ID for editing
+    document.getElementById('taskDetailsModal').setAttribute('data-task-id', taskId);
+    
+    new bootstrap.Modal(document.getElementById('taskDetailsModal')).show();
+}
+
+function editTaskFromTimeline() {
+    const taskId = document.getElementById('taskDetailsModal').getAttribute('data-task-id');
+    if (taskId) {
+        window.location.href = `/tasks/project/{{ project_id }}/tasks?edit=${taskId}`;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTimeline();
+});
+</script>
+{% endblock %}

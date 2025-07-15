@@ -1,0 +1,296 @@
+/* Phoenix Register Page - Dark Mode Only */
+
+.register-container {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
+    left: 0;
+    right: 0;
+}
+
+/* Force wider register container */
+.register-container .container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+}
+
+.register-card {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+/* Override any base container constraints for register */
+body:has(.register-container) .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+
+/* Phoenix Video Background */
+.register-video-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    transform: translateX(-50%) translateY(-50%);
+    object-fit: cover;
+    opacity: 0.3;
+}
+
+.register-video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.9) 100%);
+    z-index: 2;
+}
+
+.register-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.2;
+    z-index: 3;
+}
+
+.register-card {
+    background: rgba(45, 45, 58, 0.95);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 3rem;
+    position: relative;
+    z-index: 10;
+    animation: fadeInScale 0.6s ease-out;
+}
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Form Elements */
+.register-form .form-control {
+    height: 50px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding-left: 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.register-form .form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.register-form .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.register-form .form-label {
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.register-form .form-label i {
+    color: var(--bs-primary);
+}
+
+.input-group .btn {
+    border-radius: 0 12px 12px 0;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-left: none;
+}
+
+.register-form .btn-primary {
+    height: 50px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--bs-primary), #0056b3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.register-form .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.invalid-feedback {
+    color: #dc3545;
+}
+
+.form-label {
+    color: #ffffff !important;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.btn-outline-secondary {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    color: #ffffff !important;
+}
+
+.invalid-feedback {
+    color: #dc3545 !important;
+}
+
+.valid-feedback {
+    color: #198754 !important;
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    margin-top: 0.25rem !important;
+}
+
+/* Benefits Section */
+.benefits-section h5 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.benefit-item h6 {
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.benefit-item p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.benefit-icon i {
+    color: var(--bs-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Register Form Specific */
+.register-form .form-control {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.register-form .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--bs-primary);
+    color: #ffffff;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-check-label a {
+    color: var(--bs-primary);
+    text-decoration: none;
+}
+
+.form-check-label a:hover {
+    color: #4dabf7;
+    text-decoration: underline;
+}
+
+/* Password Strength */
+.password-strength-bar {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.password-strength-text {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.form-check-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.input-group-text {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.input-group .btn-outline-secondary {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-card {
+        padding: 2rem;
+        margin: 1rem;
+    }
+    
+    .register-container {
+        min-height: 100vh;
+    }
+}

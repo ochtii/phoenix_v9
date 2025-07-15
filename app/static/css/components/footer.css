@@ -1,0 +1,315 @@
+/* Phoenix Footer Styles - Standalone CSS */
+
+/* Main Footer Styling */
+.footer, footer {
+    background: #212529 !important; /* bg-dark */
+    color: #f8f9fa !important; /* text-light */
+    padding: 3rem 0 !important; /* py-5 */
+    margin-top: auto !important; /* mt-auto */
+    border-top: 1px solid var(--theme-border);
+}
+
+/* Container and Layout */
+.footer .container-fluid {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+    padding-right: 0.75rem !important;
+    padding-left: 0.75rem !important;
+}
+
+/* Footer Content Width Wrapper */
+.footer-content-wrapper {
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Bootstrap Grid System */
+.footer .row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-right: -0.75rem !important;
+    margin-left: -0.75rem !important;
+}
+
+.footer .col-lg-4,
+.footer .col-lg-2,
+.footer .col-md-6,
+.footer .col-md-12 {
+    position: relative !important;
+    width: 100% !important;
+    padding-right: 0.75rem !important;
+    padding-left: 0.75rem !important;
+}
+
+/* Responsive Grid */
+@media (min-width: 768px) {
+    .footer .col-md-6 {
+        flex: 0 0 auto !important;
+        width: 50% !important;
+    }
+    .footer .col-md-12 {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+    }
+    .footer .text-md-end {
+        text-align: right !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .footer .col-lg-4 {
+        flex: 0 0 auto !important;
+        width: 33.33333333% !important;
+    }
+    .footer .col-lg-2 {
+        flex: 0 0 auto !important;
+        width: 16.66666667% !important;
+    }
+}
+
+/* Margin and Padding Utilities */
+.footer .mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.footer .mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.footer .mb-2 {
+    margin-bottom: 0.5rem !important;
+}
+
+.footer .mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.footer .me-2 {
+    margin-right: 0.5rem !important;
+}
+
+.footer .me-3 {
+    margin-right: 1rem !important;
+}
+
+.footer .ms-2 {
+    margin-left: 0.5rem !important;
+}
+
+.footer .my-4 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.footer .mt-3 {
+    margin-top: 1rem !important;
+}
+
+/* Typography */
+.footer h5 {
+    font-size: 1.25rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1rem !important;
+}
+
+.footer h6 {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1rem !important;
+}
+
+.footer .text-primary {
+    color: var(--phoenix-primary) !important;
+}
+
+.footer .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.footer .text-light {
+    color: #f8f9fa !important;
+}
+
+.footer .text-uppercase {
+    text-transform: uppercase !important;
+}
+
+.footer .fw-bold {
+    font-weight: 700 !important;
+}
+
+.footer .text-decoration-none {
+    text-decoration: none !important;
+}
+
+.footer .small {
+    font-size: 0.875em !important;
+}
+
+/* Lists */
+.footer .list-unstyled {
+    padding-left: 0 !important;
+    list-style: none !important;
+}
+
+/* Links */
+.footer a {
+    color: var(--phoenix-primary) !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease-in-out !important;
+}
+
+.footer a:hover {
+    color: var(--phoenix-accent) !important;
+    text-decoration: underline !important;
+}
+
+.footer .social-links a {
+    color: #f8f9fa !important;
+    transition: color 0.15s ease-in-out !important;
+}
+
+.footer .social-links a:hover {
+    color: var(--phoenix-primary) !important;
+}
+
+/* Buttons */
+.footer .btn {
+    display: inline-block !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+    border: 1px solid transparent !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 1rem !important;
+    border-radius: 0.375rem !important;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.footer .btn-primary {
+    color: #fff !important;
+    background-color: var(--phoenix-primary) !important;
+    border-color: var(--phoenix-primary) !important;
+}
+
+.footer .btn-primary:hover {
+    background-color: var(--phoenix-accent) !important;
+    border-color: var(--phoenix-accent) !important;
+    color: white !important;
+}
+
+.footer .btn-secondary {
+    color: #fff !important;
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+.footer .btn-close {
+    box-sizing: content-box !important;
+    width: 1em !important;
+    height: 1em !important;
+    padding: 0.25em 0.25em !important;
+    color: #000 !important;
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.235.867 4.596 4.596m5.338 5.338-4.596-4.596m0 5.338 4.596-4.596M.235 10.801l4.596-4.596'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    border: 0 !important;
+    border-radius: 0.375rem !important;
+    opacity: 0.5 !important;
+}
+
+/* Forms */
+.footer .form-control {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    color: #212529 !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 0.375rem !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.footer .input-group {
+    position: relative !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: stretch !important;
+    width: 100% !important;
+}
+
+.footer .input-group-sm > .form-control {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+}
+
+.footer .input-group-sm > .btn {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+}
+
+/* Utility Classes */
+.footer .d-flex {
+    display: flex !important;
+}
+
+.footer .d-none {
+    display: none !important;
+}
+
+.footer .justify-content-center {
+    justify-content: center !important;
+}
+
+.footer .align-items-center {
+    align-items: center !important;
+}
+
+.footer .position-fixed {
+    position: fixed !important;
+}
+
+.footer .rounded-circle {
+    border-radius: 50% !important;
+}
+
+/* HR Styling */
+.footer hr {
+    margin: 1rem 0 !important;
+    color: inherit !important;
+    border: 0 !important;
+    border-top: 1px solid !important;
+    opacity: 0.25 !important;
+}
+
+/* FontAwesome Icons */
+.footer .fas,
+.footer .fab {
+    font-family: "Font Awesome 5 Free", "Font Awesome 5 Brands" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+}
+
+.footer .fa-lg {
+    font-size: 1.33333em !important;
+    line-height: 0.75em !important;
+    vertical-align: -0.0667em !important;
+}
+
+/* Back to Top Button */
+#backToTop {
+    bottom: 2rem !important;
+    right: 2rem !important;
+    z-index: 1000 !important;
+}

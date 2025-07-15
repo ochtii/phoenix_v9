@@ -1,0 +1,608 @@
+/* Phoenix Start Page - Logged-in Users */
+
+.start-page {
+    min-height: 100vh;
+    background: var(--theme-bg-primary);
+}
+
+/* Welcome Section */
+.welcome-section {
+    background: 
+        linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(168, 85, 247, 0.2) 10%),
+        radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.95) 100%),
+        url('../img/phoenix3.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: white;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 70%, rgba(0, 0, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(0, 0, 0, 0.2) 0%, transparent 50%);
+    animation: twinkle 8s ease-in-out infinite;
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.welcome-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+/* Phoenix Mascot */
+.phoenix-mascot {
+    position: relative;
+    text-align: center;
+    z-index: 2;
+}
+
+.phoenix-icon {
+    font-size: 8rem;
+    color: rgba(255, 255, 255, 0.9);
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+}
+
+.phoenix-icon-image {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.4));
+    transition: all 0.3s ease;
+}
+
+.phoenix-icon-image:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.6));
+}
+
+.mascot-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.sparkle {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: sparkle 3s ease-in-out infinite;
+}
+
+.sparkle-1 {
+    top: 20%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.sparkle-2 {
+    top: 30%;
+    right: 15%;
+    animation-delay: 1s;
+}
+
+.sparkle-3 {
+    bottom: 25%;
+    left: 25%;
+    animation-delay: 2s;
+}
+
+/* Tip Section */
+.tip-section {
+    padding: 3rem 0;
+    background: var(--theme-bg-primary);
+}
+
+.tip-card {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--phoenix-shadow-lg);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tip-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.1), transparent);
+    transition: all 0.8s ease;
+}
+
+.tip-card:hover::before {
+    left: 100%;
+}
+
+.tip-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.tip-icon-container {
+    margin-right: 1rem;
+}
+
+.tip-icon {
+    font-size: 2rem;
+    color: var(--phoenix-accent);
+}
+
+.tip-title {
+    color: var(--theme-text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.tip-text {
+    font-size: 1.1rem;
+    color: var(--theme-text-primary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    transition: opacity 0.3s ease;
+}
+
+.tip-actions {
+    text-align: right;
+}
+
+/* Quick Actions Section */
+.quick-actions-section {
+    padding: 4rem 0;
+    background: var(--theme-bg-primary);
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--theme-text-primary);
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.action-card {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.action-card:hover::before {
+    opacity: 0.05;
+}
+
+.action-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--phoenix-primary);
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.action-icon i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.create-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.projects-icon {
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+}
+
+.discover-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.messages-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.action-card h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--theme-text-primary);
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.action-card p {
+    color: var(--theme-text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+}
+
+.action-arrow {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.action-card:hover .action-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.action-arrow i {
+    color: var(--phoenix-primary);
+    font-size: 1.2rem;
+}
+
+/* Fun Facts Section */
+.fun-facts-section {
+    padding: 3rem 0 4rem;
+    background: var(--theme-bg-primary);
+}
+
+.fun-fact-card {
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.fun-fact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+}
+
+.fun-fact-content {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.fun-fact-icon {
+    margin-right: 2rem;
+}
+
+.fun-fact-icon i {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.fun-fact-image {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+    animation: wiggle 4s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(2deg) scale(1.05); }
+    50% { transform: rotate(0deg) scale(1.1); }
+    75% { transform: rotate(-2deg) scale(1.05); }
+}
+
+.fun-fact-text h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.fun-fact-text p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Animations */
+@keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes sparkle {
+    0%, 100% { 
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    25% { 
+        transform: scale(1.2) rotate(90deg);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(0.8) rotate(180deg);
+        opacity: 0.6;
+    }
+    75% { 
+        transform: scale(1.1) rotate(270deg);
+        opacity: 0.8;
+    }
+}
+
+.animated-rotate-slow {
+    animation: rotateSlow 10s linear infinite;
+}
+
+@keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-bounce-gentle {
+    animation: bounceGentle 4s ease-in-out infinite;
+}
+
+@keyframes bounceGentle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.animated-blink {
+    animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 90%, 100% { opacity: 1; }
+    95% { opacity: 0.3; }
+}
+
+.animated-pulse {
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Scroll Animations */
+.animate-fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.animate-slide-up {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.6s ease 0.2s;
+}
+
+.animate-card-hover {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.animate-fade-in.animate-visible,
+.animate-slide-up.animate-visible,
+.animate-card-hover.animate-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Button Styling */
+.btn-outline-primary {
+    border-color: var(--phoenix-primary);
+    color: var(--phoenix-primary);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: var(--phoenix-primary);
+    border-color: var(--phoenix-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+/* Enhanced Neuer Tipp Button */
+.btn-new-tip {
+    background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-accent));
+    border: 2px solid var(--phoenix-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-transform: none;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+}
+
+.btn-new-tip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+}
+
+.btn-new-tip:hover::before {
+    left: 100%;
+}
+
+.btn-new-tip:hover {
+    background: linear-gradient(135deg, var(--phoenix-accent), var(--phoenix-primary));
+    border-color: var(--phoenix-accent);
+    color: white;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+}
+
+.btn-new-tip:active {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+.btn-new-tip i {
+    margin-right: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-new-tip:hover i {
+    transform: rotate(180deg);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .welcome-title {
+        font-size: 2rem;
+    }
+    
+    .phoenix-icon {
+        font-size: 6rem;
+    }
+    
+    .phoenix-icon-image {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .action-card {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 3rem 0;
+    }
+    
+    .welcome-title {
+        font-size: 1.8rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .phoenix-icon {
+        font-size: 4rem;
+    }
+    
+    .sparkle {
+        font-size: 1rem;
+    }
+    
+    .tip-card,
+    .fun-fact-card {
+        padding: 1.5rem;
+    }
+    
+    .fun-fact-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .fun-fact-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    
+    .phoenix-icon-image {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .action-card {
+        padding: 1.5rem;
+    }
+    
+    .action-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .action-icon i {
+        font-size: 1.5rem;
+    }
+}

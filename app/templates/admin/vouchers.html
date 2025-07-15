@@ -1,0 +1,539 @@
+{% extends "base.html" %}
+
+{% block title %}Gutscheine - Admin - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .voucher-card {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .voucher-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .voucher-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--phoenix-primary);
+            background: var(--theme-bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--theme-border);
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-active { background-color: #10b981; color: white; }
+        .status-used { background-color: #6b7280; color: white; }
+        .status-expired { background-color: #ef4444; color: white; }
+        
+        .create-voucher-form {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-floating-custom {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .form-floating-custom .form-control {
+            background: var(--theme-bg-primary);
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .form-floating-custom label {
+            color: var(--theme-text-secondary);
+            padding: 1rem;
+        }
+        
+        .voucher-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--theme-bg-secondary);
+            border: 1px solid var(--theme-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--phoenix-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--theme-text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="mb-0">
+                    <i class="fas fa-ticket-alt me-3"></i>Gutscheine
+                </h1>
+                <p class="mb-0 opacity-75">Verwaltung von Gutscheincodes für bezahlte Pläne</p>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createVoucherModal">
+                    <i class="fas fa-plus me-2"></i>Neuen Gutschein erstellen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Statistiken -->
+    <div class="voucher-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_vouchers }}</div>
+            <div class="stat-label">Gesamt</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.active_vouchers }}</div>
+            <div class="stat-label">Aktiv</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.used_vouchers }}</div>
+            <div class="stat-label">Verwendet</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.expired_vouchers }}</div>
+            <div class="stat-label">Abgelaufen</div>
+        </div>
+    </div>
+
+    <!-- Filter und Suche -->
+    <div class="voucher-card">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search_query }}" placeholder="Nach Code oder Benutzer suchen...">
+                    <label for="search">Suchen...</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <select class="form-select" id="plan_filter" name="plan">
+                        <option value="">Alle Pläne</option>
+                        <option value="premium" {{ 'selected' if plan_filter == 'premium' }}>Premium</option>
+                        <option value="pro" {{ 'selected' if plan_filter == 'pro' }}>Pro</option>
+                        <option value="enterprise" {{ 'selected' if plan_filter == 'enterprise' }}>Enterprise</option>
+                    </select>
+                    <label for="plan_filter">Plan</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <select class="form-select" id="status_filter" name="status">
+                        <option value="">Alle Status</option>
+                        <option value="active" {{ 'selected' if status_filter == 'active' }}>Aktiv</option>
+                        <option value="used" {{ 'selected' if status_filter == 'used' }}>Verwendet</option>
+                        <option value="expired" {{ 'selected' if status_filter == 'expired' }}>Abgelaufen</option>
+                    </select>
+                    <label for="status_filter">Status</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary h-100 w-100">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Gutschein-Liste -->
+    <div class="row">
+        {% for voucher in vouchers %}
+        <div class="col-lg-6 col-xl-4">
+            <div class="voucher-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="voucher-code">{{ voucher.code }}</div>
+                    <span class="status-badge status-{{ voucher.status }}">
+                        {% if voucher.status == 'active' %}Aktiv
+                        {% elif voucher.status == 'used' %}Verwendet  
+                        {% elif voucher.status == 'expired' %}Abgelaufen
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Plan:</strong> 
+                    <span class="text-capitalize">{{ voucher.plan }}</span>
+                </div>
+                
+                <div class="mb-2">
+                    <strong>Dauer:</strong> {{ voucher.duration_months }} Monat(e)
+                </div>
+                
+                {% if voucher.used_by %}
+                <div class="mb-2">
+                    <strong>Verwendet von:</strong> {{ voucher.used_by_username }}
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Verwendet am: {{ voucher.used_at.strftime('%d.%m.%Y %H:%M') if voucher.used_at else 'N/A' }}</small>
+                </div>
+                {% endif %}
+                
+                <div class="mb-2">
+                    <small class="text-muted">
+                        Erstellt: {{ voucher.created_at.strftime('%d.%m.%Y %H:%M') if voucher.created_at else 'N/A' }}
+                    </small>
+                </div>
+                
+                {% if voucher.expires_at %}
+                <div class="mb-3">
+                    <small class="text-muted">
+                        Läuft ab: {{ voucher.expires_at.strftime('%d.%m.%Y %H:%M') }}
+                    </small>
+                </div>
+                {% endif %}
+                
+                <div class="d-flex gap-2">
+                    {% if voucher.status == 'active' %}
+                    <button class="btn btn-outline-danger btn-sm" onclick="deactivateVoucher('{{ voucher.id }}')">
+                        <i class="fas fa-ban me-1"></i>Deaktivieren
+                    </button>
+                    {% endif %}
+                    <button class="btn btn-outline-secondary btn-sm" onclick="copyVoucherCode('{{ voucher.code }}')">
+                        <i class="fas fa-copy me-1"></i>Kopieren
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="deleteVoucher('{{ voucher.id }}')">
+                        <i class="fas fa-trash me-1"></i>Löschen
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% if not vouchers %}
+        <div class="col-12">
+            <div class="voucher-card text-center py-5">
+                <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Keine Gutscheine gefunden</h5>
+                <p class="text-muted">Erstellen Sie Ihren ersten Gutschein für bezahlte Pläne.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Gutschein erstellen Modal -->
+<div class="modal fade" id="createVoucherModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-ticket-alt me-2"></i>Neuen Gutschein erstellen
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createVoucherForm">
+                <div class="modal-body">
+                    <div class="form-floating-custom">
+                        <div class="form-floating">
+                            <select class="form-select" id="voucherPlan" name="plan" required>
+                                <option value="">Plan auswählen</option>
+                                <option value="premium">Premium (29€/Monat)</option>
+                                <option value="pro">Pro (49€/Monat)</option>
+                                <option value="enterprise">Enterprise (99€/Monat)</option>
+                            </select>
+                            <label for="voucherPlan">Plan</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating-custom">
+                        <div class="form-floating">
+                            <select class="form-select" id="voucherDuration" name="duration" required>
+                                <option value="">Dauer auswählen</option>
+                                <option value="1">1 Monat</option>
+                                <option value="3">3 Monate</option>
+                                <option value="6">6 Monate</option>
+                                <option value="12">12 Monate</option>
+                            </select>
+                            <label for="voucherDuration">Gültigkeitsdauer</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating-custom">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="voucherExpiry" name="expires_at">
+                            <label for="voucherExpiry">Ablaufdatum (optional)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating-custom">
+                        <div class="form-floating">
+                            <input type="number" class="form-control" id="voucherCount" name="count" value="1" min="1" max="100">
+                            <label for="voucherCount">Anzahl Gutscheine</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="customCode" name="custom_code">
+                        <label class="form-check-label" for="customCode">
+                            Benutzerdefinierten Code verwenden
+                        </label>
+                    </div>
+                    
+                    <div class="form-floating-custom" id="customCodeField" style="display: none;">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="voucherCode" name="code" placeholder="CUSTOM-CODE">
+                            <label for="voucherCode">Gutschein-Code</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Erstellen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Erfolg Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-success">
+                    <i class="fas fa-check-circle me-2"></i>Gutschein(e) erstellt!
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="createdVouchers"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Custom code toggle
+    const customCodeCheckbox = document.getElementById('customCode');
+    const customCodeField = document.getElementById('customCodeField');
+    const voucherCountField = document.getElementById('voucherCount');
+    
+    customCodeCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            customCodeField.style.display = 'block';
+            voucherCountField.value = 1;
+            voucherCountField.disabled = true;
+        } else {
+            customCodeField.style.display = 'none';
+            voucherCountField.disabled = false;
+        }
+    });
+    
+    // Form submission
+    document.getElementById('createVoucherForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        
+        try {
+            const response = await fetch('/admin/api/vouchers/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Close create modal
+                const createModal = bootstrap.Modal.getInstance(document.getElementById('createVoucherModal'));
+                createModal.hide();
+                
+                // Show success modal with created vouchers
+                const createdVouchersDiv = document.getElementById('createdVouchers');
+                let html = '<h6>Folgende Gutscheine wurden erstellt:</h6><div class="mt-3">';
+                
+                result.vouchers.forEach(voucher => {
+                    html += `
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                            <code>${voucher.code}</code>
+                            <button class="btn btn-sm btn-outline-primary" onclick="copyVoucherCode('${voucher.code}')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                createdVouchersDiv.innerHTML = html;
+                
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            } else {
+                alert('Fehler beim Erstellen der Gutscheine: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ein Fehler ist aufgetreten');
+        }
+    });
+});
+
+// Copy voucher code to clipboard
+function copyVoucherCode(code) {
+    navigator.clipboard.writeText(code).then(function() {
+        // Show toast or success message
+        showToast('Gutschein-Code kopiert!', 'success');
+    }).catch(function(err) {
+        console.error('Error copying text: ', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Gutschein-Code kopiert!', 'success');
+    });
+}
+
+// Deactivate voucher
+async function deactivateVoucher(voucherId) {
+    if (!confirm('Möchten Sie diesen Gutschein wirklich deaktivieren?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/api/vouchers/${voucherId}/deactivate`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Gutschein deaktiviert', 'success');
+            location.reload();
+        } else {
+            alert('Fehler beim Deaktivieren: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Ein Fehler ist aufgetreten');
+    }
+}
+
+// Delete voucher
+async function deleteVoucher(voucherId) {
+    if (!confirm('Möchten Sie diesen Gutschein wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/api/vouchers/${voucherId}/delete`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Gutschein gelöscht', 'success');
+            location.reload();
+        } else {
+            alert('Fehler beim Löschen: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Ein Fehler ist aufgetreten');
+    }
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'primary'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    // Add to page
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+    
+    toastContainer.appendChild(toast);
+    
+    // Show toast
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remove after hiding
+    toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,354 @@
+/* Project Create - Dark Mode Only */
+
+.create-project-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--theme-bg-primary);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.privacy-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 2rem 0 1.5rem 0; /* Mehr Abstand nach oben */
+}
+
+.privacy-card {
+    border: 2px solid var(--theme-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--theme-bg-secondary);
+}
+
+.privacy-card:hover {
+    border-color: var(--phoenix-primary);
+    background: var(--theme-bg-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(73, 171, 247, 0.2);
+}
+
+.privacy-card.selected {
+    border-color: var(--phoenix-primary);
+    background: rgba(73, 171, 247, 0.1);
+}
+
+.privacy-card i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--phoenix-primary);
+}
+
+.privacy-card h6 {
+    color: var(--theme-text-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.privacy-card p {
+    color: var(--theme-text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Category and Template Row */
+.category-template-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.category-select,
+.template-select {
+    background: var(--theme-bg-secondary);
+    border: 2px solid var(--theme-border);
+    color: var(--theme-text-primary);
+    border-radius: 8px;
+}
+
+.category-select:focus,
+.template-select:focus {
+    border-color: var(--phoenix-primary);
+    box-shadow: 0 0 0 0.2rem rgba(73, 171, 247, 0.25);
+}
+
+.category-select option,
+.template-select option {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+}
+
+/* Form floating labels */
+.form-floating > label {
+    color: #e9ecef !important;
+    font-weight: 500 !important;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #4dabf7 !important;
+}
+
+.team-member-input {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.member-tag {
+    display: inline-flex;
+    align-items: center;
+    background: var(--phoenix-primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    margin: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.member-tag .remove-member {
+    margin-left: 0.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.member-tag .remove-member:hover {
+    opacity: 1;
+}
+
+/* Invite Code Section */
+.invite-code-section {
+    background: var(--theme-bg-secondary);
+    border: 2px solid var(--theme-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.invite-code-display {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 2px;
+    margin: 1rem 0;
+    color: var(--phoenix-primary);
+}
+
+.invite-code-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.public-project-note {
+    background: rgba(25, 135, 84, 0.1);
+    border: 1px solid rgba(25, 135, 84, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    color: #d1e7dd;
+}
+
+.public-project-note i {
+    color: #198754;
+    margin-right: 0.5rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+/* Team Member Card */
+.team-member-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.team-member-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.1);
+}
+
+/* Timeline Card */
+.timeline-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.timeline-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.1);
+}
+
+/* Invite Modal Styles */
+.invite-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.invite-option-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.invite-option-card:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-tertiary);
+}
+
+.invite-option-card.active {
+    border-color: var(--accent-primary);
+    background: rgba(124, 58, 237, 0.1);
+}
+
+.invite-option-card i {
+    font-size: 2rem;
+    color: var(--accent-primary);
+    margin-bottom: 1rem;
+}
+
+.invite-option-card h6 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.invite-option-card p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.invite-method {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+/* Modal Customization */
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    background: var(--card-header-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h5 {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    background: var(--card-bg);
+}
+
+.modal-footer {
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Enhanced form styling */
+.form-floating > .form-control:focus ~ label {
+    color: var(--accent-primary);
+}
+
+.form-control:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
+}
+
+/* Enhanced button styling */
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+}
+
+.btn-outline-primary {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+}
+
+/* Date input styling */
+input[type="date"] {
+    color: var(--text-primary);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+@media (max-width: 768px) {
+    .privacy-options {
+        grid-template-columns: 1fr;
+    }
+
+    .category-template-row {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .invite-code-actions {
+        flex-direction: column;
+    }
+    
+    .invite-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .timeline-card .row .col-md-6 {
+        margin-bottom: 1rem;
+    }
+}

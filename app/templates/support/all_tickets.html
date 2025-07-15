@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Alle Support-Tickets - Admin - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .admin-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%),
+                        url('{{ url_for("static", filename="img/phoenix6.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-admin {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            opacity: 0.3;
+            z-index: 5;
+            animation: phoenixGlow 3s ease-in-out infinite alternate;
+        }
+        
+        .ticket-table {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+        
+        .table th {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+        }
+        
+        .table td {
+            border: none;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-weight: 500;
+        }
+        
+        .priority-urgent { color: #dc3545; font-weight: bold; }
+        .priority-high { color: #fd7e14; font-weight: bold; }
+        .priority-medium { color: #ffc107; }
+        .priority-low { color: #28a745; }
+        
+        .ticket-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix-icon3.png') }}" alt="Phoenix" class="phoenix-accent-admin">
+    
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="phoenix-card phoenix-card-content mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-shield-alt text-warning me-3"></i>
+                        Alle Support-Tickets
+                    </h1>
+                    <p class="text-muted mb-0">Verwaltung aller Support-Anfragen im System</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-light btn-sm" onclick="exportTickets()">
+                        <i class="fas fa-download me-2"></i>Exportieren
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="refreshTickets()">
+                        <i class="fas fa-sync me-2"></i>Aktualisieren
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Controls -->
+        <div class="phoenix-card phoenix-card-subtle mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="statusFilter" class="form-label">Status</label>
+                    <select class="form-select form-select-sm" id="statusFilter">
+                        <option value="">Alle Status</option>
+                        <option value="open">Offen</option>
+                        <option value="in-progress">In Bearbeitung</option>
+                        <option value="waiting">Wartend</option>
+                        <option value="closed">Geschlossen</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="priorityFilter" class="form-label">Priorität</label>
+                    <select class="form-select form-select-sm" id="priorityFilter">
+                        <option value="">Alle Prioritäten</option>
+                        <option value="urgent">Dringend</option>
+                        <option value="high">Hoch</option>
+                        <option value="medium">Mittel</option>
+                        <option value="low">Niedrig</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="categoryFilter" class="form-label">Kategorie</label>
+                    <select class="form-select form-select-sm" id="categoryFilter">
+                        <option value="">Alle Kategorien</option>
+                        <option value="technical">Technisch</option>
+                        <option value="billing">Abrechnung</option>
+                        <option value="feature">Feature</option>
+                        <option value="bug">Bug</option>
+                        <option value="account">Konto</option>
+                        <option value="general">Allgemein</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="searchFilter" class="form-label">Suchen</label>
+                    <input type="text" class="form-control form-control-sm" id="searchFilter" 
+                           placeholder="Ticket-ID oder Betreff...">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tickets Table -->
+        <div class="phoenix-card phoenix-card-content">
+            {% if tickets %}
+                <div class="ticket-table">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Betreff</th>
+                                    <th>Ersteller</th>
+                                    <th>Kategorie</th>
+                                    <th>Priorität</th>
+                                    <th>Status</th>
+                                    <th>Erstellt</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in tickets %}
+                                <tr class="ticket-row" data-ticket-id="{{ ticket.id }}" 
+                                    data-status="{{ ticket.status }}" 
+                                    data-priority="{{ ticket.priority }}" 
+                                    data-category="{{ ticket.category }}">
+                                    <td>
+                                        <strong>#{{ ticket.id }}</strong>
+                                    </td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 300px;" title="{{ ticket.subject }}">
+                                            {{ ticket.subject }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas fa-user me-2 text-muted"></i>
+                                            {{ ticket.creator_name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if ticket.category == 'technical' %}🔧 Technisch
+                                        {% elif ticket.category == 'billing' %}💳 Abrechnung
+                                        {% elif ticket.category == 'feature' %}💡 Feature
+                                        {% elif ticket.category == 'bug' %}🐛 Bug
+                                        {% elif ticket.category == 'account' %}👤 Konto
+                                        {% else %}❓ Allgemein{% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="priority-{{ ticket.priority }}">
+                                            {% if ticket.priority == 'urgent' %}🔴 Dringend
+                                            {% elif ticket.priority == 'high' %}🟠 Hoch
+                                            {% elif ticket.priority == 'medium' %}🟡 Mittel
+                                            {% else %}🔵 Niedrig{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge 
+                                            {% if ticket.status == 'open' %}bg-success text-white
+                                            {% elif ticket.status == 'in-progress' %}bg-warning text-dark
+                                            {% elif ticket.status == 'waiting' %}bg-info text-white
+                                            {% else %}bg-secondary text-white{% endif %}">
+                                            {% if ticket.status == 'open' %}Offen
+                                            {% elif ticket.status == 'in-progress' %}In Bearbeitung
+                                            {% elif ticket.status == 'waiting' %}Wartend
+                                            {% else %}Geschlossen{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>{{ ticket.created_at.strftime('%d.%m.%Y %H:%M') if ticket.created_at else 'Unbekannt' }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('support.view_ticket_new', ticket_id=ticket.id) }}" 
+                                               class="btn btn-outline-light btn-sm" title="Anzeigen">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-outline-warning btn-sm" 
+                                                    onclick="changeStatus('{{ ticket.id }}', '{{ ticket.status }}')" 
+                                                    title="Status ändern">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <small class="text-muted">
+                        {{ tickets|length }} Tickets gefunden
+                    </small>
+                    <nav>
+                        <!-- Pagination controls here if needed -->
+                    </nav>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Keine Tickets vorhanden</h5>
+                    <p class="text-muted">Es wurden noch keine Support-Tickets erstellt.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Status Change Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.2);">
+            <div class="modal-header">
+                <h5 class="modal-title text-white">Ticket-Status ändern</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newStatus" class="form-label text-white">Neuer Status:</label>
+                    <select class="form-select" id="newStatus">
+                        <option value="open">Offen</option>
+                        <option value="in-progress">In Bearbeitung</option>
+                        <option value="waiting">Wartend</option>
+                        <option value="closed">Geschlossen</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="updateTicketStatus()">Status ändern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentTicketId = null;
+
+// Filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const statusFilter = document.getElementById('statusFilter');
+    const priorityFilter = document.getElementById('priorityFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const searchFilter = document.getElementById('searchFilter');
+    
+    function applyFilters() {
+        const rows = document.querySelectorAll('.ticket-row');
+        const searchTerm = searchFilter.value.toLowerCase();
+        
+        rows.forEach(row => {
+            const status = row.dataset.status;
+            const priority = row.dataset.priority;
+            const category = row.dataset.category;
+            const subject = row.children[1].textContent.toLowerCase();
+            const ticketId = row.children[0].textContent.toLowerCase();
+            
+            const statusMatch = !statusFilter.value || status === statusFilter.value;
+            const priorityMatch = !priorityFilter.value || priority === priorityFilter.value;
+            const categoryMatch = !categoryFilter.value || category === categoryFilter.value;
+            const searchMatch = !searchTerm || subject.includes(searchTerm) || ticketId.includes(searchTerm);
+            
+            if (statusMatch && priorityMatch && categoryMatch && searchMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    statusFilter.addEventListener('change', applyFilters);
+    priorityFilter.addEventListener('change', applyFilters);
+    categoryFilter.addEventListener('change', applyFilters);
+    searchFilter.addEventListener('input', applyFilters);
+    
+    // Row click to view ticket
+    document.querySelectorAll('.ticket-row').forEach(row => {
+        row.addEventListener('click', function(e) {
+            if (!e.target.closest('.btn-group')) {
+                const ticketId = this.dataset.ticketId;
+                window.location.href = `/support/tickets/${ticketId}`;
+            }
+        });
+    });
+});
+
+function changeStatus(ticketId, currentStatus) {
+    currentTicketId = ticketId;
+    document.getElementById('newStatus').value = currentStatus;
+    new bootstrap.Modal(document.getElementById('statusModal')).show();
+}
+
+function updateTicketStatus() {
+    const newStatus = document.getElementById('newStatus').value;
+    
+    fetch(`/support/tickets/${currentTicketId}/status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Fehler beim Ändern des Status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Fehler beim Ändern des Status');
+    });
+}
+
+function exportTickets() {
+    // Implement ticket export functionality
+    alert('Export-Funktion wird implementiert...');
+}
+
+function refreshTickets() {
+    location.reload();
+}
+</script>
+{% endblock %}

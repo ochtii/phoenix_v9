@@ -1,0 +1,704 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Projects - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link r        .progress-text {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .project-card {href="{{ url_for('static', filename='css/discover/explore.css') }}">
+    <style>
+        .discover-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%),
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-discover {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            opacity: 0.4;
+            z-index: 5;
+            animation: phoenixPulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes phoenixPulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        
+        .explore-phoenix-bg {
+            background: none; /* Override old styling */
+        }
+        
+        .explore-header {
+            background: transparent;
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .search-filters {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        /* List View Styles */
+        .project-grid.list-view {
+            display: block !important;
+        }
+        
+        .project-grid.list-view .project-card {
+            height: auto !important;
+            min-height: 120px !important;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+        
+        .project-grid.list-view .project-header {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-bottom: none;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .project-grid.list-view .project-description {
+            margin-bottom: 0.5rem;
+            min-height: unset;
+            flex: none;
+        }
+        
+        .project-grid.list-view .project-stats {
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-grid.list-view .project-progress {
+            margin-top: auto;
+        }
+        
+        .project-grid.list-view .project-actions {
+            padding: 1rem;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-width: 140px;
+        }
+        
+        .project-grid.list-view .project-tags {
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-grid.list-view .project-tag {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            margin: 0.1rem 0.2rem 0.1rem 0;
+        }
+        
+        /* Progress Bar Styles */
+        .project-progress {
+            margin-top: 1rem;
+        }
+        
+        .progress-bar-custom {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .explore-header {
+            background: linear-gradient(135deg, rgba(var(--phoenix-primary-rgb), 0.9), rgba(var(--phoenix-secondary-rgb), 0.9));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-filters {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        /* List View Styles */
+        .project-grid.list-view {
+            display: block !important;
+        }
+        
+        .project-grid.list-view .project-card {
+            height: auto !important;
+            min-height: 120px !important;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+        
+        .project-grid.list-view .project-header {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-bottom: none;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .project-grid.list-view .project-description {
+            margin-bottom: 0.5rem;
+            min-height: unset;
+            flex: none;
+        }
+        
+        .project-grid.list-view .project-stats {
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-grid.list-view .project-progress {
+            margin-top: auto;
+        }
+        
+        .project-grid.list-view .project-actions {
+            padding: 1rem;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-width: 140px;
+        }
+        
+        .project-grid.list-view .project-tags {
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-grid.list-view .project-tag {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            margin: 0.1rem 0.2rem 0.1rem 0;
+        }
+        
+        /* Progress Bar Styles */
+        .project-progress {
+            margin-top: 1rem;
+        }
+        
+        .progress-bar-custom {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--theme-text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .load-more-btn {
+            display: block;
+            margin: 2rem auto;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .explore-header {
+                padding: 2rem 0;
+                text-align: center;
+            }
+            
+            .search-filters {
+                padding: 1rem;
+            }
+            
+            .project-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .category-filters {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="discover-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix-icon3.png') }}" alt="Phoenix" class="phoenix-accent-discover">
+    
+    <!-- Explore Header -->
+    <div class="explore-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="h2 mb-3">
+                    <i class="fas fa-compass me-3"></i>Explore Projects
+                </h1>
+                <p class="lead mb-0">Discover amazing projects from the Phoenix community</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="text-white-50">
+                    <i class="fas fa-rocket me-2"></i>{{ total_projects }} Projects
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-users me-2"></i>{{ total_creators }} Creators
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Search and Filters -->
+    <div class="search-filters">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-lg" 
+                           id="projectSearch" 
+                           placeholder="Search projects by name, description, or tags..."
+                           value="{{ request.args.get('search', '') }}">
+                    <button class="btn btn-primary" type="button" onclick="performSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <select class="form-select form-select-lg sort-dropdown" id="sortSelect" onchange="changeSort()">
+                    <option value="newest" {{ 'selected' if request.args.get('sort') == 'newest' else '' }}>Newest First</option>
+                    <option value="popular" {{ 'selected' if request.args.get('sort') == 'popular' else '' }}>Most Popular</option>
+                    <option value="alphabetical" {{ 'selected' if request.args.get('sort') == 'alphabetical' else '' }}>A-Z</option>
+                    <option value="updated" {{ 'selected' if request.args.get('sort') == 'updated' else '' }}>Recently Updated</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <select class="form-select form-select-lg sort-dropdown" id="statusFilter" onchange="changeFilter()">
+                    <option value="">All Status</option>
+                    <option value="active" {{ 'selected' if request.args.get('status') == 'active' else '' }}>Active</option>
+                    <option value="completed" {{ 'selected' if request.args.get('status') == 'completed' else '' }}>Completed</option>
+                    <option value="planning" {{ 'selected' if request.args.get('status') == 'planning' else '' }}>Planning</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Category Filters -->
+        <div class="d-flex gap-2 category-filters flex-wrap">
+            <a href="{{ url_for('discover.explore') }}" 
+               class="category-filter {{ 'active' if not request.args.get('category') else '' }}">
+                All Categories
+            </a>
+            {% for category in categories %}
+            <a href="{{ url_for('discover.explore', category=category) }}" 
+               class="category-filter {{ 'active' if request.args.get('category') == category else '' }}">
+                <i class="{{ get_category_icon(category) }} me-2"></i>{{ category }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h5 class="mb-0">
+                {% if request.args.get('search') %}
+                    Search results for "{{ request.args.get('search') }}"
+                {% elif request.args.get('category') %}
+                    {{ request.args.get('category') }} Projects
+                {% else %}
+                    All Projects
+                {% endif %}
+            </h5>
+            <small class="text-muted">{{ projects|length }} project{{ 's' if projects|length != 1 else '' }} found</small>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" onclick="toggleViewMode('grid')" id="gridViewBtn">
+                <i class="fas fa-th"></i>
+            </button>
+            <button class="btn btn-outline-secondary" onclick="toggleViewMode('list')" id="listViewBtn">
+                <i class="fas fa-list"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="project-grid" id="projectsGrid">
+        {% if projects %}
+            {% for project in projects %}
+            <div class="project-card" data-project-id="{{ project.uid }}">
+                <div class="project-image">
+                    {% if project.featured %}
+                    <div class="featured-badge">
+                        <i class="fas fa-star me-1"></i>Featured
+                    </div>
+                    {% endif %}
+                    
+                    <i class="fas {{ project.icon or 'fa-rocket' }}"></i>
+                </div>
+                
+                <div class="project-content">
+                    <h3 class="project-title">{{ project.name }}</h3>
+                    <p class="project-description">{{ project.description or 'No description available.' }}</p>
+                    
+                    <div class="project-meta">
+                        <div class="project-owner">
+                            <div class="owner-avatar">
+                                {{ project.owner.username[0]|upper if project.owner else 'U' }}
+                            </div>
+                            <span>{{ project.owner.username if project.owner else 'Unknown' }}</span>
+                        </div>
+                        <div class="project-stats">
+                            <span><i class="fas fa-users me-1"></i>{{ project.member_count or 0 }}</span>
+                            <span><i class="fas fa-eye me-1"></i>{{ project.views or 0 }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if project.tags %}
+                    <div class="project-tags">
+                        {% for tag in project.tags[:3] %}
+                        <span class="project-tag">{{ tag }}</span>
+                        {% endfor %}
+                        {% if project.tags|length > 3 %}
+                        <span class="project-tag">+{{ project.tags|length - 3 }} more</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Progress Bar -->
+                    <div class="project-progress">
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: {{ project.progress|default(0) }}%"></div>
+                        </div>
+                        <div class="progress-text">
+                            Progress: {{ project.progress|default(0) }}% complete
+                        </div>
+                    </div>
+                    
+                    <div class="project-actions">
+                        <a href="{{ url_for('projects.view', project_id=project.uid) }}" 
+                           class="btn btn-primary flex-fill">
+                            <i class="fas fa-eye me-2"></i>View Project
+                        </a>
+                        {% if project.is_public and project.owner_id != current_user.uid %}
+                        <button class="btn btn-outline-success" 
+                                onclick="requestToJoin('{{ project.uid }}')">
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-outline-secondary" 
+                                onclick="toggleFavorite('{{ project.uid }}')">
+                            <i class="fas fa-heart{{ ' text-danger' if project.is_favorited else '' }}"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h4>No Projects Found</h4>
+                    <p class="mb-4">
+                        {% if request.args.get('search') %}
+                            No projects match your search criteria. Try different keywords or browse all projects.
+                        {% else %}
+                            No public projects are available yet. Be the first to create and share a project!
+                        {% endif %}
+                    </p>
+                    {% if not request.args.get('search') %}
+                    <a href="{{ url_for('projects.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create First Project
+                    </a>
+                    {% else %}
+                    <div>
+                        <a href="{{ url_for('discover.explore') }}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-compass me-2"></i>Browse All
+                        </a>
+                        <a href="{{ url_for('projects.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Project
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Load More (if pagination is implemented) -->
+    {% if has_more %}
+    <button class="btn btn-outline-primary load-more-btn" onclick="loadMoreProjects()">
+        <i class="fas fa-plus me-2"></i>Load More Projects
+    </button>
+    {% endif %}
+</div>
+
+<!-- Request to Join Modal -->
+<div class="modal fade" id="joinRequestModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request to Join Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="joinRequestForm">
+                    <div class="mb-3">
+                        <label for="joinMessage" class="form-label">Message to Project Owner</label>
+                        <textarea class="form-control" id="joinMessage" rows="4" 
+                                  placeholder="Tell the project owner why you'd like to join..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userSkills" class="form-label">Your Skills (Optional)</label>
+                        <input type="text" class="form-control" id="userSkills" 
+                               placeholder="e.g., JavaScript, Design, Project Management">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitJoinRequest()">
+                    Send Request
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        let currentProjectForJoin = null;
+        
+        // Search functionality
+        function performSearch() {
+            const searchTerm = document.getElementById('projectSearch').value.trim();
+            const currentUrl = new URL(window.location);
+            
+            if (searchTerm) {
+                currentUrl.searchParams.set('search', searchTerm);
+            } else {
+                currentUrl.searchParams.delete('search');
+            }
+            
+            window.location.href = currentUrl.toString();
+        }
+        
+        // Sort functionality
+        function changeSort() {
+            const sortValue = document.getElementById('sortSelect').value;
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('sort', sortValue);
+            window.location.href = currentUrl.toString();
+        }
+        
+        // Filter functionality
+        function changeFilter() {
+            const filterValue = document.getElementById('statusFilter').value;
+            const currentUrl = new URL(window.location);
+            
+            if (filterValue) {
+                currentUrl.searchParams.set('status', filterValue);
+            } else {
+                currentUrl.searchParams.delete('status');
+            }
+            
+            window.location.href = currentUrl.toString();
+        }
+        
+        // View mode toggle
+        function toggleViewMode(mode) {
+            const grid = document.getElementById('projectsGrid');
+            const gridBtn = document.getElementById('gridViewBtn');
+            const listBtn = document.getElementById('listViewBtn');
+            
+            if (mode === 'grid') {
+                grid.classList.remove('list-view');
+                grid.style.display = 'grid';
+                gridBtn.classList.add('active');
+                listBtn.classList.remove('active');
+            } else {
+                grid.classList.add('list-view');
+                grid.style.display = 'block';
+                gridBtn.classList.remove('active');
+                listBtn.classList.add('active');
+            }
+            
+            // Store preference
+            localStorage.setItem('explore_view_mode', mode);
+        }
+        
+        // Request to join project
+        function requestToJoin(projectId) {
+            currentProjectForJoin = projectId;
+            const modal = new bootstrap.Modal(document.getElementById('joinRequestModal'));
+            modal.show();
+        }
+        
+        function submitJoinRequest() {
+            if (!currentProjectForJoin) return;
+            
+            const message = document.getElementById('joinMessage').value.trim();
+            const skills = document.getElementById('userSkills').value.trim();
+            
+            fetch(`/discover/request-join/${currentProjectForJoin}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    skills: skills
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Phoenix.Utils.showToast('Join request sent successfully', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('joinRequestModal')).hide();
+                    
+                    // Update button to show request sent
+                    const projectCard = document.querySelector(`[data-project-id="${currentProjectForJoin}"]`);
+                    const joinBtn = projectCard.querySelector('button[onclick*="requestToJoin"]');
+                    if (joinBtn) {
+                        joinBtn.innerHTML = '<i class="fas fa-clock me-2"></i>Pending';
+                        joinBtn.disabled = true;
+                        joinBtn.classList.replace('btn-outline-success', 'btn-outline-warning');
+                    }
+                } else {
+                    Phoenix.Utils.showToast(data.message || 'Failed to send request', 'error');
+                }
+            })
+            .catch(error => {
+                Phoenix.Utils.showToast('An error occurred', 'error');
+            });
+        }
+        
+        // Toggle favorite
+        function toggleFavorite(projectId) {
+            fetch(`/discover/toggle-favorite/${projectId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const projectCard = document.querySelector(`[data-project-id="${projectId}"]`);
+                    const heartBtn = projectCard.querySelector('button[onclick*="toggleFavorite"] i');
+                    
+                    if (data.favorited) {
+                        heartBtn.classList.add('text-danger');
+                        Phoenix.Utils.showToast('Added to favorites', 'success');
+                    } else {
+                        heartBtn.classList.remove('text-danger');
+                        Phoenix.Utils.showToast('Removed from favorites', 'info');
+                    }
+                } else {
+                    Phoenix.Utils.showToast(data.message || 'Action failed', 'error');
+                }
+            })
+            .catch(error => {
+                Phoenix.Utils.showToast('An error occurred', 'error');
+            });
+        }
+        
+        // Load more projects (pagination)
+        function loadMoreProjects() {
+            // Implementation for pagination
+            Phoenix.Utils.showToast('Loading more projects...', 'info');
+        }
+        
+        // Search on Enter key
+        document.getElementById('projectSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Restore view mode preference
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedViewMode = localStorage.getItem('explore_view_mode') || 'grid';
+            toggleViewMode(savedViewMode);
+        });
+    </script>
+</div> <!-- Ende discover-phoenix-bg -->
+{% endblock %}

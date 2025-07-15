@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Backend Control - Phoenix Admin{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/backend_control.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Backend Control</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0 mt-2">
+                        <i class="fas fa-terminal me-2 text-warning"></i>Backend Control Panel
+                    </h1>
+                    <p class="text-muted mb-0">Advanced system administration and monitoring</p>
+                </div>
+                <div>
+                    <span class="badge bg-danger">Admin Only</span>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="row mb-4">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-server me-2"></i>System Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Flask Version:</strong></td>
+                                            <td>{{ system_info.flask_version }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Python Version:</strong></td>
+                                            <td>{{ system_info.python_version }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Environment:</strong></td>
+                                            <td>
+                                                <span class="badge bg-{{ 'success' if system_info.environment == 'production' else 'warning' }}">
+                                                    {{ system_info.environment.title() }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Debug Mode:</strong></td>
+                                            <td>
+                                                <span class="badge bg-{{ 'danger' if system_info.debug_mode else 'success' }}">
+                                                    {{ 'Enabled' if system_info.debug_mode else 'Disabled' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Firebase:</strong></td>
+                                            <td>
+                                                <span class="badge bg-{{ 'success' if system_info.firebase_connected else 'danger' }}">
+                                                    {{ 'Connected' if system_info.firebase_connected else 'Disconnected' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Server Time:</strong></td>
+                                            <td>{{ moment().format('YYYY-MM-DD HH:mm:ss') }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-database me-2"></i>Database Stats
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if collections_stats.error %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    {{ collections_stats.error }}
+                                </div>
+                            {% else %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Users:</span>
+                                    <strong>{{ collections_stats.users }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Projects:</span>
+                                    <strong>{{ collections_stats.projects }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Messages:</span>
+                                    <strong>{{ collections_stats.messages }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Tickets:</span>
+                                    <strong>{{ collections_stats.tickets }}</strong>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Panels -->
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cogs me-2"></i>System Actions
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-warning" type="button" disabled>
+                                    <i class="fas fa-sync-alt me-2"></i>Restart Application
+                                    <small class="d-block text-muted">Requires server access</small>
+                                </button>
+                                <button class="btn btn-outline-info" type="button" disabled>
+                                    <i class="fas fa-broom me-2"></i>Clear Cache
+                                    <small class="d-block text-muted">Clear application cache</small>
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" disabled>
+                                    <i class="fas fa-download me-2"></i>Export Data
+                                    <small class="d-block text-muted">Export database backup</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shield-alt me-2"></i>Security Actions
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-danger" type="button" disabled>
+                                    <i class="fas fa-ban me-2"></i>Emergency Stop
+                                    <small class="d-block text-muted">Stop all user sessions</small>
+                                </button>
+                                <button class="btn btn-outline-warning" type="button" disabled>
+                                    <i class="fas fa-eye me-2"></i>View Logs
+                                    <small class="d-block text-muted">Access system logs</small>
+                                </button>
+                                <button class="btn btn-outline-info" type="button" disabled>
+                                    <i class="fas fa-user-shield me-2"></i>Audit Trail
+                                    <small class="d-block text-muted">View admin actions</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Logs -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Recent System Logs
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Level</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in recent_logs %}
+                                <tr>
+                                    <td><code>{{ log.timestamp }}</code></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if log.level == 'ERROR' else 'warning' if log.level == 'WARNING' else 'info' }}">
+                                            {{ log.level }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.message }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-outline-secondary btn-sm" disabled>
+                            <i class="fas fa-download me-1"></i>Download Full Logs
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warning Notice -->
+            <div class="alert alert-warning mt-4">
+                <h6 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Important Notice
+                </h6>
+                <p class="mb-0">
+                    This is a development environment. Many advanced administrative functions are disabled for security.
+                    In a production environment, these functions would require additional authentication and logging.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/admin/backend_control.js') }}"></script>
+{% endblock %}

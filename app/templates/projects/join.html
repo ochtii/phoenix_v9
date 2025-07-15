@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Join Project - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/projects/create.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="create-project-container">
+        <!-- Page Header -->
+        <div class="text-center mb-4">
+            <h1 class="h2">
+                <i class="fas fa-key text-primary me-3"></i>Join Project
+            </h1>
+            <p class="text-muted">Enter an invite code to join an existing project</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('projects.join') }}">
+            <!-- Invite Code Input -->
+            <div class="invite-code-section">
+                <h6><i class="fas fa-ticket-alt me-2"></i>Project Invite Code</h6>
+                <p class="text-muted mb-3">Enter the 6-character invite code you received to join a project.</p>
+                
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control text-center" id="inviteCode" name="invite_code" 
+                           placeholder="ABCDEF" required maxlength="6" style="font-family: 'Courier New', monospace; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase;">
+                    <label for="inviteCode">
+                        <i class="fas fa-key me-2"></i>Invite Code
+                    </label>
+                </div>
+                
+                <div class="form-text mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Invite codes are case-insensitive and typically look like "DN9N7T" or "ABC123".
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{{ url_for('projects.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Projects
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Join Project
+                </button>
+            </div>
+        </form>
+        
+        <!-- Help Section -->
+        <div class="mt-4 p-3" style="background: var(--theme-bg-secondary); border-radius: 8px;">
+            <h6><i class="fas fa-question-circle me-2"></i>Need Help?</h6>
+            <ul class="mb-0 small">
+                <li>Ask the project owner to share their invite code with you</li>
+                <li>Invite codes are usually 6 characters long (letters and numbers)</li>
+                <li>Each project can have multiple active invite codes</li>
+                <li>You can also join public projects from the <a href="{{ url_for('discover.explore') }}">Discover</a> page</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        // Auto-format invite code input
+        document.getElementById('inviteCode').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+        
+        // Auto-submit when 6 characters entered
+        document.getElementById('inviteCode').addEventListener('input', function(e) {
+            if (this.value.length === 6) {
+                // Small delay to show the complete code
+                setTimeout(() => {
+                    this.form.submit();
+                }, 500);
+            }
+        });
+    </script>
+{% endblock %}

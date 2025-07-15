@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Anmelden - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/login.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Full width login without base container constraints -->
+</div> <!-- Close any existing container -->
+
+<div class="login-container">
+    <!-- Phoenix Background Video -->
+    <video class="login-video-bg" autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='img/phoenix.mp4') }}" type="video/mp4">
+    </video>
+    
+    <!-- Video Overlay -->
+    <div class="login-video-overlay"></div>
+    
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="login-card">
+                    <!-- Header -->
+                    <div class="login-header text-center mb-4">
+                        <div class="login-logo">
+                            <i class="fas fa-fire text-primary fa-3x mb-3"></i>
+                        </div>
+                        <h2 class="h3 mb-2">Willkommen zurück</h2>
+                        <p class="text-muted">Melden Sie sich in Ihr Phoenix-Konto an</p>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form method="POST" class="login-form" novalidate>
+                        <div class="mb-3">
+                            <label for="username_or_email" class="form-label">
+                                <i class="fas fa-user me-2"></i>Benutzername oder E-Mail
+                            </label>
+                            <input type="text" class="form-control" id="username_or_email" 
+                                   name="username_or_email" required autocomplete="username"
+                                   placeholder="Geben Sie Ihren Benutzernamen oder E-Mail ein">
+                            <div class="invalid-feedback">
+                                Bitte geben Sie Ihren Benutzernamen oder E-Mail ein.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Passwort
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" 
+                                       name="password" required autocomplete="current-password"
+                                       placeholder="Geben Sie Ihr Passwort ein">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Bitte geben Sie Ihr Passwort ein.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                            <label class="form-check-label" for="remember_me">
+                                Angemeldet bleiben
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Anmelden
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Additional Options -->
+                    <div class="login-footer">
+                        <div class="text-center mb-3">
+                            <a href="#" class="text-muted text-decoration-none">
+                                <i class="fas fa-key me-1"></i>Passwort vergessen?
+                            </a>
+                        </div>
+                        
+                        <hr class="my-3">
+                        
+                        <div class="text-center">
+                            <p class="text-muted mb-2">Haben Sie noch kein Konto?</p>
+                            <a href="{{ url_for('user.register') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-plus me-2"></i>Konto erstellen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features-Vorschau -->
+                <div class="features-preview mt-4">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="feature-item">
+                                <i class="fas fa-project-diagram text-primary mb-2"></i>
+                                <small class="text-muted">An Projekten zusammenarbeiten</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-item">
+                                <i class="fas fa-users text-primary mb-2"></i>
+                                <small class="text-muted">Mit Entwicklern vernetzen</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-item">
+                                <i class="fas fa-rocket text-primary mb-2"></i>
+                                <small class="text-muted">Ihre Ideen umsetzen</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container"> <!-- Reopen container for base template -->
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/user/login.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}Upgrade to Premium - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .upgrade-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(0,0,0,0.6)), 
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-upgrade {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            opacity: 0.4;
+            z-index: 5;
+        }
+        
+        .upgrade-header {
+            text-align: center;
+            padding: 4rem 0 2rem;
+            color: white;
+        }
+        
+        .upgrade-title {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .upgrade-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pricing-card.premium {
+            border: 2px solid #fbbf24;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1));
+        }
+        
+        .pricing-card.premium::before {
+            content: 'POPULAR';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1f2937;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 0.25rem;
+        }
+        
+        .plan-period {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-list li i {
+            color: #22c55e;
+            margin-right: 0.75rem;
+            width: 16px;
+        }
+        
+        .upgrade-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .upgrade-btn.free {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .upgrade-btn.premium {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1f2937;
+        }
+        
+        .upgrade-btn.premium:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            transform: translateY(-2px);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .upgrade-title {
+                font-size: 2rem;
+            }
+            
+            .plan-price {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="upgrade-phoenix-bg">    
+    <div class="container">
+        <!-- Header -->
+        <div class="upgrade-header">
+            <h1 class="upgrade-title">
+                <i class="fas fa-crown me-3"></i>Upgrade to Premium
+            </h1>
+            <p class="upgrade-subtitle">
+                Unlock powerful features and take your projects to the next level
+            </p>
+        </div>
+        
+        <!-- Pricing Plans -->
+        <div class="row justify-content-center">
+            <!-- Free Plan -->
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">€0</div>
+                    <div class="plan-period">forever</div>
+                    
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Up to 3 projects</li>
+                        <li><i class="fas fa-check"></i> Basic collaboration</li>
+                        <li><i class="fas fa-check"></i> Community support</li>
+                        <li><i class="fas fa-check"></i> Essential tools</li>
+                        <li><i class="fas fa-check"></i> 1GB storage</li>
+                    </ul>
+                    
+                    <button class="upgrade-btn free" disabled>
+                        Current Plan
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Premium Plan -->
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card premium">
+                    <div class="plan-name">Premium</div>
+                    <div class="plan-price">€9.99</div>
+                    <div class="plan-period">per month</div>
+                    
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Unlimited projects</li>
+                        <li><i class="fas fa-check"></i> Advanced collaboration</li>
+                        <li><i class="fas fa-check"></i> Priority support</li>
+                        <li><i class="fas fa-check"></i> Advanced analytics</li>
+                        <li><i class="fas fa-check"></i> 100GB storage</li>
+                        <li><i class="fas fa-check"></i> Custom themes</li>
+                        <li><i class="fas fa-check"></i> Export features</li>
+                        <li><i class="fas fa-check"></i> Team management</li>
+                    </ul>
+                    
+                    <button class="upgrade-btn premium" onclick="startUpgrade()">
+                        <i class="fas fa-rocket me-2"></i>Upgrade Now
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Pro Plan -->
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card">
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-price">€19.99</div>
+                    <div class="plan-period">per month</div>
+                    
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Everything in Premium</li>
+                        <li><i class="fas fa-check"></i> White-label branding</li>
+                        <li><i class="fas fa-check"></i> API access</li>
+                        <li><i class="fas fa-check"></i> Custom integrations</li>
+                        <li><i class="fas fa-check"></i> 1TB storage</li>
+                        <li><i class="fas fa-check"></i> Dedicated support</li>
+                        <li><i class="fas fa-check"></i> Advanced security</li>
+                    </ul>
+                    
+                    <button class="upgrade-btn premium" onclick="startUpgrade('pro')">
+                        <i class="fas fa-star me-2"></i>Go Pro
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature Highlights -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <h3 class="feature-title">Unlimited Projects</h3>
+                <p class="feature-description">
+                    Create as many projects as you need without any limitations. Scale your work without boundaries.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Advanced Collaboration</h3>
+                <p class="feature-description">
+                    Real-time collaboration tools, advanced permissions, and team management features.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Advanced Analytics</h3>
+                <p class="feature-description">
+                    Detailed insights into your project performance, team productivity, and timeline tracking.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="feature-title">Priority Support</h3>
+                <p class="feature-description">
+                    Get help when you need it with our priority support queue and dedicated assistance.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <h3 class="feature-title">Extended Storage</h3>
+                <p class="feature-description">
+                    Store more files, documents, and project assets with dramatically increased storage limits.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h3 class="feature-title">Export & Backup</h3>
+                <p class="feature-description">
+                    Export your projects in various formats and create automated backups for peace of mind.
+                </p>
+            </div>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+                <div class="text-center mb-4">
+                    <h2 style="color: white; margin-bottom: 2rem;">Frequently Asked Questions</h2>
+                </div>
+                
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); margin-bottom: 1rem; border-radius: 12px;">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" style="background: transparent; color: white; border: none;" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                Can I cancel my subscription anytime?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: rgba(255,255,255,0.9);">
+                                Yes, you can cancel your subscription at any time. You'll continue to have access to premium features until the end of your billing period.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); margin-bottom: 1rem; border-radius: 12px;">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" style="background: transparent; color: white; border: none;" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                What happens to my projects if I downgrade?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: rgba(255,255,255,0.9);">
+                                Your projects will remain safe, but you'll be limited to the free plan restrictions. You can still access all your data.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); margin-bottom: 1rem; border-radius: 12px;">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" style="background: transparent; color: white; border: none;" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Is there a free trial?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: rgba(255,255,255,0.9);">
+                                We offer a 14-day free trial for all premium features. No credit card required to start your trial.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="height: 4rem;"></div>
+    </div>
+</div>
+
+<script>
+function startUpgrade(plan = 'premium') {
+    // Here you would integrate with a payment processor like Stripe
+    alert(`Starting upgrade to ${plan} plan. Payment integration would be implemented here.`);
+    
+    // Example: Redirect to payment page
+    // window.location.href = '/payment?plan=' + plan;
+}
+</script>
+{% endblock %}

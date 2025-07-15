@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Datenschutz-Einstellungen{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user/privacy_settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Datenschutz-Einstellungen
+                    </h1>
+                    <p class="text-muted">Kontrolliere deine Privatsphäre und Sichtbarkeit</p>
+                </div>
+                <a href="{{ url_for('user.account_settings') }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Zurück zu Konto-Einstellungen
+                </a>
+            </div>
+
+            <!-- Privacy Cards -->
+            <div class="row">
+                <!-- Profile Visibility -->
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header border-bottom-0">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-eye me-2"></i>Profile Visibility
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('user.update_privacy') }}">
+                                <div class="mb-3">
+                                    <label class="form-label">Who can view your profile?</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="profile_visibility" 
+                                               id="profile_public" value="public" 
+                                               {% if g.user and g.user.profile_visibility == 'public' %}checked{% endif %}>
+                                        <label class="form-check-label" for="profile_public">
+                                            <strong>Public</strong> - Anyone can view your profile
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="profile_visibility" 
+                                               id="profile_members" value="members" 
+                                               {% if g.user and g.user.profile_visibility == 'members' %}checked{% endif %}>
+                                        <label class="form-check-label" for="profile_members">
+                                            <strong>Members Only</strong> - Only registered users can view your profile
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="profile_visibility" 
+                                               id="profile_private" value="private" 
+                                               {% if g.user and g.user.profile_visibility == 'private' %}checked{% endif %}>
+                                        <label class="form-check-label" for="profile_private">
+                                            <strong>Private</strong> - Only you can view your profile
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Contact Information</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="show_email" 
+                                               name="show_email" {% if g.user and g.user.show_email %}checked{% endif %}>
+                                        <label class="form-check-label" for="show_email">
+                                            Show email address on profile
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="show_join_date" 
+                                               name="show_join_date" {% if g.user and g.user.show_join_date %}checked{% endif %}>
+                                        <label class="form-check-label" for="show_join_date">
+                                            Show join date on profile
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="show_project_count" 
+                                               name="show_project_count" {% if g.user and g.user.show_project_count %}checked{% endif %}>
+                                        <label class="form-check-label" for="show_project_count">
+                                            Show project count on profile
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Privacy Settings
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Communication Preferences -->
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header border-bottom-0">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-envelope me-2"></i>Communication Preferences
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('user.update_communication') }}">
+                                <div class="mb-3">
+                                    <label class="form-label">Who can send you messages?</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="message_privacy" 
+                                               id="messages_everyone" value="everyone" 
+                                               {% if g.user and g.user.message_privacy == 'everyone' %}checked{% endif %}>
+                                        <label class="form-check-label" for="messages_everyone">
+                                            <strong>Everyone</strong> - Anyone can send you messages
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="message_privacy" 
+                                               id="messages_team" value="team" 
+                                               {% if g.user and g.user.message_privacy == 'team' %}checked{% endif %}>
+                                        <label class="form-check-label" for="messages_team">
+                                            <strong>Team Members</strong> - Only people in your projects can message you
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="message_privacy" 
+                                               id="messages_none" value="none" 
+                                               {% if g.user and g.user.message_privacy == 'none' %}checked{% endif %}>
+                                        <label class="form-check-label" for="messages_none">
+                                            <strong>No One</strong> - Disable direct messages
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Project Invitations</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="allow_invitations" 
+                                               name="allow_invitations" {% if g.user and g.user.allow_invitations %}checked{% endif %}>
+                                        <label class="form-check-label" for="allow_invitations">
+                                            Allow project invitations from other users
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="auto_join_public" 
+                                               name="auto_join_public" {% if g.user and g.user.auto_join_public %}checked{% endif %}>
+                                        <label class="form-check-label" for="auto_join_public">
+                                            Automatically join public projects when invited
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Communication Settings
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data & Analytics -->
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header border-bottom-0">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Data & Analytics
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('user.update_data_settings') }}">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="usage_analytics" 
+                                               name="usage_analytics" {% if g.user and g.user.usage_analytics %}checked{% endif %}>
+                                        <label class="form-check-label" for="usage_analytics">
+                                            <strong>Usage Analytics</strong><br>
+                                            <small class="text-muted">Help improve Phoenix by sharing anonymous usage data</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="performance_data" 
+                                               name="performance_data" {% if g.user and g.user.performance_data %}checked{% endif %}>
+                                        <label class="form-check-label" for="performance_data">
+                                            <strong>Performance Data</strong><br>
+                                            <small class="text-muted">Share performance metrics to help optimize the platform</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="marketing_emails" 
+                                               name="marketing_emails" {% if g.user and g.user.marketing_emails %}checked{% endif %}>
+                                        <label class="form-check-label" for="marketing_emails">
+                                            <strong>Marketing Emails</strong><br>
+                                            <small class="text-muted">Receive emails about new features and updates</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Data Settings
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Security -->
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header border-bottom-0">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-shield-alt me-2"></i>Account Security
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Two-Factor Authentication</label>
+                                        <p class="text-muted small mb-2">Add an extra layer of security to your account</p>
+                                        <button type="button" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-mobile-alt me-2"></i>Enable 2FA
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Active Sessions</label>
+                                        <p class="text-muted small mb-2">Manage your active login sessions</p>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-list me-2"></i>View Sessions
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Download Your Data</label>
+                                        <p class="text-muted small mb-2">Get a copy of your Phoenix data</p>
+                                        <button type="button" class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-download me-2"></i>Request Data Export
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Account Activity</label>
+                                        <p class="text-muted small mb-2">View recent account activity and logins</p>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-history me-2"></i>View Activity
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Privacy settings info tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    // Add tooltips for privacy explanations
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(tooltip => {
+        new bootstrap.Tooltip(tooltip);
+    });
+});
+
+// Form submission handlers
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            submitBtn.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}

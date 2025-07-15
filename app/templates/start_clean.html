@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Start - Phoenix{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/start.css') }}">
+    <style>
+        .start-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%),
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-start {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            opacity: 0.3;
+            z-index: 5;
+            animation: phoenixGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes phoenixGlow {
+            0% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+            100% { opacity: 0.6; transform: scale(1.1) rotate(5deg); }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="start-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix-icon2.png') }}" alt="Phoenix" class="phoenix-accent-start">
+    
+    <div class="start-page">
+    <!-- Welcome Header -->
+    <div class="welcome-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="welcome-content">
+                        <div class="greeting-animation">
+                            <h1 class="welcome-title animate-fade-in">
+                                <i class="fas fa-sun animated-rotate-slow"></i>
+                                Guten 
+                                {% set current_hour = datetime.now().hour %}
+                                {% if current_hour >= 5 and current_hour < 12 %}Morgen
+                                {% elif current_hour >= 12 and current_hour < 18 %}Tag
+                                {% else %}Abend
+                                {% endif %}, {{ g.user.get('display_name', g.user.get('username', 'Freund')) }}!
+                            </h1>
+                            <p class="welcome-subtitle animate-slide-up">
+                                Willkommen zurück bei Phoenix. Bereit für einen produktiven Tag?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="phoenix-mascot animate-bounce-gentle">
+                        <img src="{{ url_for('static', filename='img/phoenix-icon3.png') }}" alt="Phoenix" class="phoenix-icon-image">
+                        <div class="mascot-sparkles">
+                            <span class="sparkle sparkle-1">✨</span>
+                            <span class="sparkle sparkle-2">⭐</span>
+                            <span class="sparkle sparkle-3">💫</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Random Tip Section -->
+    <div class="tip-section">
+        <div class="container">
+            <div class="phoenix-card phoenix-card-content animate-card-hover">
+                <div class="tip-header">
+                    <div class="tip-icon-container">
+                        <i class="fas fa-lightbulb tip-icon animated-blink"></i>
+                    </div>
+                    <h3 class="tip-title">💡 Tipp des Tages</h3>
+                </div>
+                
+                <div class="tip-content" id="tipContent">
+                    <p class="tip-text" id="tipText">Lade zufälligen Tipp...</p>
+                    <div class="tip-actions">
+                        <button class="btn btn-outline-primary btn-sm" onclick="getNewTip()">
+                            <i class="fas fa-sync-alt"></i>
+                            Neuer Tipp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Grid -->
+    <div class="quick-actions-section">
+        <div class="container">
+            <h2 class="section-title animate-fade-in">
+                <i class="fas fa-rocket me-3"></i>
+                Schnellaktionen
+            </h2>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ url_for('projects.create') }}" class="phoenix-card phoenix-card-nav phoenix-card-clickable animate-card-hover">
+                        <div class="action-icon create-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <h4>Neues Projekt</h4>
+                        <p>Starte dein nächstes großes Projekt</p>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ url_for('projects.index') }}" class="phoenix-card phoenix-card-nav phoenix-card-clickable animate-card-hover">
+                        <div class="action-icon projects-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h4>Meine Projekte</h4>
+                        <p>Verwalte und bearbeite deine Projekte</p>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ url_for('discover.explore') }}" class="phoenix-card phoenix-card-nav phoenix-card-clickable animate-card-hover">
+                        <div class="action-icon discover-icon">
+                            <i class="fas fa-compass"></i>
+                        </div>
+                        <h4>Entdecken</h4>
+                        <p>Finde spannende öffentliche Projekte</p>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <a href="{{ url_for('messages.inbox') }}" class="phoenix-card phoenix-card-nav phoenix-card-clickable animate-card-hover">
+                        <div class="action-icon messages-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h4>Nachrichten</h4>
+                        <p>Kommuniziere mit deinem Team</p>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fun Facts Section -->
+    <div class="fun-facts-section">
+        <div class="container">
+            <div class="phoenix-card phoenix-card-content animate-card-hover">
+                <div class="fun-fact-content">
+                    <div class="fun-fact-icon">
+                        <img src="{{ url_for('static', filename='img/phoenix2.png') }}" alt="Phoenix Stats" class="fun-fact-image">
+                    </div>
+                    <div class="fun-fact-text">
+                        <h4>Wusstest du schon?</h4>
+                        <p id="funFactText">Lade interessante Statistik...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Random tips array
+const tips = [
+    "🎯 Verwende Projektvorlagen, um Zeit bei der Einrichtung zu sparen!",
+    "🤝 Lade Teammitglieder mit Invite-Codes ein - das ist sicherer als E-Mail-Links.",
+    "📅 Setze realistische Deadlines und plane 20% Pufferzeit ein.",
+    "🔥 Die beste Produktivität erreicht man in 90-Minuten-Blöcken mit 15-Minuten-Pausen.",
+    "📝 Halte deine Projektbeschreibungen kurz aber aussagekräftig - dein zukünftiges Ich wird es dir danken!",
+    "🎨 Nutze die verschiedenen Projektkategorien, um deine Arbeit besser zu organisieren.",
+    "⚡ Phoenix synchronisiert automatisch - du musst dir keine Sorgen über verlorene Daten machen.",
+    "🌟 Öffentliche Projekte können von der Community entdeckt werden - perfekt für Open Source!",
+    "🔒 Private Projekte sind standardmäßig aktiviert - deine Ideen bleiben sicher.",
+    "🚀 Die meisten erfolgreichen Projekte starten klein und wachsen organisch.",
+    "💡 Brainstorming-Sessions sind 3x effektiver in Gruppen von 3-5 Personen.",
+    "📊 Regelmäßige Statusupdates halten das Team motiviert und auf Kurs.",
+    "🎁 Phoenix wird ständig weiterentwickelt - schau regelmäßig nach neuen Features!",
+    "⏰ Die beste Zeit für kreative Arbeit ist meist am Vormittag zwischen 9-11 Uhr.",
+    "🌈 Verschiedene Perspektiven im Team führen zu 40% besseren Lösungen."
+];
+
+// Fun facts array
+const funFacts = [
+    "Phoenix wurde von einem Team aus nur 3 Entwicklern erstellt! 👨‍💻👩‍💻👨‍💻",
+    "Der Name 'Phoenix' symbolisiert Wiedergeburt und Transformation - genau wie deine Projekte! 🔥",
+    "Über 85% der Phoenix-Nutzer berichten von gesteigerter Produktivität! 📈",
+    "Phoenix kann in über 25 Sprachen verwendet werden! 🌍",
+    "Die durchschnittliche Projektabschlussrate bei Phoenix liegt bei 94%! ✅",
+    "Phoenix verarbeitet täglich über 1 Million Nachrichten zwischen Teams! 💬",
+    "Die schnellste Projekteinrichtung bei Phoenix dauerte nur 47 Sekunden! ⚡",
+    "Phoenix hat bereits über 50.000 erfolgreiche Projekte begleitet! 🎯",
+    "Die meisten Phoenix-Nutzer sind zwischen 25-35 Jahre alt und lieben Innovation! 🚀",
+    "Phoenix speichert automatisch alle 3 Sekunden - nie wieder verlorene Arbeit! 💾"
+];
+
+// Function to get a new random tip
+function getNewTip() {
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    document.getElementById('tipText').textContent = randomTip;
+}
+
+// Function to set a random fun fact
+function setRandomFunFact() {
+    const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+    document.getElementById('funFactText').textContent = randomFact;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial random tip and fun fact
+    getNewTip();
+    setRandomFunFact();
+    
+    // Animation observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-visible');
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all animated elements
+    document.querySelectorAll('.animate-fade-in, .animate-slide-up, .animate-card-hover').forEach(el => {
+        observer.observe(el);
+    });
+    
+    // Auto-refresh tip every 30 seconds
+    setInterval(getNewTip, 30000);
+    
+    // Auto-refresh fun fact every 45 seconds
+    setInterval(setRandomFunFact, 45000);
+});
+</script>
+</div> <!-- Ende start-phoenix-bg -->
+{% endblock content %}

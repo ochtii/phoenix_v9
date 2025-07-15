@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Meine Sup{% block content %}
+<!-- Full width support without base container constraints -->
+</div> <!-- Close any existing container -->
+
+<div class="support-phoenix-bg" style="width: 100vw; margin: 0; padding: 0;">
+    <img src="{{ url_for('static', filename='img/phoenix9.jpg') }}" alt="Phoenix" class="phoenix-accent-support">
+    
+    <div class="container-fluid py-5">Tickets - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .support-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), 
+                        radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%),
+                        url('{{ url_for("static", filename="img/phoenix5.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-tickets {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            opacity: 0.3;
+            z-index: 5;
+            animation: phoenixGlow 3s ease-in-out infinite alternate;
+        }
+        
+        .ticket-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #007bff;
+        }
+        
+        .ticket-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
+        }
+        
+        .ticket-open { border-left-color: #28a745; }
+        .ticket-in-progress { border-left-color: #ffc107; }
+        .ticket-waiting { border-left-color: #17a2b8; }
+        .ticket-closed { border-left-color: #6c757d; }
+        
+        .priority-urgent { background: linear-gradient(45deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05)); }
+        .priority-high { background: linear-gradient(45deg, rgba(253, 126, 20, 0.1), rgba(253, 126, 20, 0.05)); }
+        .priority-medium { background: linear-gradient(45deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05)); }
+        .priority-low { background: linear-gradient(45deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05)); }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-weight: 500;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="support-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix8.png') }}" alt="Phoenix" class="phoenix-accent-tickets">
+    
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="phoenix-card phoenix-card-content mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-headset text-primary me-3"></i>
+                        Meine Support-Tickets
+                    </h1>
+                    <p class="text-muted mb-0">Übersicht über alle Ihre Support-Anfragen</p>
+                </div>
+                <a href="{{ url_for('support.new_ticket') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Neues Ticket
+                </a>
+            </div>
+        </div>
+        
+        <!-- Filter Tabs -->
+        <div class="phoenix-card phoenix-card-subtle mb-4">
+            <ul class="nav nav-pills" id="ticketFilter" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all" 
+                            type="button" role="tab">
+                        <i class="fas fa-list me-2"></i>Alle Tickets
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="open-tab" data-bs-toggle="pill" data-bs-target="#open" 
+                            type="button" role="tab">
+                        <i class="fas fa-clock me-2"></i>Offen
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="progress-tab" data-bs-toggle="pill" data-bs-target="#progress" 
+                            type="button" role="tab">
+                        <i class="fas fa-cog me-2"></i>In Bearbeitung
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="closed-tab" data-bs-toggle="pill" data-bs-target="#closed" 
+                            type="button" role="tab">
+                        <i class="fas fa-check me-2"></i>Geschlossen
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Tickets Content -->
+        <div class="tab-content" id="ticketFilterContent">
+            <!-- All Tickets -->
+            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                {% if tickets %}
+                    <div class="row">
+                        {% for ticket in tickets %}
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="phoenix-card ticket-card ticket-{{ ticket.status }} priority-{{ ticket.priority }}" 
+                                 onclick="window.location.href='{{ url_for('support.view_ticket_new', ticket_id=ticket.id) }}'">
+                                
+                                <!-- Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-bold">
+                                            #{{ ticket.id }}
+                                        </h6>
+                                        <p class="mb-2 text-truncate" title="{{ ticket.subject }}">
+                                            {{ ticket.subject }}
+                                        </p>
+                                    </div>
+                                    
+                                    <span class="status-badge 
+                                        {% if ticket.status == 'open' %}bg-success text-white
+                                        {% elif ticket.status == 'in-progress' %}bg-warning text-dark
+                                        {% elif ticket.status == 'waiting' %}bg-info text-white
+                                        {% else %}bg-secondary text-white{% endif %}">
+                                        {% if ticket.status == 'open' %}Offen
+                                        {% elif ticket.status == 'in-progress' %}In Bearbeitung
+                                        {% elif ticket.status == 'waiting' %}Wartend
+                                        {% else %}Geschlossen{% endif %}
+                                    </span>
+                                </div>
+                                
+                                <!-- Category & Priority -->
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Kategorie</small>
+                                        <span class="fw-medium">
+                                            {% if ticket.category == 'technical' %}🔧 Technisch
+                                            {% elif ticket.category == 'billing' %}💳 Abrechnung
+                                            {% elif ticket.category == 'feature' %}💡 Feature
+                                            {% elif ticket.category == 'bug' %}🐛 Bug
+                                            {% elif ticket.category == 'account' %}👤 Konto
+                                            {% else %}❓ Allgemein{% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Priorität</small>
+                                        <span class="fw-medium">
+                                            {% if ticket.priority == 'low' %}🔵 Niedrig
+                                            {% elif ticket.priority == 'medium' %}🟡 Mittel
+                                            {% elif ticket.priority == 'high' %}🟠 Hoch
+                                            {% else %}🔴 Dringend{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Description Preview -->
+                                <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    {{ ticket.description }}
+                                </p>
+                                
+                                <!-- Footer -->
+                                <div class="d-flex justify-content-between align-items-center text-muted small">
+                                    <span>
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ ticket.created_at.strftime('%d.%m.%Y') if ticket.created_at else 'Unbekannt' }}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-comments me-1"></i>
+                                        {{ ticket.replies|length if ticket.replies else 0 }} Antworten
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="phoenix-card phoenix-card-subtle text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Keine Tickets vorhanden</h5>
+                        <p class="text-muted mb-4">
+                            Sie haben noch keine Support-Tickets erstellt.
+                        </p>
+                        <a href="{{ url_for('support.new_ticket') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Erstes Ticket erstellen
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Other tabs would filter the same tickets -->
+            <div class="tab-pane fade" id="open" role="tabpanel">
+                <!-- Filter would be applied via JavaScript -->
+            </div>
+            <div class="tab-pane fade" id="progress" role="tabpanel">
+                <!-- Filter would be applied via JavaScript -->
+            </div>
+            <div class="tab-pane fade" id="closed" role="tabpanel">
+                <!-- Filter would be applied via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="row mt-5">
+            <div class="col-md-3 mb-3">
+                <div class="phoenix-card phoenix-card-subtle text-center">
+                    <i class="fas fa-clock fa-2x text-success mb-2"></i>
+                    <h4 class="mb-1">{{ tickets|selectattr('status', 'equalto', 'open')|list|length }}</h4>
+                    <small class="text-muted">Offene Tickets</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="phoenix-card phoenix-card-subtle text-center">
+                    <i class="fas fa-cog fa-2x text-warning mb-2"></i>
+                    <h4 class="mb-1">{{ tickets|selectattr('status', 'equalto', 'in-progress')|list|length }}</h4>
+                    <small class="text-muted">In Bearbeitung</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="phoenix-card phoenix-card-subtle text-center">
+                    <i class="fas fa-pause fa-2x text-info mb-2"></i>
+                    <h4 class="mb-1">{{ tickets|selectattr('status', 'equalto', 'waiting')|list|length }}</h4>
+                    <small class="text-muted">Wartend</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="phoenix-card phoenix-card-subtle text-center">
+                    <i class="fas fa-check fa-2x text-secondary mb-2"></i>
+                    <h4 class="mb-1">{{ tickets|selectattr('status', 'equalto', 'closed')|list|length }}</h4>
+                    <small class="text-muted">Geschlossen</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filterTabs = document.querySelectorAll('#ticketFilter button[data-bs-toggle="pill"]');
+    const ticketCards = document.querySelectorAll('.ticket-card');
+    
+    filterTabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            const target = e.target.getAttribute('data-bs-target');
+            const filterType = target.replace('#', '');
+            
+            ticketCards.forEach(card => {
+                const status = card.classList.contains('ticket-open') ? 'open' :
+                              card.classList.contains('ticket-in-progress') ? 'progress' :
+                              card.classList.contains('ticket-waiting') ? 'waiting' :
+                              card.classList.contains('ticket-closed') ? 'closed' : '';
+                
+                if (filterType === 'all' || filterType === status) {
+                    card.closest('.col-lg-6').style.display = 'block';
+                } else {
+                    card.closest('.col-lg-6').style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Make cards clickable
+    ticketCards.forEach(card => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+
+<!-- Reopen container for base template -->
+<div class="container">
+{% endblock %}

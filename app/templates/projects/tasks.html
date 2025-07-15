@@ -1,0 +1,790 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks - {{ project.name }} - Phoenix{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        .tasks-phoenix-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(0,0,0,0.6)), 
+                        url('{{ url_for("static", filename="img/phoenix3.jpg") }}') center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .phoenix-accent-tasks {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            opacity: 0.4;
+            z-index: 5;
+        }
+        
+        .tasks-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .task-hierarchy {
+            margin-bottom: 2rem;
+        }
+        
+        .milestone-item {
+            background: rgba(251, 191, 36, 0.1);
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .milestone-header {
+            background: rgba(251, 191, 36, 0.2);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .milestone-header:hover {
+            background: rgba(251, 191, 36, 0.3);
+        }
+        
+        .milestone-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fbbf24;
+            margin: 0;
+        }
+        
+        .package-item {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid #a855f7;
+            border-radius: 8px;
+            margin: 1rem 0;
+            margin-left: 2rem;
+        }
+        
+        .package-header {
+            background: rgba(168, 85, 247, 0.2);
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .package-header:hover {
+            background: rgba(168, 85, 247, 0.3);
+        }
+        
+        .package-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #a855f7;
+            margin: 0;
+        }
+        
+        .task-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--phoenix-primary);
+        }
+        
+        .task-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .task-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-todo { background: #6c757d; color: white; }
+        .status-in_progress { background: #ffc107; color: #000; }
+        .status-review { background: #17a2b8; color: white; }
+        .status-done { background: #28a745; color: white; }
+        .status-blocked { background: #dc3545; color: white; }
+        
+        .task-priority {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .priority-low { background: #28a745; color: white; }
+        .priority-medium { background: #ffc107; color: #000; }
+        .priority-high { background: #fd7e14; color: white; }
+        .priority-critical { background: #dc3545; color: white; }
+        
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 6px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--phoenix-primary), var(--phoenix-secondary));
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .task-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .floating-add-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--phoenix-primary), var(--phoenix-secondary));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .floating-add-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-content.expanded {
+            max-height: 2000px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .filter-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-bar select,
+        .filter-bar input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem;
+        }
+        
+        .filter-bar select option {
+            background: #2d2d2d;
+            color: white;
+        }
+        
+        .task-comments {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .comment-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            color: var(--phoenix-primary);
+            font-size: 0.875rem;
+        }
+        
+        .comment-time {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .comment-content {
+            margin-top: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="tasks-phoenix-bg">
+    <img src="{{ url_for('static', filename='img/phoenix-icon1.png') }}" alt="Phoenix" class="phoenix-accent-tasks">
+    
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-2" style="color: white;">
+                    <i class="fas fa-tasks me-3 text-warning"></i>{{ project.name }} - Tasks
+                </h1>
+                <p class="text-muted">Manage project tasks in hierarchical structure</p>
+            </div>
+            <div>
+                <a href="{{ url_for('projects.view', project_id=project_id) }}" class="btn btn-outline-light me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Project
+                </a>
+                <button class="btn btn-primary" onclick="showCreateTaskModal('milestone')">
+                    <i class="fas fa-plus me-2"></i>New Milestone
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div>
+                <label class="form-label mb-1" style="color: rgba(255,255,255,0.8); font-size: 0.875rem;">Filter by Status:</label>
+                <select id="statusFilter" class="form-select form-select-sm" onchange="filterTasks()">
+                    <option value="">All Statuses</option>
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="review">Review</option>
+                    <option value="done">Done</option>
+                    <option value="blocked">Blocked</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label mb-1" style="color: rgba(255,255,255,0.8); font-size: 0.875rem;">Filter by Priority:</label>
+                <select id="priorityFilter" class="form-select form-select-sm" onchange="filterTasks()">
+                    <option value="">All Priorities</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label mb-1" style="color: rgba(255,255,255,0.8); font-size: 0.875rem;">Search:</label>
+                <input type="text" id="searchFilter" class="form-control form-control-sm" placeholder="Search tasks..." onkeyup="filterTasks()">
+            </div>
+            <div class="ms-auto">
+                <button class="btn btn-outline-light btn-sm" onclick="clearFilters()">
+                    <i class="fas fa-times me-1"></i>Clear Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Tasks Container -->
+        <div class="tasks-container">
+            <div id="tasks-hierarchy">
+                {% if milestones %}
+                    {% for milestone in milestones %}
+                    <div class="milestone-item" data-type="milestone" data-status="{{ milestone.status }}" data-priority="{{ milestone.priority }}">
+                        <div class="milestone-header" onclick="toggleCollapsible(this)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-flag me-2"></i>
+                                    <h3 class="milestone-title">{{ milestone.title }}</h3>
+                                    <span class="task-status status-{{ milestone.status }} ms-2">{{ milestone.status|replace('_', ' ')|title }}</span>
+                                    <span class="task-priority priority-{{ milestone.priority }} ms-2">{{ milestone.priority|title }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    {% if milestone.due_date %}
+                                        <span class="me-3" style="color: rgba(255,255,255,0.7);">
+                                            <i class="fas fa-calendar me-1"></i>{{ milestone.due_date.strftime('%m/%d/%Y') }}
+                                        </span>
+                                    {% endif %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" onclick="editTask('{{ milestone.task_id }}')">
+                                                <i class="fas fa-edit me-2"></i>Edit
+                                            </a></li>
+                                            <li><a class="dropdown-item" onclick="showCreateTaskModal('package', '{{ milestone.task_id }}')">
+                                                <i class="fas fa-plus me-2"></i>Add Package
+                                            </a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" onclick="deleteTask('{{ milestone.task_id }}')">
+                                                <i class="fas fa-trash me-2"></i>Delete
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                    <i class="fas fa-chevron-down ms-2 collapse-icon"></i>
+                                </div>
+                            </div>
+                            {% if milestone.description %}
+                            <p class="mt-2 mb-0" style="color: rgba(251, 191, 36, 0.8);">{{ milestone.description }}</p>
+                            {% endif %}
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: {{ milestone.progress or 0 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="collapsible-content expanded">
+                            <div class="p-3">
+                                <!-- Packages under this milestone -->
+                                {% for package in packages %}
+                                    {% if package.parent_id == milestone.task_id %}
+                                    <div class="package-item" data-type="package" data-status="{{ package.status }}" data-priority="{{ package.priority }}">
+                                        <div class="package-header" onclick="toggleCollapsible(this)">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-box me-2"></i>
+                                                    <h4 class="package-title">{{ package.title }}</h4>
+                                                    <span class="task-status status-{{ package.status }} ms-2">{{ package.status|replace('_', ' ')|title }}</span>
+                                                    <span class="task-priority priority-{{ package.priority }} ms-2">{{ package.priority|title }}</span>
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    {% if package.due_date %}
+                                                        <span class="me-3" style="color: rgba(255,255,255,0.7);">
+                                                            <i class="fas fa-calendar me-1"></i>{{ package.due_date.strftime('%m/%d/%Y') }}
+                                                        </span>
+                                                    {% endif %}
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a class="dropdown-item" onclick="editTask('{{ package.task_id }}')">
+                                                                <i class="fas fa-edit me-2"></i>Edit
+                                                            </a></li>
+                                                            <li><a class="dropdown-item" onclick="showCreateTaskModal('task', '{{ package.task_id }}')">
+                                                                <i class="fas fa-plus me-2"></i>Add Task
+                                                            </a></li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li><a class="dropdown-item text-danger" onclick="deleteTask('{{ package.task_id }}')">
+                                                                <i class="fas fa-trash me-2"></i>Delete
+                                                            </a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <i class="fas fa-chevron-down ms-2 collapse-icon"></i>
+                                                </div>
+                                            </div>
+                                            {% if package.description %}
+                                            <p class="mt-2 mb-0" style="color: rgba(168, 85, 247, 0.8);">{{ package.description }}</p>
+                                            {% endif %}
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: {{ package.progress or 0 }}%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="collapsible-content expanded">
+                                            <div class="p-2">
+                                                <!-- Tasks under this package -->
+                                                {% for task in tasks %}
+                                                    {% if task.parent_id == package.task_id %}
+                                                    <div class="task-item" data-type="task" data-status="{{ task.status }}" data-priority="{{ task.priority }}">
+                                                        <div class="d-flex justify-content-between align-items-start">
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="task-title">{{ task.title }}</h5>
+                                                                {% if task.description %}
+                                                                <p class="mb-2" style="color: rgba(255,255,255,0.8); font-size: 0.875rem;">{{ task.description }}</p>
+                                                                {% endif %}
+                                                                <div class="task-meta">
+                                                                    <span class="task-status status-{{ task.status }}">{{ task.status|replace('_', ' ')|title }}</span>
+                                                                    <span class="task-priority priority-{{ task.priority }}">{{ task.priority|title }}</span>
+                                                                    {% if task.assigned_to %}
+                                                                        <span><i class="fas fa-user me-1"></i>{{ task.assigned_to|length }} assigned</span>
+                                                                    {% endif %}
+                                                                    {% if task.due_date %}
+                                                                        <span><i class="fas fa-calendar me-1"></i>{{ task.due_date.strftime('%m/%d') }}</span>
+                                                                    {% endif %}
+                                                                    {% if task.estimated_hours %}
+                                                                        <span><i class="fas fa-clock me-1"></i>{{ task.estimated_hours }}h</span>
+                                                                    {% endif %}
+                                                                </div>
+                                                                {% if task.progress > 0 %}
+                                                                <div class="progress-bar-container">
+                                                                    <div class="progress-bar" style="width: {{ task.progress }}%"></div>
+                                                                </div>
+                                                                {% endif %}
+                                                                <div class="task-actions">
+                                                                    <button class="btn btn-outline-primary btn-sm" onclick="editTask('{{ task.task_id }}')">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-outline-info btn-sm" onclick="showTaskComments('{{ task.task_id }}')">
+                                                                        <i class="fas fa-comments"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteTask('{{ task.task_id }}')">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                
+                                                <!-- Add Task Button -->
+                                                <div class="text-center mt-2">
+                                                    <button class="btn btn-outline-light btn-sm" onclick="showCreateTaskModal('task', '{{ package.task_id }}')">
+                                                        <i class="fas fa-plus me-2"></i>Add Task
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                
+                                <!-- Add Package Button -->
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-outline-warning btn-sm" onclick="showCreateTaskModal('package', '{{ milestone.task_id }}')">
+                                        <i class="fas fa-plus me-2"></i>Add Package
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <h3>No Tasks Yet</h3>
+                        <p>Create your first milestone to start organizing your project tasks.</p>
+                        <button class="btn btn-primary" onclick="showCreateTaskModal('milestone')">
+                            <i class="fas fa-flag me-2"></i>Create First Milestone
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Add Button -->
+<button class="floating-add-btn" onclick="showQuickAddMenu()" title="Quick Add">
+    <i class="fas fa-plus"></i>
+</button>
+
+<!-- Task Creation/Edit Modal -->
+<div class="modal fade" id="taskModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: #2d2d2d; color: white;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskModalTitle">Create New Task</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <input type="hidden" id="taskId" name="task_id">
+                    <input type="hidden" id="parentId" name="parent_id">
+                    <input type="hidden" id="taskType" name="task_type" value="task">
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label">Title *</label>
+                                <input type="text" class="form-control" id="taskTitle" name="title" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-select" id="taskPriority" name="priority">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="taskStatus" name="status">
+                                    <option value="todo" selected>To Do</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="review">Review</option>
+                                    <option value="done">Done</option>
+                                    <option value="blocked">Blocked</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Due Date</label>
+                                <input type="date" class="form-control" id="taskDueDate" name="due_date">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Progress (%)</label>
+                                <input type="number" class="form-control" id="taskProgress" name="progress" min="0" max="100" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Estimated Hours</label>
+                                <input type="number" class="form-control" id="taskEstimatedHours" name="estimated_hours" min="0" step="0.5">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Budget (EUR)</label>
+                                <input type="number" class="form-control" id="taskBudget" name="cost_budget" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Assign To</label>
+                        <select class="form-select" id="taskAssignedTo" name="assigned_to" multiple>
+                            {% for member in project_members %}
+                            <option value="{{ member.uid }}">{{ member.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Hold Ctrl/Cmd to select multiple members</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <input type="text" class="form-control" id="taskTags" name="tags" placeholder="Enter tags separated by commas">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveTask()">Save Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Task management JavaScript
+let currentProjectId = '{{ project_id }}';
+
+function showCreateTaskModal(type = 'task', parentId = null) {
+    document.getElementById('taskModalTitle').textContent = `Create New ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    document.getElementById('taskForm').reset();
+    document.getElementById('taskId').value = '';
+    document.getElementById('parentId').value = parentId || '';
+    document.getElementById('taskType').value = type;
+    
+    // Show/hide fields based on task type
+    if (type === 'milestone') {
+        document.getElementById('taskTitle').placeholder = 'Enter milestone name...';
+    } else if (type === 'package') {
+        document.getElementById('taskTitle').placeholder = 'Enter package name...';
+    } else {
+        document.getElementById('taskTitle').placeholder = 'Enter task name...';
+    }
+    
+    new bootstrap.Modal(document.getElementById('taskModal')).show();
+}
+
+function editTask(taskId) {
+    // Load task data and populate form
+    fetch(`/tasks/task/${taskId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const task = data.task;
+                document.getElementById('taskModalTitle').textContent = `Edit ${task.task_type.charAt(0).toUpperCase() + task.task_type.slice(1)}`;
+                document.getElementById('taskId').value = task.task_id;
+                document.getElementById('parentId').value = task.parent_id || '';
+                document.getElementById('taskType').value = task.task_type;
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskDescription').value = task.description || '';
+                document.getElementById('taskStatus').value = task.status;
+                document.getElementById('taskPriority').value = task.priority;
+                document.getElementById('taskProgress').value = task.progress || 0;
+                document.getElementById('taskEstimatedHours').value = task.estimated_hours || '';
+                document.getElementById('taskBudget').value = task.cost_budget || '';
+                document.getElementById('taskTags').value = (task.tags || []).join(', ');
+                
+                if (task.due_date) {
+                    document.getElementById('taskDueDate').value = new Date(task.due_date).toISOString().split('T')[0];
+                }
+                
+                // Set assigned users
+                const assignedSelect = document.getElementById('taskAssignedTo');
+                Array.from(assignedSelect.options).forEach(option => {
+                    option.selected = task.assigned_to && task.assigned_to.includes(option.value);
+                });
+                
+                new bootstrap.Modal(document.getElementById('taskModal')).show();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading task:', error);
+            alert('Error loading task details');
+        });
+}
+
+function saveTask() {
+    const form = document.getElementById('taskForm');
+    const formData = new FormData(form);
+    const taskId = document.getElementById('taskId').value;
+    
+    const url = taskId ? `/tasks/task/${taskId}/update` : `/tasks/project/${currentProjectId}/tasks/create`;
+    
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('taskModal')).hide();
+            location.reload(); // Reload to show updated tasks
+        } else {
+            alert(data.message || 'Error saving task');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving task:', error);
+        alert('Error saving task');
+    });
+}
+
+function deleteTask(taskId) {
+    if (confirm('Are you sure you want to delete this task and all its subtasks?')) {
+        fetch(`/tasks/task/${taskId}/delete`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Error deleting task');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting task:', error);
+            alert('Error deleting task');
+        });
+    }
+}
+
+function toggleCollapsible(element) {
+    const content = element.nextElementSibling;
+    const icon = element.querySelector('.collapse-icon');
+    
+    if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-right');
+    } else {
+        content.classList.add('expanded');
+        icon.classList.remove('fa-chevron-right');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
+function filterTasks() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const priorityFilter = document.getElementById('priorityFilter').value;
+    const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+    
+    const taskItems = document.querySelectorAll('[data-type]');
+    
+    taskItems.forEach(item => {
+        let show = true;
+        
+        if (statusFilter && item.dataset.status !== statusFilter) {
+            show = false;
+        }
+        
+        if (priorityFilter && item.dataset.priority !== priorityFilter) {
+            show = false;
+        }
+        
+        if (searchFilter) {
+            const title = item.querySelector('.milestone-title, .package-title, .task-title');
+            if (title && !title.textContent.toLowerCase().includes(searchFilter)) {
+                show = false;
+            }
+        }
+        
+        item.style.display = show ? 'block' : 'none';
+    });
+}
+
+function clearFilters() {
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('priorityFilter').value = '';
+    document.getElementById('searchFilter').value = '';
+    filterTasks();
+}
+
+function showQuickAddMenu() {
+    // Simple implementation - could be expanded to a dropdown menu
+    showCreateTaskModal('task');
+}
+
+function showTaskComments(taskId) {
+    // Load and display task comments
+    // This would open a modal or sidebar with comments
+    alert('Task comments feature would be implemented here');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Any initialization code here
+});
+</script>
+{% endblock %}

@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }} - Profil{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <!-- Profil-Informationen -->
+        <div class="col-md-4">
+            <div class="card phoenix-card h-100">
+                <div class="card-body text-center">
+                    <!-- Profilbild -->
+                    <div class="mb-3">
+                        {% if profile_user.profile_data and profile_user.profile_data.avatar_url %}
+                            <img src="{{ profile_user.profile_data.avatar_url }}" 
+                                 alt="{{ profile_user.username }}" 
+                                 class="rounded-circle img-fluid"
+                                 style="width: 120px; height: 120px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-secondary text-white"
+                                 style="width: 120px; height: 120px; font-size: 48px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Benutzername und Status -->
+                    <h3 class="card-title mb-2">{{ profile_user.username }}</h3>
+                    {% if profile_user.profile_data and profile_user.profile_data.display_name %}
+                        <p class="text-muted mb-2">{{ profile_user.profile_data.display_name }}</p>
+                    {% endif %}
+                    
+                    <!-- Status Badge -->
+                    <span class="badge bg-success mb-3">
+                        <i class="fas fa-circle me-1"></i>Online
+                    </span>
+                    
+                    <!-- Bio -->
+                    {% if profile_user.profile_data and profile_user.profile_data.bio %}
+                        <p class="text-muted">{{ profile_user.profile_data.bio }}</p>
+                    {% else %}
+                        <p class="text-muted fst-italic">Keine Beschreibung verfügbar</p>
+                    {% endif %}
+                    
+                    <!-- Bearbeiten Button (nur für eigenes Profil) -->
+                    {% if current_user and current_user.uid == profile_user.uid %}
+                        <a href="{{ url_for('user.edit_profile') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Profil bearbeiten
+                        </a>
+                    {% elif current_user %}
+                        <!-- Freund hinzufügen/entfernen Button -->
+                        {% set is_friend = profile_user.uid in current_user.get('friends', []) %}
+                        {% if is_friend %}
+                            <form method="POST" action="{{ url_for('user.remove_friend', username=profile_user.username) }}" 
+                                  class="d-inline" onsubmit="return confirm('Möchten Sie {{ profile_user.username }} aus Ihrer Freundesliste entfernen?')">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-user-minus me-1"></i>Freund entfernen
+                                </button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('user.add_friend', username=profile_user.username) }}" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fas fa-user-plus me-1"></i>Freund hinzufügen
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profil-Details -->
+        <div class="col-md-8">
+            <div class="card phoenix-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Profil-Informationen
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Grundinformationen -->
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Grundinformationen</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Benutzername:</label>
+                                <p class="mb-0">{{ profile_user.username }}</p>
+                            </div>
+                            
+                            {% if profile_user.profile_data and profile_user.profile_data.display_name %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Anzeigename:</label>
+                                <p class="mb-0">{{ profile_user.profile_data.display_name }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mitglied seit:</label>
+                                <p class="mb-0">
+                                    {% if profile_user.created_at %}
+                                        {{ profile_user.created_at.strftime('%d.%m.%Y') }}
+                                    {% else %}
+                                        Unbekannt
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Rolle:</label>
+                                <span class="badge bg-primary">{{ profile_user.role or 'Benutzer' }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Kontaktinformationen -->
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Kontakt</h6>
+                            
+                            {% if current_user and current_user.uid == profile_user.uid %}
+                                <!-- Nur für eigenes Profil sichtbar -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">E-Mail:</label>
+                                    <p class="mb-0">{{ profile_user.email }}</p>
+                                </div>
+                            {% endif %}
+                            
+                            {% if profile_user.profile_data and profile_user.profile_data.website %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Website:</label>
+                                <p class="mb-0">
+                                    <a href="{{ profile_user.profile_data.website }}" target="_blank" class="text-decoration-none">
+                                        {{ profile_user.profile_data.website }}
+                                        <i class="fas fa-external-link-alt ms-1"></i>
+                                    </a>
+                                </p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if profile_user.profile_data and profile_user.profile_data.location %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Standort:</label>
+                                <p class="mb-0">
+                                    <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+                                    {{ profile_user.profile_data.location }}
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Aktivität / Statistiken -->
+            <div class="card phoenix-card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Aktivität
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="stat-box">
+                                <h4 class="text-primary mb-1">{{ project_count or 0 }}</h4>
+                                <p class="text-muted mb-0">Projekte</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="stat-box">
+                                <h4 class="text-success mb-1">0</h4>
+                                <p class="text-muted mb-0">Beiträge</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="stat-box">
+                                <h4 class="text-warning mb-1">0</h4>
+                                <p class="text-muted mb-0">Auszeichnungen</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stat-box {
+    padding: 20px;
+    border-radius: 8px;
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
+                            <span class="profile-role">
+                                {% if user.role == 'admin' %}
+                                    <i class="fas fa-crown"></i> Administrator
+                                {% elif user.role == 'moderator' %}
+                                    <i class="fas fa-shield-alt"></i> Moderator
+                                {% else %}
+                                    <i class="fas fa-user"></i> Benutzer
+                                {% endif %}
+                            </span>
+                            
+                            {% if current_user.id == user.id %}
+                                <div class="mt-3">
+                                    <a href="{{ url_for('user.edit_profile') }}" class="edit-profile-btn">
+                                        <i class="fas fa-edit"></i>
+                                        Profil bearbeiten
+                                    </a>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <span class="profile-stat-number">{{ projects|length }}</span>
+                                    <span class="profile-stat-label">Projekte</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <span class="profile-stat-number">{{ user.created_at.strftime('%Y') }}</span>
+                                    <span class="profile-stat-label">Mitglied seit</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <span class="profile-stat-number">
+                                        {% if user.last_login %}
+                                            {{ user.last_login.strftime('%d.%m') }}
+                                        {% else %}
+                                            Nie
+                                        {% endif %}
+                                    </span>
+                                    <span class="profile-stat-label">Letzter Login</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="profile-content">
+                <!-- Main Content -->
+                <div class="profile-main">
+                    <!-- Personal Information -->
+                    <div class="phoenix-card phoenix-card-content mb-4">
+                        <h3 class="profile-section-title">
+                            <i class="fas fa-user me-2"></i>
+                            Persönliche Informationen
+                        </h3>
+                        
+                        <div class="profile-info-grid">
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Vollständiger Name</span>
+                                <span class="profile-info-value">{{ user.first_name }} {{ user.last_name }}</span>
+                            </div>
+                            
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">E-Mail-Adresse</span>
+                                <span class="profile-info-value">{{ user.email }}</span>
+                            </div>
+                            
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Benutzername</span>
+                                <span class="profile-info-value">@{{ user.username }}</span>
+                            </div>
+                            
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Rolle</span>
+                                <span class="profile-info-value">
+                                    {% if user.role == 'admin' %}
+                                        Administrator
+                                    {% elif user.role == 'moderator' %}
+                                        Moderator
+                                    {% else %}
+                                        Benutzer
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Registriert</span>
+                                <span class="profile-info-value">{{ user.created_at.strftime('%d.%m.%Y um %H:%M') }}</span>
+                            </div>
+                            
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Letzter Login</span>
+                                <span class="profile-info-value">
+                                    {% if user.last_login %}
+                                        {{ user.last_login.strftime('%d.%m.%Y um %H:%M') }}
+                                    {% else %}
+                                        Noch nie angemeldet
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bio Section -->
+                    {% if user.bio or current_user.id == user.id %}
+                    <div class="phoenix-card phoenix-card-content mb-4">
+                        <h3 class="profile-section-title">
+                            <i class="fas fa-quote-left me-2"></i>
+                            Über mich
+                        </h3>
+                        
+                        <div class="profile-bio">
+                            {{ user.bio or 'Noch keine Beschreibung hinzugefügt.' }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recent Activity -->
+                    <div class="phoenix-card phoenix-card-content">
+                        <h3 class="profile-section-title">
+                            <i class="fas fa-clock me-2"></i>
+                            Kürzliche Aktivitäten
+                        </h3>
+                        
+                        {% if recent_activities %}
+                            {% for activity in recent_activities %}
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    {% if activity.type == 'project_created' %}
+                                        <i class="fas fa-plus"></i>
+                                    {% elif activity.type == 'project_updated' %}
+                                        <i class="fas fa-edit"></i>
+                                    {% elif activity.type == 'message_sent' %}
+                                        <i class="fas fa-comment"></i>
+                                    {% elif activity.type == 'ticket_created' %}
+                                        <i class="fas fa-ticket-alt"></i>
+                                    {% else %}
+                                        <i class="fas fa-circle"></i>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="activity-content">
+                                    <div class="activity-title">{{ activity.title }}</div>
+                                    <div class="activity-description">{{ activity.description }}</div>
+                                    <div class="activity-time">{{ activity.created_at.strftime('%d.%m.%Y um %H:%M') }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-clock"></i>
+                                <h4>Keine Aktivitäten</h4>
+                                <p>Es sind noch keine Aktivitäten vorhanden.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="profile-sidebar">
+                    <!-- Projects -->
+                    <div class="phoenix-card phoenix-card-subtle mb-4">
+                        <h4 class="profile-section-title">
+                            <i class="fas fa-project-diagram me-2"></i>
+                            Projekte
+                        </h4>
+                        
+                        {% if projects %}
+                            {% for project in projects %}
+                            <a href="{{ url_for('projects.view_project', project_id=project.id) }}" class="project-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="project-icon me-3">
+                                        <i class="fas fa-folder text-primary"></i>
+                                    </div>
+                                    
+                                    <div class="project-info flex-grow-1">
+                                        <div class="project-name fw-medium">{{ project.name }}</div>
+                                        <div class="project-description text-muted small">{{ project.description[:50] }}{% if project.description|length > 50 %}...{% endif %}</div>
+                                    </div>
+                                    
+                                    <span class="project-status badge bg-primary">
+                                        {{ project.status|title }}
+                                    </span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                            
+                            {% if projects|length > 3 %}
+                            <div class="text-center mt-3">
+                                <a href="{{ url_for('projects.user_projects', user_id=user.id) }}" class="btn btn-phoenix btn-sm">
+                                    <i class="fas fa-folder-open me-2"></i>
+                                    Alle Projekte anzeigen
+                                </a>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h4>Keine Projekte</h4>
+                                <p>{{ user.first_name }} hat noch keine Projekte erstellt.</p>
+                                {% if current_user.id == user.id %}
+                                    <a href="{{ url_for('projects.create_project') }}" class="btn btn-phoenix btn-sm">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Erstes Projekt erstellen
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contact Info (only for own profile or admins) -->
+                    {% if current_user.id == user.id or current_user.role == 'admin' %}
+                    <div class="profile-activity">
+                        <h4 class="profile-section-title">
+                            <i class="fas fa-cog"></i>
+                            Account-Einstellungen
+                        </h4>
+                        
+                        <div class="phoenix-card phoenix-card-subtle">
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('user.edit_profile') }}" class="btn btn-phoenix">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Profil bearbeiten
+                                </a>
+                                
+                                <a href="{{ url_for('user.account_settings') }}" class="btn btn-phoenix">
+                                    <i class="fas fa-cog me-2"></i>
+                                    Kontoeinstellungen
+                                </a>
+                                
+                                <a href="{{ url_for('user.privacy_settings') }}" class="btn btn-phoenix">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    Datenschutz
+                                </a>
+                                
+                                {% if current_user.role == 'admin' %}
+                                <a href="{{ url_for('admin.user_management') }}" class="btn btn-phoenix btn-phoenix-admin">
+                                    <i class="fas fa-users-cog me-2"></i>
+                                    Benutzerverwaltung
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/user/profile.js') }}"></script>
+{% endblock %}

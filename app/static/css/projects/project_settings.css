@@ -1,0 +1,269 @@
+/* Project Settings Specific Styles - Phoenix Theme Integration */
+
+.card {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(20px);
+    box-shadow: var(--phoenix-shadow-lg);
+}
+
+.card:hover {
+    border-color: var(--phoenix-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+}
+
+.card-header {
+    background: var(--theme-bg-tertiary);
+    border-bottom: 1px solid var(--theme-border);
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.card-header h5 {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.project-settings-card-body {
+    padding: 1.25rem;
+}
+
+/* Invite Code Items */
+.invite-code-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.invite-code-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-hover);
+}
+
+.invite-code-item:last-child {
+    margin-bottom: 0;
+}
+
+.code-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.invite-code {
+    background: var(--bg-primary);
+    color: var(--accent-primary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border: 1px solid var(--accent-primary);
+}
+
+.copy-btn {
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+/* Team Members */
+.team-member-item {
+    background: var(--bg-secondary);
+    padding: 0.75rem;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.team-member-item:hover {
+    background: var(--bg-tertiary);
+}
+
+/* Quick Actions */
+.btn-outline-light {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.btn-outline-light:hover {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+.btn-outline-danger {
+    border-color: var(--error-color);
+    color: var(--error-color);
+}
+
+.btn-outline-danger:hover {
+    background: var(--error-color);
+    border-color: var(--error-color);
+    color: white;
+}
+
+/* Project Information Grid */
+.card-body p {
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.card-body p strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* No codes message */
+#no-codes-message {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+#no-codes-message i {
+    color: var(--text-muted);
+}
+
+/* Loading animations */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Alert positioning */
+.alert {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: none;
+}
+
+.alert-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.alert-danger {
+    background: var(--error-color);
+    color: white;
+}
+
+.alert-info {
+    background: var(--accent-primary);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .invite-code-item .row {
+        text-align: center;
+    }
+    
+    .invite-code-item .col-md-3,
+    .invite-code-item .col-md-6,
+    .invite-code-item .col-md-3.text-end {
+        margin-bottom: 0.5rem;
+    }
+    
+    .code-display {
+        justify-content: center;
+    }
+    
+    .text-end {
+        text-align: center !important;
+    }
+}
+
+/* Back button */
+.btn-outline-light.me-3 {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-outline-light.me-3:hover {
+    background: var(--accent-primary);
+    transform: scale(1.05);
+}
+
+/* Settings header */
+.d-flex.align-items-center.mb-4 h2 {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* Divider lines */
+hr {
+    border-color: var(--border-color);
+    opacity: 0.5;
+}
+
+/* Modal customization */
+.modal-content.bg-dark {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color);
+}
+
+.modal-body p {
+    color: var(--text-primary);
+}
+
+/* Icon colors */
+.fas {
+    color: var(--accent-primary);
+}
+
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Button improvements */
+.btn-primary {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary);
+}
+
+.btn-primary:hover {
+    background: var(--accent-secondary);
+    border-color: var(--accent-secondary);
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Card hover effects */
+.card {
+    backdrop-filter: blur(10px);
+}
+
+.card-header {
+    backdrop-filter: blur(10px);
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.2s ease;
+}

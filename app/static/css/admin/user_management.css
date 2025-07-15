@@ -1,0 +1,282 @@
+/* Admin User Management - Dark Mode Only */
+
+body,
+html {
+    background-color: #1a1a1a !important;
+    color: #f8f9fa !important;
+}
+
+.card {
+    background-color: #2d2d2d !important;
+    border: 1px solid #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.card-header {
+    background-color: #343a40 !important;
+    border-bottom: 1px solid #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.user-management-card-body {
+    background-color: #2d2d2d !important;
+    color: #f8f9fa !important;
+}
+
+.card.bg-primary h3,
+.card.bg-success h3,
+.card.bg-warning h3,
+.card.bg-info h3 {
+    color: #ffffff !important;
+}
+
+.mb-0 {
+    color: #f8f9fa !important;
+}
+
+.card h3.mb-0 {
+    color: #f8f9fa !important;
+    font-weight: 700;
+}
+
+.table {
+    color: #f8f9fa !important;
+    background-color: #2d2d2d !important;
+}
+
+.table th {
+    background-color: #343a40 !important;
+    border-color: #404040 !important;
+    color: #f8f9fa !important;
+    padding: 0.5rem !important;
+    font-size: 0.9rem;
+}
+
+.table td {
+    border-color: #404040 !important;
+    color: #f8f9fa !important;
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-muted {
+    color: #adb5bd !important;
+}
+
+.form-control {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: var(--bs-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.form-select {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.form-select:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: var(--bs-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.form-label {
+    color: #f8f9fa !important;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000000 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-info {
+    background-color: #0dcaf0 !important;
+    color: #000000 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+.modal-content {
+    background-color: #2d2d2d !important;
+    border: 1px solid #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.modal-header {
+    background-color: #343a40 !important;
+    border-bottom: 1px solid #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.modal-body {
+    background-color: #2d2d2d !important;
+    color: #f8f9fa !important;
+}
+
+.modal-footer {
+    background-color: #343a40 !important;
+    border-top: 1px solid #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+    border-color: rgba(220, 53, 69, 0.2) !important;
+    color: #f5c6cb !important;
+}
+
+.alert-success {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+    border-color: rgba(25, 135, 84, 0.2) !important;
+    color: #d1e7dd !important;
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+    border-color: rgba(255, 193, 7, 0.2) !important;
+    color: #ffeaa7 !important;
+}
+
+.alert-info {
+    background-color: rgba(13, 202, 240, 0.1) !important;
+    border-color: rgba(13, 202, 240, 0.2) !important;
+    color: #b6effb !important;
+}
+
+/* Dark Dropdown Styling */
+.form-select {
+    background-color: #2d2d2d !important;
+    border-color: #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.form-select:focus {
+    background-color: #2d2d2d !important;
+    border-color: var(--phoenix-primary) !important;
+    color: #f8f9fa !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.form-select option {
+    background-color: #2d2d2d !important;
+    color: #f8f9fa !important;
+}
+
+/* Form Controls Dark Mode */
+.form-control {
+    background-color: #2d2d2d !important;
+    border-color: #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.form-control:focus {
+    background-color: #2d2d2d !important;
+    border-color: var(--phoenix-primary) !important;
+    color: #f8f9fa !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: #adb5bd !important;
+}
+
+/* Input Group Styling */
+.input-group .form-control {
+    background-color: #2d2d2d !important;
+    border-color: #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.input-group .btn {
+    background-color: #343a40 !important;
+    border-color: #404040 !important;
+    color: #f8f9fa !important;
+}
+
+.input-group .btn:hover {
+    background-color: #495057 !important;
+    border-color: #6c757d !important;
+}
+
+/* Form Labels */
+.form-label {
+    color: #f8f9fa !important;
+    font-weight: 600;
+}
+
+/* Form Text */
+.form-text {
+    color: #adb5bd !important;
+}
+
+/* Form Check */
+.form-check-input {
+    background-color: #2d2d2d !important;
+    border-color: #404040 !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--phoenix-primary) !important;
+    border-color: var(--phoenix-primary) !important;
+}
+
+.form-check-label {
+    color: #f8f9fa !important;
+}
+
+/* Modal Dark Styling */
+.modal-content {
+    background-color: #2d2d2d !important;
+    border: 1px solid #404040 !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid #404040 !important;
+}
+
+.modal-footer {
+    border-top: 1px solid #404040 !important;
+}
+
+.modal-title {
+    color: #f8f9fa !important;
+}
